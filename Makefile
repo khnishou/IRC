@@ -8,7 +8,7 @@ SRCS = $(wildcard $(SRCDIR)/*.cpp)
 
 OBJS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-NAME = myprogram
+NAME = ircserv
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
