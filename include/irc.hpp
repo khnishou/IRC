@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "Client.hpp"
+#include "Channel.hpp"
+#include "Server.hpp"
 
 #define RED "\033[1;31m"
 #define GREEN "\033[0;32m"
