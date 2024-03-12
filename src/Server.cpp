@@ -1,6 +1,5 @@
 
 #include "../include/Server.hpp"
-#include <cstddef>
 
 /******************************************************************************/
 /*                          Constructor & Destructor                          */
