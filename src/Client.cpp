@@ -53,7 +53,7 @@ void Client::setConnectedServer(const std::string &newConnectedServer) {
 //****************************************************************************//
 
 const char *Client::InvalidNickname::what() const throw() {
-  return "Invalid Nickname.";
+  return "Invalid nickname.";
 }
 
 //****************************************************************************//

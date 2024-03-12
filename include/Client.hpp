@@ -5,10 +5,11 @@
 
 class Client {
 private:
-  std::string _nickname;
-  std::string _hostRealName;
-  std::string _hostUsername;
-  std::string _connectedServer;
+  std::string   _nickname;
+  std::string   _hostRealName;
+  std::string   _hostUsername;
+  std::string   _connectedServer;
+  // int           _adminLevel;
 
   bool isValidNickname(const std::string &nickname) const;
 
