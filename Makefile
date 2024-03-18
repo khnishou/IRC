@@ -1,32 +1,22 @@
-CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+SRC = src/PmergeMe.cpp src/main.cpp
+OBJ = $(SRC:.cpp=.o)
+CC = g++
+RM = rm -rf
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 
-SRCDIR = src
-OBJDIR = obj
-
-SRCS = $(wildcard $(SRCDIR)/*.cpp)
-
-OBJS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
-
-NAME = ircserv
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
-.PHONY: all clean fclean re
+NAME = IRC
 
 all: $(NAME)
 
+$(NAME): $(OBJ)
+	$(CC) $(CPPFLAGS) $(OBJ) -o $(NAME)
+
 clean:
-	rm -rf $(OBJDIR)
+	$(RM) $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	$(RM) $(NAME)
 
-re: fclean all
+re: fclean $(NAME)
+
+.PHONY: all clean fclean re

@@ -1,65 +1,111 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
+/*   Updated: 2024/03/18 15:37:20 by smallem          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../include/Channel.hpp"
-#include <cstddef>
 
-/******************************************************************************/
-/*                          Constructor & Destructor                          */
-/******************************************************************************/
-
-Channel::Channel(const std::string &channelName) {
-  if (!isValidChannelName(channelName)) {
-    throw InvalidChannelName();
-  }
-  this->_channelName = channelName;
-}
-Channel &Channel::operator=(Channel const &other) {
-  _channelName = other.getChannelName();
-  return *this;
-}
-Channel::Channel(Channel const &other) { *this = other; }
-Channel::~Channel() {}
-
-//****************************************************************************//
-//                              Accessor Methods                              //
-//****************************************************************************//
-
-std::string Channel::getChannelName() const { return _channelName; }
-
-void Channel::setChannelName(const std::string &newChannelName) {
-  _channelName = newChannelName;
+Channel::Channel(std::string name, std::string topic, std::string modes,
+	std::string password, Users *owner, std::vector<Users *> userList,
+	std::vector<Users *> operatorList) : name(name), topic(topic), modes(modes),
+	password(password), owner(owner), userList(userList), operatorList(operatorList)
+{
+	
 }
 
-//****************************************************************************//
-//                           Error Message Function                           //
-//****************************************************************************//
-
-const char *Channel::InvalidChannelName::what() const throw() {
-  return "Invalid channel name.";
+Channel::~Channel() {
+	
 }
 
-//****************************************************************************//
-//                               Other Function                               //
-//****************************************************************************//
+Channel::Channel(const Channel &cp) {
+	this->name = cp.getName();
+	this->topic = cp.getTopic();
+	this->modes = cp.getModes();
+	this->password = cp.getPassword();
+	this->owner = cp.getOwner();
+	this->userList = cp.getUserList();
+	this->operatorList = cp.getOperatorList();
+}
 
-// Channel names are strings with specific prefix characters and restrictions:
+Channel &Channel::operator=(const Channel &cp) {
+	if (this != &cp) {
+		this->name = cp.getName();
+		this->topic = cp.getTopic();
+		this->modes = cp.getModes();
+		this->password = cp.getPassword();
+		this->owner = cp.getOwner();
+		this->userList = cp.getUserList();
+		this->operatorList = cp.getOperatorList();
+	}
+	return *this;
+}
 
-// > They MUST start with one of the following characters
-//   indicating the channel type:
-//		hash ('#', 0x23) for standard channels known to all servers,
-// 		ampersand ('&', 0x26) for server-specific or local channels.
-// > They MUST NOT contain any of the following characters:
-//		space (' ', 0x20), control G/BELL ('^G', 0x07), comma (',',
-//0x2C) which 		is used as a list item separator by the protocol.
+std::string Channel::getName() const {
+	return this->name;	
+}
 
-bool Channel::isValidChannelName(const std::string &channelName) const {
-  if (channelName.empty())
-    return false;
-  if (channelName[0] != '#' && channelName[0] != '&')
-    return false;
-  const std::string forbiddenChars = " ,\x07";
-  for (size_t i = 0; i < channelName.length(); ++i) {
-    if (forbiddenChars.find(channelName[i]) != std::string::npos)
-      return false;
-  }
-  return true;
+std::string Channel::getTopic() const {
+	return this->topic;
+}
+
+std::string Channel::getModes() const {
+	return this->modes;
+}
+
+std::string Channel::getPassword() const {
+	return this->password;
+}
+
+Users		*Channel::getOwner() const {
+	return this->owner;
+}
+
+std::vector<Users *> Channel::getUserList() const {
+	return this->userList;
+}
+
+std::vector<Users *> Channel::getOperatorList() const {
+	return this->operatorList;	
+}
+
+void Channel::joinChannel(Users *user) {
+	bool	flag = false;
+
+	for (std::vector<Users *>::iterator it = this->userList.begin();
+		it != this->userList.end(); ++it) {
+		if (*it && (*it)->getNickName() == user->getNickName()) {
+			flag = true;
+			break ;
+		}		
+	}
+	if (flag) {
+		this->userList.push_back(user);
+	}
+	else
+		std::cout << "User already in the channel!" << std::endl;
+}
+
+void Channel::leaveChannel(Users *user) {
+	bool	flag = false;
+
+	for (std::vector<Users *>::iterator it = this->userList.begin();
+		it != this->userList.end(); ++it) {
+		if (*it && (*it)->getNickName() == user->getNickName()) {
+			this->userList.erase(it);
+			std::cout << "User removed from channel!" << std::endl;
+			return ;
+		}
+	}
+	std::cout << "User is not in channel!" << std::endl;
+}
+
+void Channel::setMode(std::string mode) {
+	this->modes = mode;	
 }
