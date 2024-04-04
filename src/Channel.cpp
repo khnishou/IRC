@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/03/19 12:32:15 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 17:03:20 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Channel::Channel(std::string name, std::string topic, std::string modes,
 {
 	
 }
+
 
 Channel::~Channel() {
 	

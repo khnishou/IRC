@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 16:33:20 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 18:29:03 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <sys/select.h>
+#include <poll.h>
 #include "Users.hpp"
 #include "Channel.hpp"
 
@@ -36,6 +36,7 @@ class Server {
 		std::string	password;
 		std::map<std::string, Users *> all_users;
 		std::vector<Channel *> all_channels;
+		std::vector<struct pollfd> fds;
 		Server();
 		
 	public:
@@ -48,9 +49,11 @@ class Server {
 		void stop();
 		
 		// create user delete user
+		int addNewClient();
 		Users *createUser(int socketDescriptor);
 		void deleteUser(std::string uname);
 		Users *getUserByUn(const std::string uname);
+		Users *getUserByFd(int fd);
 		// create channel delete channel
 		void createChannel(Channel *channel);
 		void deleteChannel(Channel *channel);

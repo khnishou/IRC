@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 16:57:25 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 18:38:02 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,10 @@ Server::Server(int port, std::string password) {
 		exit(EXIT_FAILURE); 		
 	}
 
+	// if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
+	// 	std::cerr << "Error: Failed to set socket to non-blocking mode." << std::endl;
+	// 	exit(EXIT_FAILURE);
+	// }
 	// Now binding the socket to the address and port
 	struct sockaddr_in serverAddress;
 	std::memset(&serverAddress, 0, sizeof(serverAddress));
@@ -50,7 +54,6 @@ Server::Server(int port, std::string password) {
 		std::cerr << "Error: failed to start listening for incoming connections." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	this->start();
 }
 
 Server::Server(const Server &cp) {
@@ -82,8 +85,11 @@ Users* Server::createUser(int socketDescriptor) {
     // You can use socketDescriptor to retrieve client details if needed
 	char buffer[1024];
 	ssize_t bytesReceived;
+	
+	
 	std::string msg = "Welcome to this IRC Server.\nPlease input the password.\n";
 	send(socketDescriptor, msg.c_str(), msg.size(), 0);
+	
 	bytesReceived = recv(socketDescriptor, buffer, sizeof(buffer), 0);
 	if (bytesReceived <= 0)
 		return NULL;
@@ -91,8 +97,12 @@ Users* Server::createUser(int socketDescriptor) {
 	if (passwd != this->getPassword())		
 		return NULL;
 
+
+
 	msg = "Input your Username.\n";
 	send(socketDescriptor, msg.c_str(), msg.size(), 0);
+
+
 	bytesReceived = recv(socketDescriptor, buffer, sizeof(buffer), 0);
 	if (bytesReceived <= 0)
 		return NULL;
@@ -102,95 +112,109 @@ Users* Server::createUser(int socketDescriptor) {
 		return this->getUserByUn(userName);
 	}
 
+
 	msg = "Please choose a nickname, this will be your broadcast ID.\n";
 	send(socketDescriptor, msg.c_str(), msg.size(), 0);
+
+
 	bytesReceived = recv(socketDescriptor, buffer, sizeof(buffer), 0);
 	if (bytesReceived <= 0)
 		return NULL;
-
 	std::string nickName(buffer, bytesReceived - 1);
     std::string defaultModes = "normal";
     int defaultPermissionLevel = 0; // Default permission level
     // Create a new Users object with default values
+
 
     Users *newUser = new Users(nickName, userName, defaultModes, defaultPermissionLevel, socketDescriptor);
 	std::cout << "Created @" << newUser->getUserName() << std::endl;
     return newUser;
 }
 
+int Server::addNewClient() {
+	struct sockaddr_in clientAddress;
+	socklen_t clientAddrSize = sizeof(clientAddress);
+	int clientSocket = accept(this->serverSocket, (struct sockaddr *)&clientAddress, &clientAddrSize);
+	if (clientSocket == -1) {
+		std::cerr << "Error: Failed to accept incoming connection." << std::endl;
+		return -1;
+	}
+
+	// possibly might have to set this socket as well ot non blocking before adding
+
+	
+	// Add the new client socket to the vector
+    pollfd new_client_fd;
+    new_client_fd.fd = clientSocket;
+    new_client_fd.events = POLLIN;
+    fds.push_back(new_client_fd);
+
+	Users *user = createUser(clientSocket);
+	if (!user) {
+		std::cerr << "Error: failed to create user for the connected client." << std::endl;
+		close(clientSocket);
+		return -1;
+	}
+
+	if (user->getSocketDescriptor() != clientSocket || !user->getStatus()) {
+		user->setSocketDescriptor(clientSocket);
+		user->setStatus(1);
+	}
+	else
+		this->all_users.insert(std::pair<std::string, Users *>(user->getUserName(), user));
+	return 0;
+}
+
 void Server::start() {
-	fd_set readfds;
-	int max_sd = this->serverSocket;
 	int activity;
-    char buffer[1024];
+	char	buffer[1024];
 	ssize_t bytesReceived;
 	Users	*user;
+	
+	// First adding the server socket to the fd list
+	struct pollfd server_fd;
+    server_fd.fd = this->serverSocket;
+    server_fd.events = POLLIN;
+    fds.push_back(server_fd);
 
-	FD_ZERO(&readfds);
 	while (true) {
-		FD_SET(this->serverSocket, &readfds);
-		for (std::map<std::string, Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
-			if (!it->second->getStatus())
-				continue ;
-			int cs = it->second->getSocketDescriptor();
-			FD_SET(cs, &readfds);
-			if (cs > max_sd)
-				max_sd = cs;
+		// We listen for incoming connections or incoming anything really
+		activity = poll(&(this->fds[0]), this->fds.size(), -1);	
+		if (activity < 0) {
+			std::cout << "Error: Poll error: " << errno << std::endl;
+			continue ;
 		}
-		activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
-
-		if (activity < 0 && errno != EINTR) {
-			std::cerr << "Some type of error: " << errno << std::endl;
-			continue;
+		
+		// Check for events occuring on server socket aka new clients connecting
+		if (this->fds[0].revents & POLLIN) {
+			if (addNewClient() == -1)
+				continue ;
 		}
 
-		if (FD_ISSET(this->serverSocket, &readfds)) {
-			struct sockaddr_in clientAddress;
-			socklen_t clientAddrSize = sizeof(clientAddress);
-			int cs = accept(this->serverSocket, (struct sockaddr *)&clientAddress, &clientAddrSize);
-			if (cs == -1) {
-				std::cerr << "Error: Failed to accept incoming connection." << std::endl;
-				continue;
-			}
-			
-			user = this->createUser(cs);
-			if (!user) {
-				std::cerr << "Error: failed to create user for the connected client." << std::endl;
-				close(cs);
-				continue ;
-			}
-			if (user->getSocketDescriptor() != cs || !user->getStatus()) {
-				user->setSocketDescriptor(cs);
-				user->setStatus(1);
-			}
-			else
-				this->all_users.insert(std::pair<std::string, Users *>(user->getUserName(), user));
-			FD_SET(cs, &readfds);
-			if (cs >= max_sd)
-				max_sd = cs;
-			user = NULL;
-		}
-		for (std::map<std::string, Users*>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
-            int clientSocket = it->second->getSocketDescriptor();
-            if (FD_ISSET(clientSocket, &readfds) && it->second->getStatus()) {
-				bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+		// Check for events occuring on already connected clients
+		for (size_t i = 0; i < this->fds.size(); ++i) {
+			if (this->fds[i].revents & POLLIN) {
+				user = getUserByFd(this->fds[i].fd);
+				if (!user)
+					continue ;
+				bytesReceived = recv(this->fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesReceived == 0) {
-					close(clientSocket); // Close the socket
-            		FD_CLR(clientSocket, &readfds); // Remove from FD_SET
-					it->second->setStatus(0);
-					it->second->setSocketDescriptor(-1);
-					std::cerr << "Connection closed by @" << it->second->getNickName() << std::endl;
+					close(this->fds[i].fd);
+					this->fds.erase(this->fds.begin() + i);
+					// set status to 0 and fd to -1
+					user->setStatus(0);
+					user->setSocketDescriptor(-1);
+					std::cout << "Connection closed by @" << user->getUserName() << std::endl;
 					continue ;
 				}
 				else if (bytesReceived < 0) {
-					std::cerr << "Error receiving msg from @" << it->second->getNickName() << std::endl;
-					continue ;
+					std::cerr << "Error receiving msg from @" << user->getUserName() << std::endl;
+					continue ;	
 				}
 				std::string msg(buffer, bytesReceived - 1);
-				// parse msg, type std::string 
-				std::cout << "@" << it->second->getNickName() << ": " << msg << std::endl;
-            }
-        }
+				std::cout << "@" << user->getUserName() << ": " << msg << std::endl;
+			}
+		}
 	}
 }
 
@@ -200,6 +224,15 @@ void Server::stop() {
 
 std::string Server::getPassword() const {
 	return this->password;
+}
+
+Users *Server::getUserByFd(int fd) {
+	for (std::map<std::string, Users *>::iterator it = this->all_users.begin(); 
+			it != this->all_users.end(); ++it) {
+		if (it->second->getSocketDescriptor() == fd)
+			return it->second;
+	}
+	return NULL;
 }
 
 Users *Server::getUserByUn(const std::string username) {
