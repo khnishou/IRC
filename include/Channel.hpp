@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:20 by smallem           #+#    #+#             */
-/*   Updated: 2024/03/18 14:54:38 by smallem          ###   ########.fr       */
+/*   Updated: 2024/03/19 12:32:01 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,7 @@ class Channel {
 		Users		*getOwner() const;
 		std::vector<Users *> getUserList() const;
 		std::vector<Users *> getOperatorList() const;
-		void joinChannel(Users *user);
-		void leaveChannel(Users *user);
-		void setMode(std::string mode);
+		bool isOperator(const Users &user);
 };
 
 #endif

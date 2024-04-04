@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 12:04:22 by smallem           #+#    #+#             */
-/*   Updated: 2024/03/18 14:11:35 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 15:33:45 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,21 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "Channel.hpp"
+
+class Channel;
 
 class Users {
 	private:
 		std::string nickName;
 		std::string userName;
-		std::string hostName;
-		std::string realName;
 		std::string modes;
 		int 		permissionLevel;
 		int			socketDescriptor;
+		int			status;
 	public:
-		Users(std::string nickName, std::string userName, std::string hostName,
-			std::string realName, std::string modes, int permissionLevel,
-			int socketDescriptor);
+		Users(std::string nickName, std::string userName, std::string modes,
+			int permissionLevel, int socketDescriptor);
 		~Users();
 		Users(const Users &cp);
 		Users &operator=(const Users &cp);
@@ -39,11 +40,13 @@ class Users {
 		std::string getNickName() const;
 		std::string getUserName() const;
 		std::string getHostName() const;
-		std::string getRealName() const;
 		std::string getModes() const;
 		int 		getPermissionLevel() const;
 		int			getSocketDescriptor() const;
+		int			getStatus() const;
+		void		setSocketDescriptor(int sd);
 		void		setModes(std::string mode);
+		void		setStatus(int stat);
 		void		setPermissionLevel(int permissionLevel);
 };
 

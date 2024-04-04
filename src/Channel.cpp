@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/03/18 15:37:20 by smallem          ###   ########.fr       */
+/*   Updated: 2024/03/19 12:32:15 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,37 +75,11 @@ std::vector<Users *> Channel::getOperatorList() const {
 	return this->operatorList;	
 }
 
-void Channel::joinChannel(Users *user) {
-	bool	flag = false;
-
-	for (std::vector<Users *>::iterator it = this->userList.begin();
-		it != this->userList.end(); ++it) {
-		if (*it && (*it)->getNickName() == user->getNickName()) {
-			flag = true;
-			break ;
-		}		
+bool Channel::isOperator(const Users &user) {
+	for (std::vector<Users *>::iterator it = this->operatorList.begin();
+			it != this->operatorList.end(); ++it) {
+		if ((*it)->getNickName() == user.getNickName())
+			return true;		
 	}
-	if (flag) {
-		this->userList.push_back(user);
-	}
-	else
-		std::cout << "User already in the channel!" << std::endl;
-}
-
-void Channel::leaveChannel(Users *user) {
-	bool	flag = false;
-
-	for (std::vector<Users *>::iterator it = this->userList.begin();
-		it != this->userList.end(); ++it) {
-		if (*it && (*it)->getNickName() == user->getNickName()) {
-			this->userList.erase(it);
-			std::cout << "User removed from channel!" << std::endl;
-			return ;
-		}
-	}
-	std::cout << "User is not in channel!" << std::endl;
-}
-
-void Channel::setMode(std::string mode) {
-	this->modes = mode;	
+	return false;
 }

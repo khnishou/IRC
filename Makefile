@@ -1,8 +1,8 @@
-SRC = src/PmergeMe.cpp src/main.cpp
+SRC = src/Server.cpp src/main.cpp src/Users.cpp src/Channel.cpp
 OBJ = $(SRC:.cpp=.o)
 CC = g++
 RM = rm -rf
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
+CPPFLAGS = -std=c++98 -pedantic
 
 NAME = IRC
 
