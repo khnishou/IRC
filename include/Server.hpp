@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 16:33:20 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 19:17:43 by ykerdel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+#include <sstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -26,6 +27,14 @@
 #include <sys/select.h>
 #include "Users.hpp"
 #include "Channel.hpp"
+#include "lib.hpp"
+
+struct Message {
+    std::vector<std::string> tags;
+    std::string source;
+    std::string command;
+    std::vector<std::string> parameters;
+};
 
 class Users;
 class Channel;
@@ -37,6 +46,7 @@ class Server {
 		std::map<std::string, Users *> all_users;
 		std::vector<Channel *> all_channels;
 		Server();
+		Message Server::parsing(std::string str);
 		
 	public:
 		Server(int port, std::string password);

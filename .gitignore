@@ -1,0 +1,7 @@
+src/Server.o
+src/Users.o
+src/main.o
+src/Channel.o
+IRC
+a.out
+test.cpp
