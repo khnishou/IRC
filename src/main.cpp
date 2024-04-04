@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:44:42 by smallem           #+#    #+#             */
-/*   Updated: 2024/03/20 14:49:10 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/04 19:26:45 by ykerdel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,4 +16,6 @@
 
 int main() {
 	Server serv(6667, "zebi");
+
+	serv.start();
 }
