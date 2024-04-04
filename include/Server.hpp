@@ -6,7 +6,7 @@
 /*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 19:22:55 by ykerdel          ###   ########.fr       */
+/*   Updated: 2024/04/04 19:29:07 by ykerdel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class Server {
 		std::vector<Channel *> all_channels;
 		std::vector<struct pollfd> fds;
 		Server();
-		Message Server::parsing(std::string str);
+		Message parsing(std::string str);
 		
 	public:
 		Server(int port, std::string password);

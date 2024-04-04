@@ -5,3 +5,10 @@ src/Channel.o
 IRC
 a.out
 test.cpp
+IRC
+lib/skip.o
+src/main.o
+src/Server.o
+IRC
+src/main.o
+src/Server.o

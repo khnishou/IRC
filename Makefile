@@ -1,4 +1,4 @@
-SRC = src/Server.cpp src/main.cpp src/Users.cpp src/Channel.cpp
+SRC = src/Server.cpp src/main.cpp src/Users.cpp src/Channel.cpp lib/skip.cpp
 OBJ = $(SRC:.cpp=.o)
 CC = g++
 RM = rm -rf

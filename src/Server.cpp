@@ -6,7 +6,7 @@
 /*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 19:27:27 by ykerdel          ###   ########.fr       */
+/*   Updated: 2024/04/04 19:30:42 by ykerdel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ Server::Server(int port, std::string password) {
 		std::cerr << "Error: failed to start listening for incoming connections." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-}
 
   // Start listening for incoming connections
   if (listen(this->serverSocket, SOMAXCONN) == -1) {
@@ -62,7 +61,6 @@ Server::Server(int port, std::string password) {
               << std::endl;
     exit(EXIT_FAILURE);
   }
-  this->start();
 }
 
 Server::Server(const Server &cp) { *this = cp; }
