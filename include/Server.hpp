@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 19:29:07 by ykerdel          ###   ########.fr       */
+/*   Updated: 2024/04/05 15:48:43 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@ class Channel;
 class Server {
 	private:
 		int	serverSocket;
+		ssize_t	bytesReceived;
+		char	buffer[1024];
 		std::string	password;
-		std::map<std::string, Users *> all_users;
+		std::vector<Users *> all_users;
 		std::vector<Channel *> all_channels;
 		std::vector<struct pollfd> fds;
 		Server();
-		Message parsing(std::string str);
 		
 	public:
 		Server(int port, std::string password);
@@ -60,21 +61,17 @@ class Server {
 		
 		// create user delete user
 		int addNewClient();
-		Users *createUser(int socketDescriptor);
+		void handleMsg(Users *user, size_t i);
+		
 		void deleteUser(std::string uname);
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
-		// create channel delete channel
-		void createChannel(Channel *channel);
-		void deleteChannel(Channel *channel);
-		Channel *getChannel(const std::string &name);
-
+		
+		size_t getNumberOfUsers();
 		// message forwarding i guess
-		void sendToAll(const std::string &msg);
-		void sendToChannel(const std::string &msg, Channel *channel);
-		void sendToUser(const std::string &msg, const std::string uname);
-
+	
 		std::string getPassword() const;
+		Message parsing(std::string str);
 };
 
 #endif

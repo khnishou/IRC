@@ -4,7 +4,7 @@ CC = g++
 RM = rm -rf
 CPPFLAGS = -std=c++98 -pedantic
 
-NAME = IRC
+NAME = ircserv
 
 all: $(NAME)
 
