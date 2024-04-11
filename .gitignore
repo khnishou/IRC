@@ -12,3 +12,4 @@ src/Server.o
 IRC
 src/main.o
 src/Server.o
+ircserv
