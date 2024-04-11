@@ -233,28 +233,31 @@ Message Server::parsing(std::string str) {
 
 //	Command: KICK
 //	Parameters: <channel> <user> *( "," <user> ) [<comment>]
-void c_kick (std::vector<std::string> param)
+int Server::c_kick (std::vector<std::string> param)
 {
+	if (param.size() >= 3)
+		; // error ERR_NEEDMOREPARAMS (461)
+	Channel *channel;
 	
 }
 
 //	Command: INVITE
 //	Parameters: <nickname> <channel>
-void c_invite (std::vector<std::string> param)
+int Server::c_invite (std::vector<std::string> param)
 {
 	
 }
 
 //	Command: TOPIC
 //	Parameters: <channel> [<topic>]
-void c_topic (std::vector<std::string> param)
+int Server::c_topic (std::vector<std::string> param)
 {
 	
 }
 
 //	Command: MODE
 //	Parameters: <target> [<modestring> [<mode arguments>...]]
-void c_mode (std::vector<std::string> param)
+int Server::c_mode (std::vector<std::string> param)
 {
 	
 }
