@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 12:04:22 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 15:33:45 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 17:26:29 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,14 @@ class Users {
 	private:
 		std::string nickName;
 		std::string userName;
+		std::string hostName;
 		std::string modes;
 		int 		permissionLevel;
 		int			socketDescriptor;
 		int			status;
 	public:
-		Users(std::string nickName, std::string userName, std::string modes,
-			int permissionLevel, int socketDescriptor);
+		Users(std::string nickName, std::string userName, std::string hostname,
+			std::string modes, int permissionLevel, int socketDescriptor);
 		~Users();
 		Users(const Users &cp);
 		Users &operator=(const Users &cp);
@@ -46,6 +47,7 @@ class Users {
 		int			getStatus() const;
 		void		setSocketDescriptor(int sd);
 		void		setModes(std::string mode);
+		void		setHostName(std::string hostname);
 		void		setStatus(int stat);
 		void		setPermissionLevel(int permissionLevel);
 };
