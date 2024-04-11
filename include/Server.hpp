@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 15:28:49 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 16:42:51 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,7 @@
 #include <poll.h>
 #include "Users.hpp"
 #include "Channel.hpp"
-#include "lib.hpp"
-
-struct Message {
-    std::vector<std::string> tags;
-    std::string source;
-    std::string command;
-    std::vector<std::string> parameters;
-};
+#include "Lib.hpp"
 
 class Users;
 class Channel;
@@ -66,6 +59,8 @@ class Server {
 
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
+		
+		Channel *getChannel(const std::string cname);
 		
 		size_t getNumberOfUsers();
 		// message forwarding i guess

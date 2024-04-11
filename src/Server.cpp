@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 15:43:28 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 16:48:26 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,15 @@ Users *Server::getUserByUn(const std::string username) {
 	for (std::vector<Users *>::iterator it = this->all_users.begin();
 			it != this->all_users.end(); ++it) {
 		if ((*it)->getUserName() == username)
+			return *it;
+	}
+	return NULL;
+}
+
+Channel *Server::getChannel(const std::string cname) {
+	for (std::vector<Channel *>::iterator it = this->all_channels.begin();
+			it != this->all_channels.end(); ++it) {
+		if ((*it)->getName() == cname)
 			return *it;
 	}
 	return NULL;
