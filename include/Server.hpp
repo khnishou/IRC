@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/05 15:48:43 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 15:28:49 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class Server {
 		// create user delete user
 		int addNewClient();
 		void handleMsg(Users *user, size_t i);
-		
-		void deleteUser(std::string uname);
+		void executeCmd(Message msg);
+
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
 		

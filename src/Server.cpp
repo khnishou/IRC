@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/05 15:48:12 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 15:43:28 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,4 +229,55 @@ Message Server::parsing(std::string str) {
 		i = skip_space(str, i);
 	}
     return msg;
+}
+
+//	Command: KICK
+//	Parameters: <channel> <user> *( "," <user> ) [<comment>]
+void c_kick (std::vector<std::string> param)
+{
+	
+}
+
+//	Command: INVITE
+//	Parameters: <nickname> <channel>
+void c_invite (std::vector<std::string> param)
+{
+	
+}
+
+//	Command: TOPIC
+//	Parameters: <channel> [<topic>]
+void c_topic (std::vector<std::string> param)
+{
+	
+}
+
+//	Command: MODE
+//	Parameters: <target> [<modestring> [<mode arguments>...]]
+void c_mode (std::vector<std::string> param)
+{
+	
+}
+
+
+void Server::executeCmd(Message msg)
+{
+	// handle tag
+	// handle source 
+	if (msg.command == "KICK") {
+		c_kick(msg.parameters);	
+	}
+	else if (msg.command == "INVITE") {
+		c_invite(msg.parameters);
+	}
+	else if (msg.command == "TOPIC") {
+		c_topic(msg.parameters);
+	}
+	else if (msg.command == "MODE") {
+		c_mode(msg.parameters);
+	}
+	else {
+		// invalid cmd or whatever
+	}
+	
 }
