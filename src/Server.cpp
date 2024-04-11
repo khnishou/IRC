@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 16:48:26 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/11 17:32:07 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ int Server::addNewClient() {
 	std::string tmp;
 
 	tmp = "default" + std::to_string(id);
-	Users *user = new Users(tmp, tmp, "normal", 0, clientSocket);
+	Users *user = new Users(tmp, tmp, "default", "normal", 0, clientSocket);
 	if (!user) {
 		std::cerr << "Error: failed to create user for the connected client." << std::endl;
 		close(clientSocket);
