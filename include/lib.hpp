@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 enum USER_STATE {
 	INIT,
@@ -18,5 +19,7 @@ struct Message {
     std::vector<std::string> parameters;
 };
 
-int skip_space(std::string str, int i);
-int skip_arg(std::string str, int i);
+int							skip_space(std::string str, int i);
+int							skip_arg(std::string str, int i);
+std::vector<std::string>	splitString(const std::string& str, char delimiter);
+
