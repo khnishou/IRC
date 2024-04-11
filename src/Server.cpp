@@ -243,11 +243,24 @@ Message Server::parsing(std::string str) {
 //	Command: KICK
 //	Parameters: <channel> <user> *( "," <user> ) [<comment>]
 int Server::c_kick (std::vector<std::string> param)
-{
+  std::vector<std::string> split;
 	if (param.size() >= 3)
 		; // error ERR_NEEDMOREPARAMS (461)
-	Channel *channel;
-	
+  Channel *channel = getChannel(param[0]);
+  if (!channel)
+    ; // error ERR_NOSUCHCHANNEL (403)
+  if (!channel->isOperator(user))
+    ; // error ERR_CHANOPRIVSNEEDED (482)
+  split = splitString(param[1], ',');
+  for (size_t i = 0; i < split.size(); i++) {
+    Users *user = getUserByUn(split[i]);
+    if (!user)
+      ; // error ERR_USERNOTINCHANNEL (441) // check repetition
+    if (!channel->isOperator(*user))
+			; // error ERR_USERNOTINCHANNEL (441) // check repetition
+		// channel->deleteUser(user); // add deleteUser in channel class
+		// kick message // add kick message for the current user that s being deleted
+  }
 }
 
 //	Command: INVITE
@@ -272,14 +285,12 @@ int Server::c_mode (std::vector<std::string> param)
 }
 
 
-void Server::executeCmd(Message msg)
-{
+void Server::executeCmd(Message msg) { // check add user
 	// handle tag
 	// handle source 
 	if (msg.command == "KICK") {
-		c_kick(msg.parameters);	
-	}
-	else if (msg.command == "INVITE") {
+    c_kick(msg.parameters); // check add user
+  } else if (msg.command == "INVITE") {
 		c_invite(msg.parameters);
 	}
 	else if (msg.command == "TOPIC") {
