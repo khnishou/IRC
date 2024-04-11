@@ -69,7 +69,7 @@ class Server {
 		Message parsing(std::string str);
 
 		int c_kick (std::vector<std::string> param, Users user);
-		int c_invite (std::vector<std::string> param);
+		int c_invite (std::vector<std::string> param, Users user);
 		int c_topic (std::vector<std::string> param);
 		int c_mode (std::vector<std::string> param);
 
