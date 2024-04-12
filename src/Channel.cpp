@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/12 16:32:04 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/12 16:47:21 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,23 @@ std::string Channel::getPassword() const {
 Users		*Channel::getOwner() const {
 	return this->owner;
 }
+
+void Channel::setTopic(const std::string topic) {
+	this->topic = topic;
+}
+
+void Channel::setMode(const std::string mode) {
+	this->modes = mode;
+}
+
+void Channel::setPassword(const std::string pass) {
+	this->password = pass;
+}
+
+void Channel::setOwner(Users *user) {
+	this->owner = user;
+}
+
 
 void Channel::addUser(Users *user) {
 	for (std::vector<Users *>::iterator it = this->userList.begin();
