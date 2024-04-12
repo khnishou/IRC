@@ -247,8 +247,7 @@ Message Server::parsing(std::string str) {
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERNOTINCHANNEL (441)
 //				ERR_NOTONCHANNEL (442)
-int Server::c_kick(std::vector<std::string> param, Users user)
-{
+int Server::c_kick(std::vector<std::string> param, Users user) {
   std::vector<std::string> split;
 	if (!(param.size() >= 3))
 		return (461); // error ERR_NEEDMOREPARAMS (461)
@@ -260,14 +259,13 @@ int Server::c_kick(std::vector<std::string> param, Users user)
 	if (!channel->isUser(user))
 		return (442); // error ERR_NOTONCHANNEL (442) // check 441 before 442
   split = splitString(param[1], ',');
-	for (size_t i = 0; i < split.size(); i++)
-	{
+  for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
 			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
 		if (!channel->isUser(*toKick))
 			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
-		// channel->deleteUser(toKick); // add deleteUser in channel class
+    channel->deleteUser(toKick); // add deleteUser in channel class
 		// kick message // add kick message for the current user <toKick>
 	}
 	return (0); // no error no message return
@@ -281,8 +279,7 @@ int Server::c_kick(std::vector<std::string> param, Users user)
 //				ERR_NOTONCHANNEL (442)
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERONCHANNEL (443)
-int Server::c_invite(std::vector<std::string> param, Users user)
-{
+int Server::c_invite(std::vector<std::string> param, Users user) {
 	if (!(param.size() >= 2))
 		return (461); // error ERR_NEEDMOREPARAMS (461)
 	Channel *channel = getChannel(param[1]);
@@ -292,11 +289,11 @@ int Server::c_invite(std::vector<std::string> param, Users user)
     	return (442); // error ERR_NOTONCHANNEL (442)
 	if (!channel->isOperator(user))
     	return (482); // error ERR_CHANOPRIVSNEEDED (482)
-	Users* toAdd = getUserByUn(param[0]);
+  Users *toAdd = getUserByUn(param[0]);
 	if (!channel->isUser(*toAdd))
 		return (443); // error ERR_USERONCHANNEL (443)
 	// channel->addUser(toAdd); // add addUser in channel class
-  	return (341); // no error RPL_INVITING (341)
+  return (341);   // no error RPL_INVITING (341)
 }
 
 //	Command: TOPIC
@@ -329,13 +326,13 @@ int Server::c_topic(std::vector<std::string> param, Users user) {
 
 //	Command: MODE
 //	Parameters: <target> [<modestring> [<mode arguments>...]]
-int Server::c_mode (std::vector<std::string> param)
+int Server::c_mode(std::vector<std::string> param, Users user)
 {
 	
 }
 
 
-void Server::executeCmd(Message msg) { // check add user
+void Server::executeCmd(Message msg, Users user) {
 	// handle tag
 	// handle source 
 	if (msg.command == "KICK") {
@@ -343,12 +340,7 @@ void Server::executeCmd(Message msg) { // check add user
   } else if (msg.command == "INVITE") {
     c_invite(msg.parameters); // check add user
   } else if (msg.command == "TOPIC") {
-		c_topic(msg.parameters);
-	}
-	else if (msg.command == "MODE") {
-		c_mode(msg.parameters);
-	}
-	else {
+  } else {
 		// invalid cmd or whatever
 	}
 	
