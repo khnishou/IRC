@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 17:36:19 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/12 16:32:04 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,50 @@ std::string Channel::getPassword() const {
 
 Users		*Channel::getOwner() const {
 	return this->owner;
+}
+
+void Channel::addUser(Users *user) {
+	for (std::vector<Users *>::iterator it = this->userList.begin();
+			it != this->userList.end(); ++it) {
+		if ((*it)->getNickName() == user->getNickName()) {
+			// user already in list idk what u want			
+			return ;
+		}
+	}
+	this->userList.push_back(user);
+}
+
+void Channel::addOperator(Users *user) {
+	for (std::vector<Users *>::iterator it = this->operatorList.begin();
+			it != this->operatorList.end(); ++it) {
+		if ((*it)->getNickName() == user->getNickName()) {
+			// alrdy op, idk what do
+			return ;
+		}
+	}
+	this->operatorList.push_back(user);
+}
+
+void Channel::deleteUser(Users *user) {
+	for (std::vector<Users *>::iterator it = this->userList.begin();
+			it != this->userList.end(); ++it) {
+		if ((*it)->getNickName() == user->getNickName()) {
+			this->userList.erase(it);
+			return ;
+		}
+	}
+	// some type of error, mans aint on the channel probably
+}
+
+void Channel::deleteOperator(Users *user) {
+	for (std::vector<Users *>::iterator it = this->operatorList.begin();
+			it != this->operatorList.end(); ++it) {
+		if ((*it)->getNickName() == user->getNickName()) {
+			this->operatorList.erase(it);
+			return ;
+		}
+	}
+	// some type of error, mans aint no op
 }
 
 std::vector<Users *> Channel::getUserList() const {
