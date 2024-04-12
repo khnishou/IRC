@@ -201,7 +201,7 @@ Channel *Server::getChannel(const std::string cname) {
 }
 
 // ['@' <tags> SPACE] [':' <source> SPACE] <command> <parameters> <crlf>
-Message Server::parsing(std::string str) {
+Message Server::parsing(std::string str, Users user) {
 
     Message msg;
 
@@ -292,7 +292,7 @@ int Server::c_invite(std::vector<std::string> param, Users user) {
   Users *toAdd = getUserByUn(param[0]);
 	if (!channel->isUser(*toAdd))
 		return (443); // error ERR_USERONCHANNEL (443)
-	// channel->addUser(toAdd); // add addUser in channel class
+  channel->addUser(toAdd);
   return (341);   // no error RPL_INVITING (341)
 }
 
@@ -326,6 +326,15 @@ int Server::c_topic(std::vector<std::string> param, Users user) {
 
 //	Command: MODE
 //	Parameters: <target> [<modestring> [<mode arguments>...]]
+//              ERR_NOSUCHNICK (401)
+//              ERR_USERSDONTMATCH (502)
+//              RPL_UMODEIS (221)
+//              ERR_UMODEUNKNOWNFLAG (501)
+//              ERR_NOSUCHCHANNEL (403)
+//              RPL_CHANNELMODEIS (324)
+//              RPL_CREATIONTIME (329)
+//              ERR_CHANOPRIVSNEEDED (482)
+//      i t k o l
 int Server::c_mode(std::vector<std::string> param, Users user)
 {
 	
@@ -336,10 +345,13 @@ void Server::executeCmd(Message msg, Users user) {
 	// handle tag
 	// handle source 
 	if (msg.command == "KICK") {
-    c_kick(msg.parameters); // check add user
+    c_kick(msg.parameters, user);
   } else if (msg.command == "INVITE") {
-    c_invite(msg.parameters); // check add user
+    c_invite(msg.parameters, user);
   } else if (msg.command == "TOPIC") {
+    c_topic(msg.parameters, user);
+  } else if (msg.command == "MODE") {
+    c_mode(msg.parameters, user);
   } else {
 		// invalid cmd or whatever
 	}
