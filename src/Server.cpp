@@ -301,9 +301,30 @@ int Server::c_invite(std::vector<std::string> param, Users user)
 
 //	Command: TOPIC
 //	Parameters: <channel> [<topic>]
-int Server::c_topic (std::vector<std::string> param)
-{
-	
+//				ERR_NEEDMOREPARAMS (461)
+//				ERR_NOSUCHCHANNEL (403)
+//				ERR_NOTONCHANNEL (442)
+//				ERR_CHANOPRIVSNEEDED (482)
+//				RPL_NOTOPIC (331)
+//				RPL_TOPIC (332)
+//				RPL_TOPICWHOTIME (333)
+int Server::c_topic(std::vector<std::string> param, Users user) {
+  if (!(param.size() >= 1))
+    return (461); // error ERR_NEEDMOREPARAMS (461)
+  Channel *channel = getChannel(param[1]);
+  if (!channel)
+    return (403); // error ERR_NOSUCHCHANNEL (403)
+  if (!channel->isUser(user))
+    return (442); // error ERR_NOTONCHANNEL (442)
+  if (!channel->isOperator(user))
+    return (482); // error ERR_CHANOPRIVSNEEDED (482)
+  if (param.size() == 1) {
+    if (!channel->getTopic().empty())
+      return (331); // no error RPL_NOTOPIC (331)
+    else
+      return (332); // no error RPL_TOPIC (332)
+  }
+  return (333); // no error RPL_TOPICWHOTIME (333)
 }
 
 //	Command: MODE
