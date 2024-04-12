@@ -55,7 +55,7 @@ class Server {
 		// create user delete user
 		int addNewClient();
 		void handleMsg(Users *user, size_t i);
-		void executeCmd(Message msg);
+  void executeCmd(Message msg, Users user);
 
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
