@@ -13,3 +13,4 @@ IRC
 src/main.o
 src/Server.o
 ircserv
+.vscode/settings.json
