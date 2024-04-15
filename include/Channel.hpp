@@ -27,7 +27,6 @@ class Channel {
 	private:
 		std::string name;
 		std::string topic;
-		std::string modes;
 		std::string password;
 		uint8_t		modes;
 		Users 		*owner;
@@ -42,7 +41,6 @@ class Channel {
 
 		std::string getName() const;
 		std::string getTopic() const;
-		std::string getModes() const;
 		std::string getPassword() const;
 		uint8_t		getModes() const;
 		Users		*getOwner() const;
