@@ -1,5 +1,5 @@
 
-#include "../include/Lib.hpp"
+#include "../include/lib.hpp"
 
 int skip_space(std::string str, int i)
 {

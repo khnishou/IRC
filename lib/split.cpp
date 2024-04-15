@@ -1,5 +1,5 @@
 
-#include "../include/Lib.hpp"
+#include "../include/lib.hpp"
 
 std::vector<std::string> splitString(const std::string& str, char delimiter) {
     std::vector<std::string> tokens;
