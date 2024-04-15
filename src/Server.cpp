@@ -326,9 +326,6 @@ int Server::c_topic(std::vector<std::string> param, Users user) {
 
 //	Command: MODE
 //	Parameters: <target> [<modestring> [<mode arguments>...]]
-//              ERR_NOSUCHNICK (401)
-//              ERR_USERSDONTMATCH (502)
-//              RPL_UMODEIS (221)
 //              ERR_UMODEUNKNOWNFLAG (501)
 //              ERR_NOSUCHCHANNEL (403)
 //              RPL_CHANNELMODEIS (324)
@@ -337,7 +334,25 @@ int Server::c_topic(std::vector<std::string> param, Users user) {
 //      i t k o l
 int Server::c_mode(std::vector<std::string> param, Users user)
 {
-	
+	uint8_t mode;
+	int i;
+
+	if (!(param.size() >= 2))
+    	return (461); // error ERR_NEEDMOREPARAMS (461) // check
+	i = 0;
+	while (++i < param.size())
+		mode = initMode(param[i], mode);
+	if (mode & (1 << 7))
+		return (501); // error ERR_UMODEUNKNOWNFLAG (501)
+	Channel *channel = getChannel(param[0]);
+	if (!channel)
+    	return (403); // error ERR_NOSUCHCHANNEL (403)
+	if (!channel->isUser(user))
+    	return (442); // error ERR_NOTONCHANNEL (442)
+	if (!channel->isOperator(user))
+    	return (482); // error ERR_CHANOPRIVSNEEDED (482)
+	channel->setMode(mode);
+	return (0); // check should return an RPL value
 }
 
 
