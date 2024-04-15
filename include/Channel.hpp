@@ -14,6 +14,7 @@
 # define CHANNEL_HPP
 
 #include "Users.hpp"
+#include <cstdint>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -28,6 +29,7 @@ class Channel {
 		std::string topic;
 		std::string modes;
 		std::string password;
+		uint8_t		modes;
 		Users 		*owner;
 		std::vector<Users *> userList;
 		std::vector<Users *> operatorList;
@@ -42,12 +44,13 @@ class Channel {
 		std::string getTopic() const;
 		std::string getModes() const;
 		std::string getPassword() const;
+		uint8_t		getModes() const;
 		Users		*getOwner() const;
 		std::vector<Users *> getUserList() const;
 		std::vector<Users *> getOperatorList() const;
 		
 		void		setTopic(const std::string topic);
-		void		setMode(const std::string mode);
+		void		setMode(const uint8_t mode);
 		void		setPassword(const std::string pass);
 		void		setOwner(Users *user);
 		

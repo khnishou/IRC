@@ -55,7 +55,7 @@ std::string Channel::getTopic() const {
 	return this->topic;
 }
 
-std::string Channel::getModes() const {
+uint8_t Channel::getModes() const {
 	return this->modes;
 }
 
@@ -71,7 +71,7 @@ void Channel::setTopic(const std::string topic) {
 	this->topic = topic;
 }
 
-void Channel::setMode(const std::string mode) {
+void Channel::setMode(const uint8_t mode) {
 	this->modes = mode;
 }
 
