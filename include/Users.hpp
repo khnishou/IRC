@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 12:04:22 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 17:26:29 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 14:27:21 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,37 +19,47 @@
 #include <vector>
 #include <algorithm>
 #include "Channel.hpp"
+#include "lib.hpp"
 
 class Channel;
 
 class Users {
 	private:
+		std::string hostName;
 		std::string nickName;
 		std::string userName;
-		std::string hostName;
 		std::string modes;
 		int 		permissionLevel;
 		int			socketDescriptor;
-		int			status;
+		USER_STATE	status;
+		std::vector<Channel *> invite_lst;
 	public:
-		Users(std::string nickName, std::string userName, std::string hostname,
-			std::string modes, int permissionLevel, int socketDescriptor);
+		Users(std::string hostname, int socketDescriptor);
 		~Users();
 		Users(const Users &cp);
 		Users &operator=(const Users &cp);
 
+		// GETTERS
+		std::string getHostName() const;
 		std::string getNickName() const;
 		std::string getUserName() const;
-		std::string getHostName() const;
 		std::string getModes() const;
 		int 		getPermissionLevel() const;
 		int			getSocketDescriptor() const;
-		int			getStatus() const;
-		void		setSocketDescriptor(int sd);
-		void		setModes(std::string mode);
+		USER_STATE	getStatus() const;
+		// SETTERS
 		void		setHostName(std::string hostname);
-		void		setStatus(int stat);
+		void		setNickName(std::string nname);
+		void		setUserName(std::string uname);
+		void		setModes(std::string mode);
 		void		setPermissionLevel(int permissionLevel);
+		void		setSocketDescriptor(int sd);
+		void		setStatus(USER_STATE stat);
+		// OTHER
+		void		invite(Channel *channel);
+		bool		is_invited(std::string cname);
+		void		remove_invite(std::string cname);
+
 };
 
 #endif

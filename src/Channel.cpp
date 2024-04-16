@@ -6,13 +6,13 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/12 16:47:21 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/15 12:56:55 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
 
-Channel::Channel(std::string name, std::string topic, std::string modes,
+Channel::Channel(std::string name, std::string topic, uint8_t modes,
 	std::string password, Users *owner) : name(name), topic(topic), modes(modes),
 	password(password), owner(owner) 
 {

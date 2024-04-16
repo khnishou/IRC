@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:20 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/12 16:47:36 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/15 12:56:43 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Channel {
 		std::vector<Users *> userList;
 		std::vector<Users *> operatorList;
 	public:
-		Channel(std::string name, std::string topic, std::string modes,
+		Channel(std::string name, std::string topic, uint8_t modes,
 			std::string password, Users *owner);
 		~Channel();
 		Channel(const Channel &cp);

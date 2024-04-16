@@ -57,8 +57,13 @@
 enum USER_STATE {
 	INIT,
 	LOGIN,
-	REGISTERED,
-	DISCONNECTED
+	REGISTERED
+};
+
+enum SERVER_STATE {
+	ON,
+	OFF,
+	START
 };
 
 struct Message {

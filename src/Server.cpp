@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/11 17:32:07 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 14:59:02 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,50 +15,9 @@
 
 Server::Server() {}
 
-Server::Server(int port, std::string password) {
-	//Creating the socket
-	this->password = password;
-	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (this->serverSocket == -1) {
-		std::cerr << "Error: Failed to create server socket." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	// Setting the socket options for reusing address and port
-	int opt = 1;
-	if (setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))
-			== -1) {
-		std::cerr << "Error: failed to set socket options." << std::endl;
-		exit(EXIT_FAILURE); 		
-	}
-
-	if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cerr << "Error: Failed to set socket to non-blocking mode." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	// Now binding the socket to the address and port
-	struct sockaddr_in serverAddress;
-	std::memset(&serverAddress, 0, sizeof(serverAddress));
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr = INADDR_ANY;
-	serverAddress.sin_port = htons(port);
-
-	if (bind(this->serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress))
-			== -1) {
-		std::cerr << "Error: failed to bind server socket." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	struct pollfd server_fd;
-    server_fd.fd = this->serverSocket;
-    server_fd.events = POLLIN;
-    fds.push_back(server_fd);
-	
-	// Start listening for incoming connections
-	if (listen(this->serverSocket, SOMAXCONN) == -1) {
-		std::cerr << "Error: failed to start listening for incoming connections." << std::endl;
-		exit(EXIT_FAILURE);
-	}
+Server::Server(int port, std::string password) : port(port), password(password) {
+	std::cout << "-------CREATING SERVER-------" << std::endl;
+	this->state = START;
 }
 
 Server::Server(const Server &cp) { *this = cp; }
@@ -70,18 +29,71 @@ Server &Server::operator=(const Server &cp) {
 }
 
 Server::~Server() {
-	close(this->serverSocket);
-	// probably close and clean all the FDS form the pollfd
-	
-    // Clean up channels
-    for (std::vector<Channel*>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
-        delete *it;
-    }
+	// LOOK INTO THIS LATER, THIS CHANGED BECAUSE OF NEWLY ADDED SERVER STATE
+}
 
-    // Clean up users
-    for (std::vector<Users*>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
-        delete *it;
-    }
+void Server::init() {
+	// HERE WE ARE GOING TO CREATE OUR SERVER, OR RATHER INITIALIZE IT FOR FIRSTTIME/AGAIN
+	char name[1024];
+
+	// getting the hostname
+	if (gethostname(name, sizeof(name)) == -1) {
+		std::cerr << "Error: gethostname: " << std::strerror(errno) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	this->host = std::string(name);
+	
+	// creating the socket
+	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (this->serverSocket == -1) {
+		std::cerr << "Error: socket: " << std::strerror(errno) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// setting socket options
+	int opt = 1;
+	if (setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))
+			== -1) {
+		std::cerr << "Error: setsockopt: " << std::strerror(errno) << std::endl;
+		// might have to close socket first think on this later, same remqrks bellow
+		exit(EXIT_FAILURE);	
+	}
+
+	// set socket to nonblocking mode
+	if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
+		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// bind the socket to the address and port
+	// there is probably a better way and more secure way to do this, if encountering 
+	// issues with restarting server or manipulating server state look into this further 
+	// and change accordingly, prolly need to loop through usable addresses and use the right one
+	struct sockaddr_in serverAdr;
+	std::memset(&serverAdr, 0, sizeof(serverAdr));
+	serverAdr.sin_family = AF_INET;
+	serverAdr.sin_addr.s_addr = INADDR_ANY;
+	serverAdr.sin_port = htons(this->port);
+	if (bind(this->serverSocket, (struct sockaddr *)&serverAdr, sizeof(serverAdr))
+			== -1) {
+		std::cerr << "Error: bind: " << std::strerror(errno) << std::endl;
+		exit(EXIT_FAILURE);			
+	}
+
+	// start listening to incoming connections, secnod arg is max allowed connections
+	if (listen(this->serverSocket, 128) == -1) {
+		std::cerr << "Error: listen: " << std::strerror(errno) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+
+	// add the server socket to the pollfd array 
+	struct pollfd sfd;
+	sfd.fd = this->serverSocket;
+	sfd.events = POLLIN;
+	this->fds.push_back(sfd);
+
+	// now server is ready, consider later myb adding a default starting channel.
 }
 
 int Server::addNewClient() {
