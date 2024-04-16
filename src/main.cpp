@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ykerdel <ykerdel@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:44:42 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/04 19:26:45 by ykerdel          ###   ########.fr       */
+/*   Updated: 2024/04/16 15:17:26 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 #include "../include/Channel.hpp"
 
 int main() {
-	Server serv(6667, "zebi");
+	Server serv(6667, "pswd");
 
-	serv.start();
+	while (serv.getState() == START) {
+		serv.init();
+		serv.start();
+	}
 }

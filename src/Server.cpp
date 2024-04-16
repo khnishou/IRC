@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 14:59:02 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 15:33:05 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,37 +96,84 @@ void Server::init() {
 	// now server is ready, consider later myb adding a default starting channel.
 }
 
+void Server::start() {
+	int activity;
+	Users	*user;
+
+	std::cout << "-------------IRCSERVER ON-------------" << std::endl;
+	this->state = ON;
+	while (this->state == ON) {
+		// We listen for incoming connections or incoming anything really
+		activity = poll(&(this->fds[0]), this->fds.size(), -1);	
+		if (activity < 0) {
+			std::cout << "Error: poll: " << std::strerror(errno) << std::endl;
+			// probably have some stuff to free here first
+			exit(EXIT_FAILURE);
+		}
+		// Check for events occuring on already connected clients
+		for (size_t i = 0; i < this->fds.size(); ++i) {
+			if (this->fds[i].revents & POLLIN) {
+				if (this->fds[i].fd == this->serverSocket) {
+					if (addNewClient() == -1)
+						continue ;
+				}
+				else {
+					user = getUserByFd(this->fds[i].fd);
+					if (user)
+						handleMsg(user, i);
+				}		
+			}
+		}
+	}
+	if (this->state == OFF)
+		std::cout << "-------------IRCSERVER OFF-------------" << std::endl;
+	else if (this->state == START)
+		std::cout << "-------------IRCSERVER STARTING-------------" << std::endl;
+}
+
+void Server::stop() { close(this->serverSocket); }
+
+SERVER_STATE Server::getState() const {
+	return this->state;
+}
+
 int Server::addNewClient() {
-	struct sockaddr_in clientAddress;
-	socklen_t clientAddrSize = sizeof(clientAddress);
-	int clientSocket = accept(this->serverSocket, (struct sockaddr *)&clientAddress, &clientAddrSize);
+	struct sockaddr_in clientAdr;
+	socklen_t clientAddrSize = sizeof(clientAdr);
+	int clientSocket = accept(this->serverSocket, (struct sockaddr *)&clientAdr, &clientAddrSize);
 	if (clientSocket == -1) {
-		std::cerr << "Error: Failed to accept incoming connection." << std::endl;
+		std::cerr << "Error: accept: " << std::strerror(errno) << std::endl;
 		return -1;
 	}
-	// possibly might have to set this socket as well ot non blocking before adding
+	else
+		std::cout << "NEW CONNECTION" << std::endl;
+
+	// setting client socket to non-blocking not sure tho
 	if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cerr << "Error: Failed to set socket to non-blocking mode." << std::endl;
+		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	// get hostname info
+	char name[1000];
+	if (getnameinfo((struct sockaddr*)&clientAdr, clientAddrSize, name, sizeof(name), 0, 0, NI_NAMEREQD) != 0) {
+		std::cerr << "Error: getnameinfo: " << std::strerror(errno) << std::endl;
+	}
+	
 	// Add the new client socket to the vector
     pollfd new_client_fd;
     new_client_fd.fd = clientSocket;
-    new_client_fd.events = POLLIN;
+    new_client_fd.events = POLLIN | POLLOUT;
     fds.push_back(new_client_fd);
-	size_t id = getNumberOfUsers();
-	
-	std::string tmp;
 
-	tmp = "default" + std::to_string(id);
-	Users *user = new Users(tmp, tmp, "default", "normal", 0, clientSocket);
+	// create new user and add to list
+	Users *user = new Users(std::string(name), clientSocket);
 	if (!user) {
 		std::cerr << "Error: failed to create user for the connected client." << std::endl;
 		close(clientSocket);
 		return -1;
 	}	
 	this->all_users.push_back(user);
-	std::cout << "New connection!" << std::endl;
 	return 0;
 }
 
@@ -149,35 +196,6 @@ void Server::handleMsg(Users *user, size_t i) {
 	}
 }
 
-void Server::start() {
-	int activity;
-	Users	*user;
-
-	while (true) {
-		// We listen for incoming connections or incoming anything really
-		activity = poll(&(this->fds[0]), this->fds.size(), -1);	
-		if (activity < 0) {
-			std::cout << "Error: Poll error: " << errno << std::endl;
-			continue ;
-		}
-		// Check for events occuring on already connected clients
-		for (size_t i = 0; i < this->fds.size(); ++i) {
-			if (this->fds[i].revents & POLLIN) {
-				if (this->fds[i].fd == this->serverSocket) {
-					if (addNewClient() == -1)
-						continue ;
-				}
-				else {
-					user = getUserByFd(this->fds[i].fd);
-					if (user)
-						handleMsg(user, i);
-				}		
-			}
-		}
-	}
-}
-
-void Server::stop() { close(this->serverSocket); }
 
 size_t	Server::getNumberOfUsers() {
 	return this->all_users.size();

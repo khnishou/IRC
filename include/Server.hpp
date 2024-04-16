@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 14:41:16 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 15:26:24 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -56,6 +57,7 @@ class Server {
 		void start();
 		void stop();
 		
+		SERVER_STATE getState() const;
 		// create user delete user
 		int addNewClient();
 		void handleMsg(Users *user, size_t i);
