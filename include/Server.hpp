@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 15:26:24 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 15:47:42 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,27 @@ class Server {
 		int c_invite(std::vector<std::string> param, Users user);
 		int c_topic(std::vector<std::string> param, Users user);
 		int c_mode(std::vector<std::string> param, Users user);
+
+		// need to add following to start testing-- also probably new user cant do 
+		// any other command until they do these.
+		// cmd pass checks if the user is in the right state to prompt for password
+		// cmd nick checks user state then prompts for nickname
+		// cmd user checks user state then prompts for username
+		// structure is something like this:
+		// pass needs to be ran, check if right user state and check password and send the right reply
+		// then nickname, also check if right state then send reply and same for user
+		
+		// PASS--> USER STATE NEEDS TO BE INIT
+		// NICK/USER --> USERSTATE NEEDS TO BE LOGIN
+		// after that userstate should be set to registered and from that point onwards cant use any of these
+		
+
+
+		// unrelated but kidna is to above situation,, due to how server socket and client sockets work
+		// and the factthat everything is non blocking, we need to add some sort of buffer either on server
+		// or on client to make it so that if there is a reply/error or anything it needs ot be saved on a buffer
+		// and then we can send the replies accordingly.
+		
 };
 
 #endif
