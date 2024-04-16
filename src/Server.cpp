@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 16:01:55 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 18:30:36 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,9 @@ void Server::start() {
 					user = getUserByFd(this->fds[i].fd);
 					if (user)
 						handleMsg(user, i);
-				}		
+				}
+				// above logic probably needs to be changed a little for outgoing
+				// messages/errors/replies	
 			}
 		}
 	}
@@ -426,7 +428,7 @@ void Server::executeCmd(Message msg, Users user) {
 		// need to check wether we simply close the socket or remove the user from channels
 	}
 	else {
-		//ERR_UNKNOWNCOMMAND(_host, client->get_nick(), cmd);
+		//ERR_UNKNOWNCOMMAND(this->host, user.getNickName(), cmd);
 		// invalid cmd or whatever
 	}
 	
