@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 15:33:05 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/16 16:01:55 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,16 +181,18 @@ void Server::handleMsg(Users *user, size_t i) {
 	this->bytesReceived = recv(user->getSocketDescriptor(), this->buffer, sizeof(this->buffer), 0);
 
 	if (this->bytesReceived <= 0) {
-		close(user->getSocketDescriptor());
-		this->fds.erase(this->fds.begin() + i);
 		if (this->bytesReceived == 0)
 			std::cout << "Connection closed." << std::endl;
 		else
 			std::cerr << "Error: recv: " << std::strerror(errno) << std::endl;
+		// check this close, might have to do more
+		this->fds.erase(this->fds.begin() + i);
+		close(user->getSocketDescriptor());
 		return ;
 	}
 	else {
 		//  N A T S U E Z G H O D
+		// thos needs to be changed to handle split messages and incomplete messages
 		std::string msg(buffer, bytesReceived - 1);
 		std::cout << "Received: " << msg << std::endl;
 	}
@@ -389,15 +391,42 @@ int Server::c_mode(std::vector<std::string> param, Users user)
 void Server::executeCmd(Message msg, Users user) {
 	// handle tag
 	// handle source 
-	if (msg.command == "KICK") {
-    c_kick(msg.parameters, user);
-  } else if (msg.command == "INVITE") {
-    c_invite(msg.parameters, user);
-  } else if (msg.command == "TOPIC") {
-    c_topic(msg.parameters, user);
-  } else if (msg.command == "MODE") {
-    c_mode(msg.parameters, user);
-  } else {
+	if (msg.command == "PASS") {
+		// add password check command
+	}
+	else if (msg.command == "NICK") {
+		// add nickname setting comand
+	}
+	else if (msg.command == "USER") {
+		// add username setting command
+	}
+	else if (msg.command == "JOIN") {
+		// add join command
+	}
+	else if (msg.command == "KICK") {
+    	c_kick(msg.parameters, user);
+  	}
+  	else if (msg.command == "INVITE") {
+    	c_invite(msg.parameters, user);
+  	} 
+	else if (msg.command == "TOPIC") {
+    	c_topic(msg.parameters, user);
+  	} 
+	else if (msg.command == "MODE") {
+		c_mode(msg.parameters, user);
+  	}
+	else if (msg.command == "RESTART") {
+		// server restart command
+		// this command checks if the client has the right privileges, if he 
+		//does restart the server aka just set server state to START instead of ON
+	}
+	else if (msg.command == "QUIT") {
+		// quit command
+		// this command allows a user to properly exit the server
+		// need to check wether we simply close the socket or remove the user from channels
+	}
+	else {
+		//ERR_UNKNOWNCOMMAND(_host, client->get_nick(), cmd);
 		// invalid cmd or whatever
 	}
 	
