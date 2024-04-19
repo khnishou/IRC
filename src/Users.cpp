@@ -14,7 +14,7 @@
 
 Users::Users(std::string hostname, int socketDescriptor) : 
 hostName(hostname), nickName("default"), userName("default"), modes("default"), 
-permissionLevel(0), socketDescriptor(socketDescriptor), status(INIT) 
+permissionLevel(0), socketDescriptor(socketDescriptor), status(0) 
 {}
 
 Users::~Users() {
@@ -60,7 +60,7 @@ std::string Users::getModes() const {
 	return this->modes;
 }
 
-USER_STATE Users::getStatus() const {
+uint8_t Users::getStatus() const {
 	return this->status;
 }
 
@@ -97,8 +97,12 @@ void Users::setSocketDescriptor(int sd) {
 	this->socketDescriptor = sd;
 }
 
-void Users::setStatus(USER_STATE stat) {
-	this->status = stat;
+void Users::setStatus(uint8_t stat) {
+	this->status |= stat;
+}
+
+void Users::unsetStatus(uint8_t stat) {
+	this->status &= ~stat;
 }
 
 // ADDITIONAL NECESSARY FUNCTIONS GO HERE

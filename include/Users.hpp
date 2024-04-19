@@ -25,14 +25,14 @@ class Channel;
 
 class Users {
 	private:
-		std::string hostName;
-		std::string nickName;
-		std::string userName;
-		std::string modes;
-		int 		permissionLevel;
-		int			socketDescriptor;
-		USER_STATE	status;
-		std::vector<Channel *> invite_lst;
+		std::string 			hostName;
+		std::string 			nickName;
+		std::string 			userName;
+		std::string 			modes;
+		int 					permissionLevel;
+		int						socketDescriptor;
+		uint8_t					status;
+		std::vector<Channel *>	invite_lst;
 	public:
 		Users(std::string hostname, int socketDescriptor);
 		~Users();
@@ -46,7 +46,7 @@ class Users {
 		std::string getModes() const;
 		int 		getPermissionLevel() const;
 		int			getSocketDescriptor() const;
-		USER_STATE	getStatus() const;
+		uint8_t		getStatus() const;
 		// SETTERS
 		void		setHostName(std::string hostname);
 		void		setNickName(std::string nname);
@@ -54,7 +54,8 @@ class Users {
 		void		setModes(std::string mode);
 		void		setPermissionLevel(int permissionLevel);
 		void		setSocketDescriptor(int sd);
-		void		setStatus(USER_STATE stat);
+		void		setStatus(uint8_t stat);
+		void		unsetStatus(uint8_t stat);
 		// OTHER
 		void		invite(Channel *channel);
 		bool		is_invited(std::string cname);

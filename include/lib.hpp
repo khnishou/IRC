@@ -54,11 +54,9 @@
 #define RPL_MODECHAN(src_nick, src_usr, src_host, chan, mode, nick) 	":" + src_nick + "!" + src_usr + "@" + src_host + " MODE " + chan + " " + mode + " " + nick + "\r\n"
 #define RPL_KICK(src_nick, src_usr, src_host, chan, targ)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + targ + "\r\n"
 
-enum USER_STATE {
-	INIT,
-	LOGIN,
-	REGISTERED
-};
+#define PASS_FLAG (1 << 0)
+#define NICK_FLAG (1 << 1)
+#define USER_FLAG (1 << 2)
 
 enum SERVER_STATE {
 	ON,
