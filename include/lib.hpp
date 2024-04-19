@@ -75,4 +75,5 @@ int							skip_space(std::string str, int i);
 int							skip_arg(std::string str, int i);
 std::vector<std::string>	splitString(const std::string& str, char delimiter);
 uint8_t						initMode(std::string str, uint8_t mode);
+bool                        isNickname(const std::string& nickname);
 
