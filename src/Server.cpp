@@ -401,6 +401,19 @@ int Server::c_pass(std::vector<std::string> param, Users user)
 	return (0); // check should return an RPL value
 }
 
+int Server::c_nick(std::vector<std::string> param, Users user)
+{
+	if (!(param.size() >= 1))
+    	return (431); // error ERR_NONICKNAMEGIVEN (431)
+	if (!isNickname(param[0]))
+		return (432); // error ERR_ERRONEUSNICKNAME (432)
+	if (<nickname in use>)
+		return (433); // error ERR_NICKNAMEINUSE (433)
+	// check add nick name
+	user.setStatus(NICK_FLAG);
+	return (0); // check should return an RPL value
+}
+
 void Server::executeCmd(Message msg, Users user) {
 	// handle tag
 	// handle source 
@@ -408,7 +421,7 @@ void Server::executeCmd(Message msg, Users user) {
     	c_pass(msg.parameters, user);
 	}
 	else if (msg.command == "NICK") {
-		// add nickname setting comand
+    	c_nick(msg.parameters, user);
 	}
 	else if (msg.command == "USER") {
 		// add username setting command
