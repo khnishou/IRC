@@ -389,12 +389,23 @@ int Server::c_mode(std::vector<std::string> param, Users user)
 	return (0); // check should return an RPL value
 }
 
+int Server::c_pass(std::vector<std::string> param, Users user)
+{
+	if (!(param.size() >= 1))
+    	return (461); // error ERR_NEEDMOREPARAMS (461)
+	if (user.getStatus() & PASS_FLAG)
+		return (462); // error ERR_ALREADYREGISTERED (462)
+	if (param[0] != <password>)
+		return (464); // error ERR_PASSWDMISMATCH (464)
+	user.setStatus(PASS_FLAG);
+	return (0); // check should return an RPL value
+}
 
 void Server::executeCmd(Message msg, Users user) {
 	// handle tag
 	// handle source 
 	if (msg.command == "PASS") {
-		// add password check command
+    	c_pass(msg.parameters, user);
 	}
 	else if (msg.command == "NICK") {
 		// add nickname setting comand
