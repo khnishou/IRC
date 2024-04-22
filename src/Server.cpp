@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 13:59:33 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 14:16:15 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -343,6 +343,17 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	toAdd->invite(channel);
 }
 
+std::string Server::fill_vec(std::vector<std::string> param) {
+	std::string res;
+
+	for (std::vector<std::string>::iterator it = param.begin(); it != param.end(); ++it) {
+		res += *it;
+		if (it != param.end() - 1)
+			res += " ";
+	}
+	return res;
+}
+
 //	Command: TOPIC
 //	Parameters: <channel> [<topic>]
 //				ERR_NEEDMOREPARAMS (461)
@@ -359,19 +370,22 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	if (!channel)
 		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); //  (403)
 	if (!channel->isUser(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
-	if (!channel->isOperator(user))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
 	if (param.size() == 1) {
 		if (!channel->getTopic().empty())
       	return (user->setBuffer(RPL_NOTOPIC(this->host, user->getNickName(), channel->getName()))); // (331)
    	else
    		return (user->setBuffer(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
 	}
+		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
+	// this check is not enough, need to check for permissions differently, doesnt need to be operator in channel to change topic
+	if (!channel->isOperator(user) && (<cond>))
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
 	// add param vector together on string and then set
-	//channel->setTopic();
+	std::string top;
+	top = fill_vec(param);
+	channel->setTopic(top);
 	std::string time; // use this to set time
-	user->setBuffer(RPL_TOPICWHOTIME(this->host, channel->getName(), user->getNickName(), time)); // (333)
+	// need to look into this, when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
 }
 
 //	Command: MODE

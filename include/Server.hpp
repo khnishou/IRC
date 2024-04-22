@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 12:42:40 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 14:13:17 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ class Server {
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
 		bool	nickNameExists(std::string nname);
-		
+		std::string fill_vec(std::vector<std::string> param);
 		Channel *getChannel(const std::string cname);
 		
 		size_t getNumberOfUsers();
