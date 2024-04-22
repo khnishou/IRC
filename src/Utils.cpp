@@ -89,3 +89,13 @@ uint8_t initMode(std::string str, uint8_t mode)
 	return (mode);
 }
 
+std::string fill_vec(std::vector<std::string> param) {
+	std::string res;
+
+	for (std::vector<std::string>::iterator it = param.begin(); it != param.end(); ++it) {
+		res += *it;
+		if (it != param.end() - 1)
+			res += " ";
+	}
+	return res;
+}

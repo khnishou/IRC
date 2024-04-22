@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 15:27:03 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 15:44:41 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,17 +357,6 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName()));
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
 	toAdd->invite(channel);
-}
-
-std::string Server::fill_vec(std::vector<std::string> param) {
-	std::string res;
-
-	for (std::vector<std::string>::iterator it = param.begin(); it != param.end(); ++it) {
-		res += *it;
-		if (it != param.end() - 1)
-			res += " ";
-	}
-	return res;
 }
 
 //	Command: TOPIC
