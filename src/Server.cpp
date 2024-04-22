@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 15:44:41 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 15:47:43 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -426,7 +426,6 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 
 void	Server::c_pass(std::vector<std::string> param, Users *user)
 {
-	// no reply on success, however need to check if password alreadyinputed, err alreadyloggedin 460
 	if (!(param.size() >= 1))
     	return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PASS"))); // (461)
 	if (user->getStatus() & PASS_FLAG)

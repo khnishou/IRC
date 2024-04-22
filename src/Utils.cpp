@@ -35,7 +35,7 @@ bool isNickname(const std::string& nickname)
 			 || nickname[0] == '@' || isdigit(nickname[0]) || std::isspace(nickname[0]))
 		return (false);
 	i = 0;
-	while (i < nickname.length())
+	while (i < nickname.length() - 1)
 	{
 		if (!isalnum(nickname[i]) && nickname[i] != '\\' && nickname[i] != '|'
 			&& nickname[i] != '[' && nickname[i] != ']' && nickname[i] != '{'
