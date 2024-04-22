@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:20 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/15 12:56:43 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 12:02:17 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ class Channel {
 		void		deleteUser(Users *user);
 		void		deleteOperator(Users *user);
 		
-		bool isOperator(const Users &user);
-		bool isUser(const Users &user);
+		bool isOperator(const Users *user);
+		bool isUser(const Users *user);
 };
 
 #endif

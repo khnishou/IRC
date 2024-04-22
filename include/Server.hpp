@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 15:47:42 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 11:59:17 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class Server {
 		std::string					password;
 		SERVER_STATE				state;
 		int							serverSocket;
-		char						buffer[1024];
+		char							buffer[1024];
 		ssize_t						bytesReceived;
 		std::vector<Users *>		all_users;
 		std::vector<Channel *>		all_channels;
@@ -61,10 +61,11 @@ class Server {
 		// create user delete user
 		int addNewClient();
 		void handleMsg(Users *user, size_t i);
-  		void executeCmd(Message msg, Users user);
+  		void executeCmd(Message msg, Users *user);
 
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
+		bool	nickNameExists(std::string nname); // implement
 		
 		Channel *getChannel(const std::string cname);
 		
@@ -72,14 +73,14 @@ class Server {
 		// message forwarding i guess
 	
 		std::string getPassword() const;
- 		Message parsing(std::string str, Users user);
+ 		Message parsing(std::string str, Users *user);
 
-		int c_kick(std::vector<std::string> param, Users user);
-		int c_invite(std::vector<std::string> param, Users user);
-		int c_topic(std::vector<std::string> param, Users user);
-		int c_mode(std::vector<std::string> param, Users user);
-		int c_pass(std::vector<std::string> param, Users user);
-		int c_nick(std::vector<std::string> param, Users user);
+		int c_kick(std::vector<std::string> param, Users *user);
+		int c_invite(std::vector<std::string> param, Users *user);
+		int c_topic(std::vector<std::string> param, Users *user);
+		int c_mode(std::vector<std::string> param, Users *user);
+		int c_pass(std::vector<std::string> param, Users *user);
+		int c_nick(std::vector<std::string> param, Users *user);
 
 		// need to add following to start testing-- also probably new user cant do 
 		// any other command until they do these.

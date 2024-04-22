@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 18:30:36 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 12:05:32 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,6 +225,14 @@ Users *Server::getUserByUn(const std::string username) {
 	return NULL;
 }
 
+bool	Server::nickNameExists(std::string nname) {
+	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
+		if ((*it)->getNickName() == nname)
+			return true;
+	}
+	return false;
+}
+
 Channel *Server::getChannel(const std::string cname) {
 	for (std::vector<Channel *>::iterator it = this->all_channels.begin();
 			it != this->all_channels.end(); ++it) {
@@ -235,7 +243,7 @@ Channel *Server::getChannel(const std::string cname) {
 }
 
 // ['@' <tags> SPACE] [':' <source> SPACE] <command> <parameters> <crlf>
-Message Server::parsing(std::string str, Users user) {
+Message Server::parsing(std::string str, Users *user) {
 
     Message msg;
 
@@ -281,7 +289,7 @@ Message Server::parsing(std::string str, Users user) {
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERNOTINCHANNEL (441)
 //				ERR_NOTONCHANNEL (442)
-int Server::c_kick(std::vector<std::string> param, Users user) {
+int Server::c_kick(std::vector<std::string> param, Users *user) {
   std::vector<std::string> split;
 	if (!(param.size() >= 3))
 		return (461); // error ERR_NEEDMOREPARAMS (461)
@@ -297,7 +305,7 @@ int Server::c_kick(std::vector<std::string> param, Users user) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
 			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
-		if (!channel->isUser(*toKick))
+		if (!channel->isUser(toKick))
 			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
     channel->deleteUser(toKick); // add deleteUser in channel class
 		// kick message // add kick message for the current user <toKick>
@@ -313,7 +321,7 @@ int Server::c_kick(std::vector<std::string> param, Users user) {
 //				ERR_NOTONCHANNEL (442)
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERONCHANNEL (443)
-int Server::c_invite(std::vector<std::string> param, Users user) {
+int Server::c_invite(std::vector<std::string> param, Users *user) {
 	if (!(param.size() >= 2))
 		return (461); // error ERR_NEEDMOREPARAMS (461)
 	Channel *channel = getChannel(param[1]);
@@ -324,7 +332,7 @@ int Server::c_invite(std::vector<std::string> param, Users user) {
 	if (!channel->isOperator(user))
     	return (482); // error ERR_CHANOPRIVSNEEDED (482)
   Users *toAdd = getUserByUn(param[0]);
-	if (!channel->isUser(*toAdd))
+	if (!channel->isUser(toAdd))
 		return (443); // error ERR_USERONCHANNEL (443)
   channel->addUser(toAdd);
   return (341);   // no error RPL_INVITING (341)
@@ -339,7 +347,7 @@ int Server::c_invite(std::vector<std::string> param, Users user) {
 //				RPL_NOTOPIC (331)
 //				RPL_TOPIC (332)
 //				RPL_TOPICWHOTIME (333)
-int Server::c_topic(std::vector<std::string> param, Users user) {
+int Server::c_topic(std::vector<std::string> param, Users *user) {
   if (!(param.size() >= 1))
     return (461); // error ERR_NEEDMOREPARAMS (461)
   Channel *channel = getChannel(param[1]);
@@ -366,7 +374,7 @@ int Server::c_topic(std::vector<std::string> param, Users user) {
 //              RPL_CREATIONTIME (329)
 //              ERR_CHANOPRIVSNEEDED (482)
 //      i t k o l
-int Server::c_mode(std::vector<std::string> param, Users user)
+int Server::c_mode(std::vector<std::string> param, Users *user)
 {
 	uint8_t mode;
 	int i;
@@ -389,32 +397,32 @@ int Server::c_mode(std::vector<std::string> param, Users user)
 	return (0); // check should return an RPL value
 }
 
-int Server::c_pass(std::vector<std::string> param, Users user)
+int Server::c_pass(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() >= 1))
     	return (461); // error ERR_NEEDMOREPARAMS (461)
-	if (user.getStatus() & PASS_FLAG)
+	if (user->getStatus() & PASS_FLAG)
 		return (462); // error ERR_ALREADYREGISTERED (462)
-	if (param[0] != <password>)
+	if (param[0] != this->getPassword())
 		return (464); // error ERR_PASSWDMISMATCH (464)
-	user.setStatus(PASS_FLAG);
+	user->setStatus(PASS_FLAG);
 	return (0); // check should return an RPL value
 }
 
-int Server::c_nick(std::vector<std::string> param, Users user)
+int Server::c_nick(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() >= 1))
     	return (431); // error ERR_NONICKNAMEGIVEN (431)
 	if (!isNickname(param[0]))
 		return (432); // error ERR_ERRONEUSNICKNAME (432)
-	if (<nickname in use>)
+	if (nickNameExists(param[0]))
 		return (433); // error ERR_NICKNAMEINUSE (433)
-	// check add nick name
-	user.setStatus(NICK_FLAG);
+	user->setNickName(param[0]);
+	user->setStatus(NICK_FLAG);
 	return (0); // check should return an RPL value
 }
 
-void Server::executeCmd(Message msg, Users user) {
+void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
 	// handle source 
 	if (msg.command == "PASS") {

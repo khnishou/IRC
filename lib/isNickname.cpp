@@ -8,7 +8,7 @@ bool isNickname(const std::string& nickname)
 {
 	int	i;
 
-	if (nickname.empty() || nickname[0] == '#' || nickname[0] == '&' || nickname[0] == ':'
+	if (nickname.empty() || nickname.length() > 30 || nickname[0] == '#' || nickname[0] == '&' || nickname[0] == ':'
 			 || nickname[0] == '@' || isdigit(nickname[0]) || std::isspace(nickname[0]))
 		return (false);
 	i = 0;

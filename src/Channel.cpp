@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/15 12:56:55 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 12:02:16 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,19 +136,19 @@ std::vector<Users *> Channel::getOperatorList() const {
 	return this->operatorList;	
 }
 
-bool Channel::isOperator(const Users &user) {
+bool Channel::isOperator(const Users *user) {
 	for (std::vector<Users *>::iterator it = this->operatorList.begin();
 			it != this->operatorList.end(); ++it) {
-		if ((*it)->getNickName() == user.getNickName())
+		if ((*it)->getNickName() == user->getNickName())
 			return true;		
 	}
 	return false;
 }
 
-bool Channel::isUser(const Users &user) {
+bool Channel::isUser(const Users *user) {
 	for (std::vector<Users *>::iterator it = this->userList.begin();
 			it != this->userList.end(); ++it) {
-		if ((*it)->getNickName() == user.getNickName())
+		if ((*it)->getNickName() == user->getNickName())
 			return true;		
 	}
 	return false;
