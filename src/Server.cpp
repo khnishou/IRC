@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 14:16:15 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 15:27:03 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,8 @@ void Server::start() {
 				// above logic probably needs to be changed a little for outgoing
 				// messages/errors/replies	
 			}
+			if (this->fds[i].revents & POLLOUT)
+				this->send_2usr(this->fds[i].fd);
 		}
 	}
 	if (this->state == OFF)
@@ -137,6 +139,20 @@ void Server::stop() { close(this->serverSocket); }
 
 SERVER_STATE Server::getState() const {
 	return this->state;
+}
+
+void	Server::send_2usr(int fd) {
+	if (fd == this->serverSocket || fd == -1)
+		return ;
+	Users *user = this->getUserByFd(fd);
+	std::string msg = user->getBuffer();
+	if (msg.empty())
+		return ;
+	if (send(fd, msg.c_str(), msg.size(), 0) == (long)msg.size())
+		std::cout << "SENT: \"" << msg << "\"" << std::endl;
+	else
+		std::cerr << "Error: send: did not send al data" << std::endl;
+	user->setBuffer("");
 }
 
 int Server::addNewClient() {
@@ -378,7 +394,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	}
 		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
 	// this check is not enough, need to check for permissions differently, doesnt need to be operator in channel to change topic
-	if (!channel->isOperator(user) && (<cond>))
+	if (!channel->isOperator(user)) // add cond here for priv check
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
 	// add param vector together on string and then set
 	std::string top;

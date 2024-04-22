@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 12:04:22 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 12:45:36 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 15:28:39 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include "Channel.hpp"
-#include "lib.hpp"
+#include "Lib.hpp"
 
 class Channel;
 

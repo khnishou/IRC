@@ -55,9 +55,22 @@
 #define RPL_MODECHAN(src_nick, src_usr, src_host, chan, mode, nick) 	":" + src_nick + "!" + src_usr + "@" + src_host + " MODE " + chan + " " + mode + " " + nick + "\r\n"
 #define RPL_KICK(src_nick, src_usr, src_host, chan, targ)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + targ + "\r\n"
 
+// USER STATES
 #define PASS_FLAG (1 << 0)
 #define NICK_FLAG (1 << 1)
 #define USER_FLAG (1 << 2)
+
+// MODE STATES
+#define FLAG_I		(1 << 0)
+#define FLAG_T		(1 << 1)
+#define FLAG_K		(1 << 2)
+#define FLAG_O		(1 << 3)
+#define FLAG_L		(1 << 4)
+#define FLAG_ERR	(1 << 7)
+
+// FlAG UTILS
+#define FLAG_SET	(1 << 0)
+#define FLAG_UNSET	(1 << 1)
 
 enum SERVER_STATE {
 	ON,
