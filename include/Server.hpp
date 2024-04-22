@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 11:59:17 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 12:42:40 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Server {
 
 		Users *getUserByUn(const std::string uname);
 		Users *getUserByFd(int fd);
-		bool	nickNameExists(std::string nname); // implement
+		bool	nickNameExists(std::string nname);
 		
 		Channel *getChannel(const std::string cname);
 		
@@ -73,14 +73,14 @@ class Server {
 		// message forwarding i guess
 	
 		std::string getPassword() const;
- 		Message parsing(std::string str, Users *user);
+ 		Message parsing(std::string str);
 
-		int c_kick(std::vector<std::string> param, Users *user);
-		int c_invite(std::vector<std::string> param, Users *user);
-		int c_topic(std::vector<std::string> param, Users *user);
-		int c_mode(std::vector<std::string> param, Users *user);
-		int c_pass(std::vector<std::string> param, Users *user);
-		int c_nick(std::vector<std::string> param, Users *user);
+		void c_kick(std::vector<std::string> param, Users *user);
+		void c_invite(std::vector<std::string> param, Users *user);
+		void c_topic(std::vector<std::string> param, Users *user);
+		void c_mode(std::vector<std::string> param, Users *user);
+		void c_pass(std::vector<std::string> param, Users *user);
+		void c_nick(std::vector<std::string> param, Users *user);
 
 		// need to add following to start testing-- also probably new user cant do 
 		// any other command until they do these.

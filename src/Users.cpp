@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Users.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 13:53:50 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 14:27:14 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 12:45:56 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Users::Users(std::string hostname, int socketDescriptor) : 
 hostName(hostname), nickName("default"), userName("default"), modes("default"), 
-permissionLevel(0), socketDescriptor(socketDescriptor), status(0) 
+buffer(""), permissionLevel(0), socketDescriptor(socketDescriptor), status(0)
 {}
 
 Users::~Users() {
@@ -23,10 +23,11 @@ Users::~Users() {
 Users::Users(const Users &cp) {
 	this->hostName = cp.getHostName();
 	this->nickName = cp.getNickName();
-    this->userName = cp.getUserName();
-    this->modes = cp.getModes();
-    this->permissionLevel = cp.getPermissionLevel();
-    this->socketDescriptor = cp.getSocketDescriptor();
+   this->userName = cp.getUserName();
+   this->modes = cp.getModes();
+	this->buffer = cp.getBuffer();
+   this->permissionLevel = cp.getPermissionLevel();
+   this->socketDescriptor = cp.getSocketDescriptor();
 	this->status = cp.getStatus();
 }
 
@@ -36,6 +37,7 @@ Users &Users::operator=(const Users &cp) {
 		this->nickName = cp.getNickName();
 		this->userName = cp.getUserName();
 		this->modes = cp.getModes();
+		this->buffer = cp.getBuffer();
 		this->permissionLevel = cp.getPermissionLevel();
 		this->socketDescriptor = cp.getSocketDescriptor();
 		this->status = cp.getStatus();
@@ -58,6 +60,10 @@ std::string Users::getHostName() const {
 
 std::string Users::getModes() const {
 	return this->modes;
+}
+
+std::string Users::getBuffer() const {
+	return this->buffer;
 }
 
 uint8_t Users::getStatus() const {
@@ -87,6 +93,10 @@ void Users::setUserName(std::string uname) {
 
 void Users::setModes(std::string mode) {
 	this->modes = mode;
+}
+
+void Users::setBuffer(std::string buf) {
+	this->buffer = buf;
 }
 
 void Users::setPermissionLevel(int permissionLevel) {

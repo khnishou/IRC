@@ -15,6 +15,7 @@
 #define ERR_NICKNAMEINUSE(src, nick, used)								":" + src + " 433 " + nick + " " + used + " :Nickname is already in use\r\n"
 #define ERR_USERNOTINCHANNEL(src, nick, targ, chan)						":" + src +  " 441 " + nick + " " + targ + " " + chan + " :They aren't on that channel\r\n"
 #define ERR_NOTONCHANNEL(src, nick, chan)								":" + src +  " 442 " + nick + " " + chan + " :You're not on that channel\r\n"
+#define ERR_USERONCHANNEL(src, nick, chan)                              ":" + src + " 443 " + nick + " " + chan + " :is already on channel\r\n"
 #define ERR_NOTREGISTERED(source)										":" + source + " 451 " + ":You have not registered\r\n"
 #define ERR_ALREADYLOGEDIN(source)										":" + source + " 460 " ":Already logged in\r\n"
 #define ERR_NEEDMOREPARAMS(source, cmd)									":" + source + " 461 " + cmd + " :Not enough parameters\r\n"
@@ -24,7 +25,7 @@
 #define ERR_INVITEONLYCHAN(src, nick, chan)								":" + src + " 473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n"
 #define	ERR_NOPRIVILEGES(src, cmd)										":" + src + " 481 " + cmd + " :Permission Denied- You're not an IRC operator\r\n"
 #define ERR_CHANOPRIVSNEEDED(src, nick, chan)							":" + src +  " 482 " + nick + " " + chan + " :You're not channel operator\r\n"
-#define	ERR_UMODEUNKNOWNFLAUSR(src, nick)								":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
+#define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
 #define ERR_USERSDONTMATCH(src, nick)									":" + src +  " 502 " + nick + " :Cant change mode for other users\r\n"
 
 // NUMERIC REPLIES			
@@ -33,6 +34,7 @@
 #define RPL_MODECHANNEL(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
+#define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
 #define	RPL_INVITING(src, nick, targ, chan)								":" + src + " 341 " + nick + " " + targ + " " + chan + "\r\n"
 #define	RPL_NAMREPLY(src, nick, chan)									":" + src + " 353 " + nick + " = " + chan + " :"
 #define RPL_ENDOFNAMES(src, nick, chan)									":" + src + " 366 " + nick + " " + chan + " :END of NAMES list\r\n"

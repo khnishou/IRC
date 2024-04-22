@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Users.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 12:04:22 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/16 14:27:21 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/22 12:45:36 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class Users {
 		std::string 			nickName;
 		std::string 			userName;
 		std::string 			modes;
+		std::string				buffer;
 		int 					permissionLevel;
 		int						socketDescriptor;
 		uint8_t					status;
@@ -44,6 +45,7 @@ class Users {
 		std::string getNickName() const;
 		std::string getUserName() const;
 		std::string getModes() const;
+		std::string getBuffer() const;
 		int 		getPermissionLevel() const;
 		int			getSocketDescriptor() const;
 		uint8_t		getStatus() const;
@@ -52,6 +54,7 @@ class Users {
 		void		setNickName(std::string nname);
 		void		setUserName(std::string uname);
 		void		setModes(std::string mode);
+		void		setBuffer(std::string buf);
 		void		setPermissionLevel(int permissionLevel);
 		void		setSocketDescriptor(int sd);
 		void		setStatus(uint8_t stat);
