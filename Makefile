@@ -4,7 +4,7 @@ CC = g++
 RM = rm -rf
 CFLAGS =  -std=c++98 -MD
 
-SRC		=	Server main Users Channel Utils
+SRC		=	Server main Users Channel Utils ServerCommands ServerEngine
 
 SRC_DIR = src/
 OBJ_DIR = objects/

@@ -99,3 +99,42 @@ std::string fill_vec(std::vector<std::string> param) {
 	}
 	return res;
 }
+
+Message parsing(std::string str) {
+
+   Message msg;
+
+	int i;
+	int len;
+
+	i = skip_space(str, 0);
+	while (str[i] && str[i] == '@')
+	{
+		len = skip_arg(str, i);
+		msg.tags.push_back(str.substr(i + 1, len - 1));
+		i += len;
+		i = skip_space(str, i);
+	}
+	if (str[i] && str[i] == ':')
+	{
+		len = skip_arg(str, i);
+        msg.source = str.substr(i + 1, len - 1);
+		i += len;
+		i = skip_space(str, i);
+   }
+	if (str[i])
+	{
+		len = skip_arg(str, i);
+      msg.command = str.substr(i, len);
+		i += len;
+		i = skip_space(str, i);
+   }
+	while (str[i])
+	{
+		len = skip_arg(str, i);
+		msg.parameters.push_back(str.substr(i, len));
+		i += len;
+		i = skip_space(str, i);
+	}
+   return msg;
+}

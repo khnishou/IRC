@@ -91,4 +91,4 @@ std::vector<std::string>	splitString(const std::string& str, char delimiter);
 uint8_t						initMode(std::string str, uint8_t mode);
 bool                        isNickname(const std::string& nickname);
 std::string                 fill_vec(std::vector<std::string> param);
-
+Message                     parsing(std::string str);

@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/23 17:01:19 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/23 17:38:00 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,11 @@ class Server {
 		std::string						password;
 		SERVER_STATE					state;
 		int								serverSocket;
-		char								buffer[1024];
+		char							buffer[1024];
 		ssize_t							bytesReceived;
 		std::vector<Users *>			all_users;
-		std::vector<Channel *>		all_channels;
-		std::vector<struct pollfd>	fds;
+		std::vector<Channel *>			all_channels;
+		std::vector<struct pollfd>		fds;
 		Server();
 		
 	public:
@@ -75,7 +75,6 @@ class Server {
 		int				addNewClient();
 		void			removeUserFromServer(Users *user);
 		void			handleMsg(Users *user, size_t i);
- 		Message			parsing(std::string str);
   		void			executeCmd(Message msg, Users *user);
 
 		// COMMANDS
