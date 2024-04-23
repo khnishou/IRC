@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 15:47:43 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:22:37 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,11 @@ void Server::init() {
 	sfd.fd = this->serverSocket;
 	sfd.events = POLLIN;
 	this->fds.push_back(sfd);
-
 	// now server is ready, consider later myb adding a default starting channel.
+	Channel *general = new Channel("#GENERAL");
+	// general->setMode(); figure out which modes to open this channel with
+	general->setTopic("--GENERAL IRCSERV CHANNEL--");
+	this->all_channels.push_back(general);
 }
 
 void Server::start() {
@@ -122,10 +125,9 @@ void Server::start() {
 					if (user)
 						handleMsg(user, i);
 				}
-				// above logic probably needs to be changed a little for outgoing
-				// messages/errors/replies	
 			}
-			if (this->fds[i].revents & POLLOUT)
+			// send outgoing error messages/replies or even private messages
+			if (i < this->fds.size() && this->fds[i].revents & POLLOUT)
 				this->send_2usr(this->fds[i].fd);
 		}
 	}
@@ -151,7 +153,7 @@ void	Server::send_2usr(int fd) {
 	if (send(fd, msg.c_str(), msg.size(), 0) == (long)msg.size())
 		std::cout << "SENT: \"" << msg << "\"" << std::endl;
 	else
-		std::cerr << "Error: send: did not send al data" << std::endl;
+		std::cerr << "Error: send: did not send all data" << std::endl;
 	user->setBuffer("");
 }
 
@@ -203,26 +205,10 @@ void Server::handleMsg(Users *user, size_t i) {
 			std::cout << "Connection closed." << std::endl;
 		else
 			std::cerr << "Error: recv: " << std::strerror(errno) << std::endl;
-		// check this close, might have to do more
-		this->fds.erase(this->fds.begin() + i);
-		close(user->getSocketDescriptor());
-		if (user->getStatus() == (PASS_FLAG | USER_FLAG | NICK_FLAG)) { // check aka logic here is if at least one flag is off, delete user
-			// HERE USER HAS COMPLETED REGISTERING AND SHOULDNT BE DELETED
-			user->setSocketDescriptor(-1);
-		}
-		else {
-			// add delete function later this will do for now
-			for (std::vector<Users *>:: iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
-				if ((*it) == user) {
-					this->all_users.erase(it);
-					break ;
-				}
-			}
-		}
-		return ;
+		this->removeUserFromServer(user);
 	}
 	else {
-		// thos needs to be changed to handle split messages and incomplete messages
+		// those needs to be changed to handle split messages and incomplete messages
 		std::string msg(buffer, bytesReceived - 1);
 		Message cont = parsing(msg);
 		executeCmd(cont, user);
@@ -235,6 +221,8 @@ void Server::handleMsg(Users *user, size_t i) {
 size_t	Server::getNumberOfUsers() {
 	return this->all_users.size();
 }
+
+std::string Server::getHost() const { return this->host; }
 
 std::string Server::getPassword() const { return this->password; }
 
@@ -313,13 +301,6 @@ Message Server::parsing(std::string str) {
    return msg;
 }
 
-//	Command: KICK
-//	Parameters: <channel> <user> *( "," <user> ) [<comment>]
-//				ERR_NEEDMOREPARAMS (461)
-//				ERR_NOSUCHCHANNEL (403)
-//				ERR_CHANOPRIVSNEEDED (482)
-//				ERR_USERNOTINCHANNEL (441)
-//				ERR_NOTONCHANNEL (442)
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
   std::vector<std::string> split;
 	if (!(param.size() >= 3))
@@ -332,26 +313,19 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (!channel->isUser(user))
 		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
   split = splitString(param[1], ',');
-  for (size_t i = 0; i < split.size(); i++) {
+  for (size_t i = 0; i < split.size(); i++) { // check -1
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
 			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
-		if (!channel->isUser(toKick))
+		if (!channel->isUser(toKick) && !channel->isOperator(toKick))
 			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
-    channel->deleteUser(toKick); // add deleteUser in channel class
-		// kick message // add kick message for the current user <toKick>
+		if (channel->isUser(toKick))
+			channel->deleteUser(toKick, user, this->getHost());
+		else if (channel->isOperator(toKick))
+			channel->deleteOperator(toKick, user, this->getHost());
 	}
- 	//user->setBuffer()  need to find correct reply message on success
 }
 
-//	Command: INVITE
-//	Parameters: <nickname> <channel>
-//				RPL_INVITING (341)
-//				ERR_NEEDMOREPARAMS (461)
-//				ERR_NOSUCHCHANNEL (403)
-//				ERR_NOTONCHANNEL (442)
-//				ERR_CHANOPRIVSNEEDED (482)
-//				ERR_USERONCHANNEL (443)
 void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	if (!(param.size() >= 2))
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
@@ -372,15 +346,6 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	toAdd->invite(channel);
 }
 
-//	Command: TOPIC
-//	Parameters: <channel> [<topic>]
-//				ERR_NEEDMOREPARAMS (461)
-//				ERR_NOSUCHCHANNEL (403)
-//				ERR_NOTONCHANNEL (442)
-//				ERR_CHANOPRIVSNEEDED (482)
-//				RPL_NOTOPIC (331)
-//				RPL_TOPIC (332)
-//				RPL_TOPICWHOTIME (333)
 void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	if (!(param.size() >= 1))
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "TOPIC"))); // (461)
@@ -406,14 +371,6 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	// need to look into this, when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
 }
 
-//	Command: MODE
-//	Parameters: <target> [<modestring> [<mode arguments>...]]
-//              ERR_UMODEUNKNOWNFLAG (501)
-//              ERR_NOSUCHCHANNEL (403)
-//              RPL_CHANNELMODEIS (324)
-//              RPL_CREATIONTIME (329)
-//              ERR_CHANOPRIVSNEEDED (482)
-//      i t k o l
 void	Server::c_mode(std::vector<std::string> param, Users *user)
 {
 	uint8_t mode;
@@ -481,6 +438,39 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	
 }
 
+void Server::c_quit(std::vector<std::string> param, Users *user) {
+	
+}
+
+void Server::removeUserFromServer(Users *user) {
+	for (std::vector<pollfd>::iterator it = this->fds.begin(); it != this->fds.end(); it++) {
+		if ((*it).fd == this->serverSocket)
+			continue ;
+		if ((*it).fd == user->getSocketDescriptor()) {
+			close(user->getSocketDescriptor());
+			this->fds.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
+		if ((*it) == user) {
+			this->all_users.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
+		if ((*it)->isOperator(user)) {
+			(*it)->deleteOperator(user, NULL, this->getHost());
+			break ;
+		}
+		else if ((*it)->isUser(user)) {
+			(*it)->deleteUser(user, NULL, this->getHost());
+			break ;
+		}
+	}
+	delete user;
+}
+
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
 	// handle source 
@@ -511,20 +501,13 @@ void Server::executeCmd(Message msg, Users *user) {
 	else if (msg.command == "MODE") {
 		c_mode(msg.parameters, user);
   	}
-	else if (msg.command == "RESTART") {
-		// server restart command
-		// this command checks if the client has the right privileges, if he 
-		//does restart the server aka just set server state to START instead of ON
-	}
 	else if (msg.command == "QUIT") {
 		// quit command
 		// this command allows a user to properly exit the server
-		// need to check wether we simply close the socket or remove the user from channels
 	}
 	else {
-		//ERR_UNKNOWNCOMMAND(this->host, user.getNickName(), cmd);
+		// invalid cmd
 		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
-		// invalid cmd or whatever
 	}
 }
 

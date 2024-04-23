@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:20 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 15:42:16 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:58:39 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,10 @@ class Channel {
 		std::string 			name;
 		std::string 			topic;
 		uint8_t					modes;
-		std::string 			password;
-		Users 					*owner;
 		std::vector<Users *> userList;
 		std::vector<Users *> operatorList;
 	public:
-		Channel(std::string name, std::string topic, uint8_t modes,
-			std::string password, Users *owner);
+		Channel(std::string name);
 		~Channel();
 		Channel(const Channel &cp);
 		Channel &operator=(const Channel &cp);
@@ -42,23 +39,19 @@ class Channel {
 		// GETTERS
 		std::string 			getName() const;
 		std::string 			getTopic() const;
-		std::string 			getPassword() const;
 		uint8_t					getModes() const;
-		Users						*getOwner() const;
 		std::vector<Users *> getUserList() const;
 		std::vector<Users *> getOperatorList() const;
 		
 		// SETTERS
 		void						setTopic(const std::string topic);
 		void						setMode(const uint8_t mode);
-		void						setPassword(const std::string pass);
-		void						setOwner(Users *user);
 		
 		// UTILS
 		void						addUser(Users *user);
 		void						addOperator(Users *user);
-		void						deleteUser(Users *user);
-		void						deleteOperator(Users *user);
+		void						deleteUser(Users *removed, Users *remover, std::string host);
+		void						deleteOperator(Users *removed, Users *remover, std::string host);
 		bool 						isOperator(const Users *user);
 		bool 						isUser(const Users *user);
 };
