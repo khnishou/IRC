@@ -422,6 +422,21 @@ int Server::c_nick(std::vector<std::string> param, Users *user)
 	return (0); // check should return an RPL value
 }
 
+int Server::c_user(std::vector<std::string> param, Users *user)
+{
+	if (!(param.size() >= 1))
+    	return (461); // error ERR_NEEDMOREPARAMS (461)
+	if (user->getStatus() & USER_FLAG)
+		return (462); // error ERR_ALREADYREGISTERED (462)
+	user->setUserName(param[0]);
+	if (param.size() >= 4)
+		;// check  set realName
+	user->setStatus(USER_FLAG);
+	return (0); // check should return an RPL value
+}
+
+int Server::c_join(std::vector<std::string> param, Users *user)
+
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
 	// handle source 

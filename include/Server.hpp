@@ -81,6 +81,8 @@ class Server {
 		int c_mode(std::vector<std::string> param, Users *user);
 		int c_pass(std::vector<std::string> param, Users *user);
 		int c_nick(std::vector<std::string> param, Users *user);
+		int c_user(std::vector<std::string> param, Users *user);
+		int c_join(std::vector<std::string> param, Users *user);
 
 		// need to add following to start testing-- also probably new user cant do 
 		// any other command until they do these.
