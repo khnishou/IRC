@@ -206,6 +206,19 @@ void Server::handleMsg(Users *user, size_t i) {
 		// check this close, might have to do more
 		this->fds.erase(this->fds.begin() + i);
 		close(user->getSocketDescriptor());
+		if (user->getStatus() == (PASS_FLAG | USER_FLAG | NICK_FLAG)) { // check aka logic here is if at least one flag is off, delete user
+			// HERE USER HAS COMPLETED REGISTERING AND SHOULDNT BE DELETED
+			user->setSocketDescriptor(-1);
+		}
+		else {
+			// add delete function later this will do for now
+			for (std::vector<Users *>:: iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
+				if ((*it) == user) {
+					this->all_users.erase(it);
+					break ;
+				}
+			}
+		}
 		return ;
 	}
 	else {
