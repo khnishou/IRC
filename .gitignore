@@ -1,3 +1,4 @@
+*.o
 src/Server.o
 src/Users.o
 src/main.o
@@ -14,3 +15,5 @@ src/main.o
 src/Server.o
 ircserv
 .vscode/settings.json
+lib/initMode.o
+lib/split.o
