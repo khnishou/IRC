@@ -15,6 +15,7 @@
 #define ERR_NICKNAMEINUSE(src, nick, used)								":" + src + " 433 " + nick + " " + used + " :Nickname is already in use\r\n"
 #define ERR_USERNOTINCHANNEL(src, nick, targ, chan)						":" + src +  " 441 " + nick + " " + targ + " " + chan + " :They aren't on that channel\r\n"
 #define ERR_NOTONCHANNEL(src, nick, chan)								":" + src +  " 442 " + nick + " " + chan + " :You're not on that channel\r\n"
+#define ERR_USERONCHANNEL(src, nick, chan)                              ":" + src + " 443 " + nick + " " + chan + " :is already on channel\r\n"
 #define ERR_NOTREGISTERED(source)										":" + source + " 451 " + ":You have not registered\r\n"
 #define ERR_ALREADYLOGEDIN(source)										":" + source + " 460 " ":Already logged in\r\n"
 #define ERR_NEEDMOREPARAMS(source, cmd)									":" + source + " 461 " + cmd + " :Not enough parameters\r\n"
@@ -24,7 +25,7 @@
 #define ERR_INVITEONLYCHAN(src, nick, chan)								":" + src + " 473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n"
 #define	ERR_NOPRIVILEGES(src, cmd)										":" + src + " 481 " + cmd + " :Permission Denied- You're not an IRC operator\r\n"
 #define ERR_CHANOPRIVSNEEDED(src, nick, chan)							":" + src +  " 482 " + nick + " " + chan + " :You're not channel operator\r\n"
-#define	ERR_UMODEUNKNOWNFLAUSR(src, nick)								":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
+#define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
 #define ERR_USERSDONTMATCH(src, nick)									":" + src +  " 502 " + nick + " :Cant change mode for other users\r\n"
 
 // NUMERIC REPLIES			
@@ -33,6 +34,7 @@
 #define RPL_MODECHANNEL(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
+#define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
 #define	RPL_INVITING(src, nick, targ, chan)								":" + src + " 341 " + nick + " " + targ + " " + chan + "\r\n"
 #define	RPL_NAMREPLY(src, nick, chan)									":" + src + " 353 " + nick + " = " + chan + " :"
 #define RPL_ENDOFNAMES(src, nick, chan)									":" + src + " 366 " + nick + " " + chan + " :END of NAMES list\r\n"
@@ -50,13 +52,25 @@
 #define RPL_PRIVMSG(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " PRIVMSG " + dis_nick + " :" + msg + "\r\n"
 #define RPL_NOTICE(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " NOTICE " + dis_nick + " :" + msg + "\r\n"
 #define RPL_QUIT(src_nick, src_usr, src_host, reason)					":" + src_nick + "!" + src_usr + "@" + src_host + " " + reason + "\r\n"
-#define RPL_TOPICCHANGE(src_nick, src_usr, src_host, chan, topic)		":" + src_nick + "!" + src_usr + "@" + src_host + " TOPIC " + chan + " :" + topic + "\r\n"
 #define RPL_MODECHAN(src_nick, src_usr, src_host, chan, mode, nick) 	":" + src_nick + "!" + src_usr + "@" + src_host + " MODE " + chan + " " + mode + " " + nick + "\r\n"
 #define RPL_KICK(src_nick, src_usr, src_host, chan, targ)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + targ + "\r\n"
 
+// USER STATES
 #define PASS_FLAG (1 << 0)
 #define NICK_FLAG (1 << 1)
 #define USER_FLAG (1 << 2)
+
+// MODE STATES
+#define FLAG_I		(1 << 0)
+#define FLAG_T		(1 << 1)
+#define FLAG_K		(1 << 2)
+#define FLAG_O		(1 << 3)
+#define FLAG_L		(1 << 4)
+#define FLAG_ERR	(1 << 7)
+
+// FlAG UTILS
+#define FLAG_SET	(1 << 0)
+#define FLAG_UNSET	(1 << 1)
 
 enum SERVER_STATE {
 	ON,
@@ -65,10 +79,10 @@ enum SERVER_STATE {
 };
 
 struct Message {
-    std::vector<std::string> tags;
-    std::string source;
-    std::string command;
-    std::vector<std::string> parameters;
+    std::vector<std::string>    tags;
+    std::string                 source;
+    std::string                 command;
+    std::vector<std::string>    parameters;
 };
 
 int							skip_space(std::string str, int i);
@@ -76,4 +90,5 @@ int							skip_arg(std::string str, int i);
 std::vector<std::string>	splitString(const std::string& str, char delimiter);
 uint8_t						initMode(std::string str, uint8_t mode);
 bool                        isNickname(const std::string& nickname);
+std::string                 fill_vec(std::vector<std::string> param);
 

@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 12:05:32 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/22 15:47:43 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,8 @@ void Server::start() {
 				// above logic probably needs to be changed a little for outgoing
 				// messages/errors/replies	
 			}
+			if (this->fds[i].revents & POLLOUT)
+				this->send_2usr(this->fds[i].fd);
 		}
 	}
 	if (this->state == OFF)
@@ -137,6 +139,20 @@ void Server::stop() { close(this->serverSocket); }
 
 SERVER_STATE Server::getState() const {
 	return this->state;
+}
+
+void	Server::send_2usr(int fd) {
+	if (fd == this->serverSocket || fd == -1)
+		return ;
+	Users *user = this->getUserByFd(fd);
+	std::string msg = user->getBuffer();
+	if (msg.empty())
+		return ;
+	if (send(fd, msg.c_str(), msg.size(), 0) == (long)msg.size())
+		std::cout << "SENT: \"" << msg << "\"" << std::endl;
+	else
+		std::cerr << "Error: send: did not send al data" << std::endl;
+	user->setBuffer("");
 }
 
 int Server::addNewClient() {
@@ -193,13 +209,15 @@ void Server::handleMsg(Users *user, size_t i) {
 		return ;
 	}
 	else {
-		//  N A T S U E Z G H O D
 		// thos needs to be changed to handle split messages and incomplete messages
 		std::string msg(buffer, bytesReceived - 1);
+		Message cont = parsing(msg);
+		executeCmd(cont, user);
+		// send reply if buffer not empty to client 
 		std::cout << "Received: " << msg << std::endl;
+		std::cout << "Reply code: " << user->getBuffer() << std::endl;
 	}
 }
-
 
 size_t	Server::getNumberOfUsers() {
 	return this->all_users.size();
@@ -243,9 +261,9 @@ Channel *Server::getChannel(const std::string cname) {
 }
 
 // ['@' <tags> SPACE] [':' <source> SPACE] <command> <parameters> <crlf>
-Message Server::parsing(std::string str, Users *user) {
+Message Server::parsing(std::string str) {
 
-    Message msg;
+   Message msg;
 
 	int i;
 	int len;
@@ -264,14 +282,14 @@ Message Server::parsing(std::string str, Users *user) {
         msg.source = str.substr(i + 1, len - 1);
 		i += len;
 		i = skip_space(str, i);
-    }
+   }
 	if (str[i])
 	{
 		len = skip_arg(str, i);
-        msg.command = str.substr(i, len);
+      msg.command = str.substr(i, len);
 		i += len;
 		i = skip_space(str, i);
-    }
+   }
 	while (str[i])
 	{
 		len = skip_arg(str, i);
@@ -279,7 +297,7 @@ Message Server::parsing(std::string str, Users *user) {
 		i += len;
 		i = skip_space(str, i);
 	}
-    return msg;
+   return msg;
 }
 
 //	Command: KICK
@@ -289,28 +307,28 @@ Message Server::parsing(std::string str, Users *user) {
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERNOTINCHANNEL (441)
 //				ERR_NOTONCHANNEL (442)
-int Server::c_kick(std::vector<std::string> param, Users *user) {
+void	Server::c_kick(std::vector<std::string> param, Users *user) {
   std::vector<std::string> split;
 	if (!(param.size() >= 3))
-		return (461); // error ERR_NEEDMOREPARAMS (461)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "KICK"))); // (461)
   Channel *channel = getChannel(param[0]);
   if (!channel)
-		return (403); // error ERR_NOSUCHCHANNEL (403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
   if (!channel->isOperator(user))
-		return (482); // error ERR_CHANOPRIVSNEEDED (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	if (!channel->isUser(user))
-		return (442); // error ERR_NOTONCHANNEL (442) // check 441 before 442
+		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
   split = splitString(param[1], ',');
   for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
-			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
 		if (!channel->isUser(toKick))
-			return (441); // error ERR_USERNOTINCHANNEL (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
     channel->deleteUser(toKick); // add deleteUser in channel class
 		// kick message // add kick message for the current user <toKick>
 	}
-	return (0); // no error no message return
+ 	//user->setBuffer()  need to find correct reply message on success
 }
 
 //	Command: INVITE
@@ -321,21 +339,24 @@ int Server::c_kick(std::vector<std::string> param, Users *user) {
 //				ERR_NOTONCHANNEL (442)
 //				ERR_CHANOPRIVSNEEDED (482)
 //				ERR_USERONCHANNEL (443)
-int Server::c_invite(std::vector<std::string> param, Users *user) {
+void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	if (!(param.size() >= 2))
-		return (461); // error ERR_NEEDMOREPARAMS (461)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
 	Channel *channel = getChannel(param[1]);
 	if (!channel)
-		return (403); // error ERR_NOSUCHCHANNEL (403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
 	if (!channel->isUser(user))
-    	return (442); // error ERR_NOTONCHANNEL (442)
+    	return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); //  (442)
 	if (!channel->isOperator(user))
-    	return (482); // error ERR_CHANOPRIVSNEEDED (482)
+    	return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
   Users *toAdd = getUserByUn(param[0]);
 	if (!channel->isUser(toAdd))
-		return (443); // error ERR_USERONCHANNEL (443)
-  channel->addUser(toAdd);
-  return (341);   // no error RPL_INVITING (341)
+		return (user->setBuffer(ERR_USERONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (443)
+  	channel->addUser(toAdd);
+	// no error occured, setting the correct replies on the executing user and receiving user
+	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName()));
+	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
+	toAdd->invite(channel);
 }
 
 //	Command: TOPIC
@@ -347,23 +368,29 @@ int Server::c_invite(std::vector<std::string> param, Users *user) {
 //				RPL_NOTOPIC (331)
 //				RPL_TOPIC (332)
 //				RPL_TOPICWHOTIME (333)
-int Server::c_topic(std::vector<std::string> param, Users *user) {
-  if (!(param.size() >= 1))
-    return (461); // error ERR_NEEDMOREPARAMS (461)
-  Channel *channel = getChannel(param[1]);
-  if (!channel)
-    return (403); // error ERR_NOSUCHCHANNEL (403)
-  if (!channel->isUser(user))
-    return (442); // error ERR_NOTONCHANNEL (442)
-  if (!channel->isOperator(user))
-    return (482); // error ERR_CHANOPRIVSNEEDED (482)
-  if (param.size() == 1) {
-    if (!channel->getTopic().empty())
-      return (331); // no error RPL_NOTOPIC (331)
-    else
-      return (332); // no error RPL_TOPIC (332)
-  }
-  return (333); // no error RPL_TOPICWHOTIME (333)
+void	Server::c_topic(std::vector<std::string> param, Users *user) {
+	if (!(param.size() >= 1))
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "TOPIC"))); // (461)
+	Channel *channel = getChannel(param[1]);
+	if (!channel)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); //  (403)
+	if (!channel->isUser(user))
+	if (param.size() == 1) {
+		if (!channel->getTopic().empty())
+      	return (user->setBuffer(RPL_NOTOPIC(this->host, user->getNickName(), channel->getName()))); // (331)
+   	else
+   		return (user->setBuffer(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
+	}
+		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
+	// this check is not enough, need to check for permissions differently, doesnt need to be operator in channel to change topic
+	if (!channel->isOperator(user)) // add cond here for priv check
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
+	// add param vector together on string and then set
+	std::string top;
+	top = fill_vec(param);
+	channel->setTopic(top);
+	std::string time; // use this to set time
+	// need to look into this, when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
 }
 
 //	Command: MODE
@@ -374,49 +401,48 @@ int Server::c_topic(std::vector<std::string> param, Users *user) {
 //              RPL_CREATIONTIME (329)
 //              ERR_CHANOPRIVSNEEDED (482)
 //      i t k o l
-int Server::c_mode(std::vector<std::string> param, Users *user)
+void	Server::c_mode(std::vector<std::string> param, Users *user)
 {
 	uint8_t mode;
 	int i;
 
-	if (!(param.size() >= 2))
-    	return (461); // error ERR_NEEDMOREPARAMS (461) // check
+	if (!(param.size() >= 1))
+    	return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461) 
 	i = 0;
 	while (++i < param.size())
 		mode = initMode(param[i], mode);
 	if (mode & (1 << 7))
-		return (501); // error ERR_UMODEUNKNOWNFLAG (501)
+		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(this->host, user->getNickName()))); //(501)
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
-    	return (403); // error ERR_NOSUCHCHANNEL (403)
+    	return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // 403)
 	if (!channel->isUser(user))
-    	return (442); // error ERR_NOTONCHANNEL (442)
+    	return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user))
-    	return (482); // error ERR_CHANOPRIVSNEEDED (482)
+    	return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	channel->setMode(mode);
-	return (0); // check should return an RPL value
+	// check should return an RPL value
 }
 
-int Server::c_pass(std::vector<std::string> param, Users *user)
+void	Server::c_pass(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() >= 1))
-    	return (461); // error ERR_NEEDMOREPARAMS (461)
+    	return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PASS"))); // (461)
 	if (user->getStatus() & PASS_FLAG)
-		return (462); // error ERR_ALREADYREGISTERED (462)
+		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
 	if (param[0] != this->getPassword())
-		return (464); // error ERR_PASSWDMISMATCH (464)
+		return (user->setBuffer(ERR_PASSWDMISMATCH(user->getNickName()))); // (464)
 	user->setStatus(PASS_FLAG);
-	return (0); // check should return an RPL value
 }
 
-int Server::c_nick(std::vector<std::string> param, Users *user)
+void	Server::c_nick(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() >= 1))
-    	return (431); // error ERR_NONICKNAMEGIVEN (431)
+    	return (user->setBuffer(ERR_NONICKNAMEGIVEN(user->getNickName()))); // (431)
 	if (!isNickname(param[0]))
-		return (432); // error ERR_ERRONEUSNICKNAME (432)
+		return (user->setBuffer(ERR_ERRONEUSNICKNAME(this->host, user->getNickName(), param[0]))); // (432)
 	if (nickNameExists(param[0]))
-		return (433); // error ERR_NICKNAMEINUSE (433)
+		return (user->setBuffer(ERR_NICKNAMEINUSE(this->host, user->getNickName(), param[0]))); // (433)
 	user->setNickName(param[0]);
 	user->setStatus(NICK_FLAG);
 	return (0); // check should return an RPL value
@@ -448,6 +474,7 @@ void Server::executeCmd(Message msg, Users *user) {
 	}
 	else if (msg.command == "USER") {
 		// add username setting command
+		// user len cant be over 18
 	}
 	else if (msg.command == "JOIN") {
 		// add join command
@@ -478,5 +505,6 @@ void Server::executeCmd(Message msg, Users *user) {
 		//ERR_UNKNOWNCOMMAND(this->host, user.getNickName(), cmd);
 		// invalid cmd or whatever
 	}
-	
 }
+
+
