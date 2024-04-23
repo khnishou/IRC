@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 15:44:49 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:38:00 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,11 @@ class Server {
 		std::string						password;
 		SERVER_STATE					state;
 		int								serverSocket;
-		char								buffer[1024];
+		char							buffer[1024];
 		ssize_t							bytesReceived;
 		std::vector<Users *>			all_users;
-		std::vector<Channel *>		all_channels;
-		std::vector<struct pollfd>	fds;
+		std::vector<Channel *>			all_channels;
+		std::vector<struct pollfd>		fds;
 		Server();
 		
 	public:
@@ -62,21 +62,22 @@ class Server {
 		void stop();
 		
 		// GETTERS
-		SERVER_STATE getState() const;
-		Users 		*getUserByUn(const std::string uname);
-		Users 		*getUserByFd(int fd);
-		std::string	getPassword() const;
+		SERVER_STATE 	getState() const;
+		Users 			*getUserByUn(const std::string uname);
+		Users 			*getUserByFd(int fd);
+		std::string		getHost() const;
+		std::string		getPassword() const;
 		Channel 		*getChannel(const std::string cname);
-		size_t 		getNumberOfUsers();
+		size_t 			getNumberOfUsers();
 		
 		bool			nickNameExists(std::string nname);
 		
 		// message forwarding i guess
 		void			send_2usr(int fd);
 
-		int			addNewClient();
+		int				addNewClient();
+		void			removeUserFromServer(Users *user);
 		void			handleMsg(Users *user, size_t i);
- 		Message		parsing(std::string str);
   		void			executeCmd(Message msg, Users *user);
 
 		// COMMANDS
@@ -88,6 +89,7 @@ class Server {
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
 		void			c_join(std::vector<std::string> param, Users *user);
+		void			c_quit(std::vector<std::string> param, Users *user);
 };
 
 #endif
