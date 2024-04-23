@@ -476,9 +476,42 @@ void	Server::c_user(std::vector<std::string> param, Users *user)
 
 void	Server::c_join(std::vector<std::string> param, Users *user)
 {
+	int i;
+	std::vector<std::string> keys;
+	std::vector<std::string> channels;
+
 	if (!(param.size() >= 1))
-    	return ; // error ERR_NEEDMOREPARAMS (461)
-	
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
+	channels = splitString(param[0], ',');
+	if (channels.size() > CHANLIMIT)
+		; // error ERR_TOOMANYCHANNELS (405)
+	if (!(param.size() >= 2))
+		keys = splitString(param[1], ',');
+	i = 0;
+	while (i < channels.size()) // check add -1 
+	{
+		Channel *channel = getChannel(channels[i]);
+		if (!channel)
+			this->all_channels.push_back(channel);
+		else if (channel->getModes() & FLAG_I)
+			; // error ERR_INVITEONLYCHAN (473)
+		else if (!(channel->getModes() & FLAG_K) ||
+			(!(keys.empty()) && !(keys[i].empty()) && keys[i] == channel->getPassword()))
+		{
+			if (channel->getUserList().size() > USERLIMIT)
+				; // error ERR_CHANNELISFULL (471)
+			else
+				channel->addUser(user);
+		}
+		else
+			; // error ERR_BADCHANNELKEY (475)
+		i++;
+	}
+	// check add RPL msg
+	// RPL_TOPIC (332)
+	// RPL_TOPICWHOTIME (333)
+	// RPL_NAMREPLY (353)
+	// RPL_ENDOFNAMES (366)
 }
 
 void Server::executeCmd(Message msg, Users *user) {

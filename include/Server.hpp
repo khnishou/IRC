@@ -30,6 +30,9 @@
 #include "Channel.hpp"
 #include "Lib.hpp"
 
+#define CHANLIMIT	5
+#define USERLIMIT	20
+
 class Users;
 class Channel;
 
