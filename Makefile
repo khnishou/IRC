@@ -1,22 +1,32 @@
-SRC = src/Server.cpp src/main.cpp src/Users.cpp src/Channel.cpp src/Utils.cpp
-OBJ = $(SRC:.cpp=.o)
-CC = g++
-RM = rm -rf
-CPPFLAGS = -std=c++98 -pedantic
 
 NAME = ircserv
+CC = g++
+RM = rm -rf
+CFLAGS =  -std=c++98 -MD
 
-all: $(NAME)
+SRC		=	Server main Users Channel Utils
 
-$(NAME): $(OBJ)
-	$(CC) $(CPPFLAGS) $(OBJ) -o $(NAME)
+SRC_DIR = src/
+OBJ_DIR = objects/
+
+SRCS = $(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC)))
+
+OBJS = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC)))
+
+all: $(NAME) 
+
+$(NAME): $(OBJS)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
+
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJ_DIR)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) 
 
-re: fclean $(NAME)
-
+re: fclean all
 .PHONY: all clean fclean re
