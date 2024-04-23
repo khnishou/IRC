@@ -445,23 +445,28 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 		return (user->setBuffer(ERR_NICKNAMEINUSE(this->host, user->getNickName(), param[0]))); // (433)
 	user->setNickName(param[0]);
 	user->setStatus(NICK_FLAG);
-	return (0); // check should return an RPL value
+	// return (0); // check should return an RPL value
 }
 
-int Server::c_user(std::vector<std::string> param, Users *user)
+void	Server::c_user(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() >= 1))
-    	return (461); // error ERR_NEEDMOREPARAMS (461)
+    	return ; // error ERR_NEEDMOREPARAMS (461)
 	if (user->getStatus() & USER_FLAG)
-		return (462); // error ERR_ALREADYREGISTERED (462)
+		return ; // error ERR_ALREADYREGISTERED (462)
 	user->setUserName(param[0]);
 	if (param.size() >= 4)
 		;// check  set realName
 	user->setStatus(USER_FLAG);
-	return (0); // check should return an RPL value
+	// return (0); // check should return an RPL value
 }
 
-int Server::c_join(std::vector<std::string> param, Users *user)
+void	Server::c_join(std::vector<std::string> param, Users *user)
+{
+	if (!(param.size() >= 1))
+    	return ; // error ERR_NEEDMOREPARAMS (461)
+	
+}
 
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
@@ -473,10 +478,12 @@ void Server::executeCmd(Message msg, Users *user) {
     	c_nick(msg.parameters, user);
 	}
 	else if (msg.command == "USER") {
+    	c_user(msg.parameters, user);
 		// add username setting command
 		// user len cant be over 18
 	}
 	else if (msg.command == "JOIN") {
+    	c_join(msg.parameters, user);
 		// add join command
 	}
 	else if (msg.command == "KICK") {
@@ -503,6 +510,7 @@ void Server::executeCmd(Message msg, Users *user) {
 	}
 	else {
 		//ERR_UNKNOWNCOMMAND(this->host, user.getNickName(), cmd);
+		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
 		// invalid cmd or whatever
 	}
 }

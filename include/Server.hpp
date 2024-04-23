@@ -83,6 +83,8 @@ class Server {
 		void			c_mode(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
+		void			c_user(std::vector<std::string> param, Users *user);
+		void			c_join(std::vector<std::string> param, Users *user);
 };
 
 #endif

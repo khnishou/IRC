@@ -27,8 +27,8 @@ class Channel {
 	private:
 		std::string 			name;
 		std::string 			topic;
-		std::string 			password;
 		uint8_t					modes;
+		std::string 			password;
 		Users 					*owner;
 		std::vector<Users *> userList;
 		std::vector<Users *> operatorList;
