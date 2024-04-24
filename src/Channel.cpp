@@ -29,17 +29,17 @@ Channel &Channel::operator=(const Channel &cp) {
 //                              Accessor Methods                              //
 //****************************************************************************//
 
-std::string Channel::getName() const { return this->_name; }
-std::string Channel::getTopic() const { return this->_topic; }
-std::string Channel::getPassword() const { return this->_password; }
-uint8_t Channel::getModes() const { return this->_modes; }
-std::vector<Users *> Channel::getUserList() const { return this->_userList; }
-std::vector<Users *> Channel::getOperatorList() const { return this->_operatorList; }
+std::string				Channel::getName() const { return this->_name; }
+std::string				Channel::getTopic() const { return this->_topic; }
+std::string				Channel::getPassword() const { return this->_password; }
+uint8_t					Channel::getModes() const { return this->_modes; }
+std::vector<Users *>	Channel::getUserList() const { return this->_userList; }
+std::vector<Users *>	Channel::getOperatorList() const { return this->_operatorList; }
 
-void Channel::setName(const std::string name) { this->_name = name; }
-void Channel::setTopic(const std::string topic) { this->_topic = topic; }
-void Channel::setMode(const uint8_t mode) { this->_modes = mode; }
-void Channel::setPassword(const std::string pass) { this->_password = pass; }
+void					Channel::setName(const std::string name) { this->_name = name; }
+void					Channel::setTopic(const std::string topic) { this->_topic = topic; }
+void					Channel::setMode(const uint8_t mode) { this->_modes = mode; }
+void					Channel::setPassword(const std::string pass) { this->_password = pass; }
 
 //****************************************************************************//
 //                           User Accessor Methods                            //
