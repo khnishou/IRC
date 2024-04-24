@@ -78,13 +78,12 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	if (!(param.size() >= 1))
     	return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461) 
 	i = 0;
-	while (++i < param.size())
-		mode = initMode(param[i], mode);
-	if (mode & (1 << 7))
-		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(this->host, user->getNickName()))); //(501)
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
     	return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // 403)
+	mode = initMode(param, mode, channel);
+	if (mode & (1 << 7))
+		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(this->host, user->getNickName()))); //(501)
 	if (!channel->isUser(user))
     	return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user))
