@@ -5,10 +5,10 @@
 //                          Constructor & Destructor                          //
 //****************************************************************************//
 
-Channel::Channel(std::string name) : _name(name), _topic(""), _password(""), _modes(0) { }
+Channel::Channel(std::string name) : _name(name), _topic(""), _password(""), _modes(0), _chanLimit(20) { }
 
 Channel::Channel(const Channel &cp) : _name(cp.getName()), _topic(cp.getTopic()),
-_password(cp.getPassword()), _modes(cp.getModes()), _userList(cp.getUserList()),
+_password(cp.getPassword()), _modes(cp.getModes()), _chanLimit(cp.getChanLimit()), _userList(cp.getUserList()),
 _operatorList(cp.getOperatorList()) { }
 
 Channel::~Channel() { }
@@ -18,6 +18,7 @@ Channel &Channel::operator=(const Channel &cp) {
 		this->_name = cp.getName();
 		this->_topic = cp.getTopic();
 		this->_modes = cp.getModes();
+		this->_chanLimit = cp.getChanLimit();
 		this->_password = cp.getPassword();
 		this->_userList = cp.getUserList();
 		this->_operatorList = cp.getOperatorList();
@@ -33,13 +34,15 @@ std::string				Channel::getName() const { return this->_name; }
 std::string				Channel::getTopic() const { return this->_topic; }
 std::string				Channel::getPassword() const { return this->_password; }
 uint8_t					Channel::getModes() const { return this->_modes; }
+int						Channel::getChanLimit() const { return this->_chanLimit; }
 std::vector<Users *>	Channel::getUserList() const { return this->_userList; }
 std::vector<Users *>	Channel::getOperatorList() const { return this->_operatorList; }
 
 void					Channel::setName(const std::string name) { this->_name = name; }
 void					Channel::setTopic(const std::string topic) { this->_topic = topic; }
-void					Channel::setMode(const uint8_t mode) { this->_modes = mode; }
 void					Channel::setPassword(const std::string pass) { this->_password = pass; }
+void					Channel::setMode(const uint8_t mode) { this->_modes = mode; }
+void					Channel::setChanLimit(const int chanLimit) { this->_chanLimit = chanLimit; }
 
 //****************************************************************************//
 //                           User Accessor Methods                            //
