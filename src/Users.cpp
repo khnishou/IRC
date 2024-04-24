@@ -3,14 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Users.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 13:53:50 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/22 12:45:56 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/24 11:34:27 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Users.hpp"
+
+//****************************************************************************//
+//                          Constructor & Destructor                          //
+//****************************************************************************//
 
 Users::Users(std::string hostname, int socketDescriptor) : 
 hostName(hostname), nickName("default"), userName("default"), modes("default"), 
@@ -45,7 +49,10 @@ Users &Users::operator=(const Users &cp) {
 	return *this;
 }
 
-// ALL NECESSARY GETTERS
+//****************************************************************************//
+//                              Accessor Methods                              //
+//****************************************************************************//
+
 std::string Users::getNickName() const {
 	return this->nickName;	
 }
@@ -78,7 +85,6 @@ int	Users::getSocketDescriptor() const {
 	return this->socketDescriptor;
 }
 
-// ALL NECESSARY SETTERS
 void Users::setHostName(std::string hostname) {
 	this->hostName = hostname;
 }
@@ -115,7 +121,9 @@ void Users::unsetStatus(uint8_t stat) {
 	this->status &= ~stat;
 }
 
-// ADDITIONAL NECESSARY FUNCTIONS GO HERE
+//****************************************************************************//
+//                               Other Function                               //
+//****************************************************************************//
 
 void Users::invite(Channel *channel) {
 	if (this->is_invited(channel->getName()) == false)

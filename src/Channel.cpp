@@ -6,11 +6,15 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/23 16:58:37 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/24 11:35:23 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
+
+//****************************************************************************//
+//                          Constructor & Destructor                          //
+//****************************************************************************//
 
 Channel::Channel(std::string name) : name(name), topic(""), modes(0) {
 }
@@ -38,6 +42,10 @@ Channel &Channel::operator=(const Channel &cp) {
 	return *this;
 }
 
+//****************************************************************************//
+//                              Accessor Methods                              //
+//****************************************************************************//
+
 std::string Channel::getName() const {
 	return this->name;	
 }
@@ -57,6 +65,19 @@ void Channel::setTopic(const std::string topic) {
 void Channel::setMode(const uint8_t mode) {
 	this->modes = mode;
 }
+
+
+std::vector<Users *> Channel::getUserList() const {
+	return this->userList;
+}
+
+std::vector<Users *> Channel::getOperatorList() const {
+	return this->operatorList;	
+}
+
+//****************************************************************************//
+//                               Other Function                               //
+//****************************************************************************//
 
 void Channel::addUser(Users *user) {
 	for (std::vector<Users *>::iterator it = this->userList.begin();
@@ -100,14 +121,6 @@ void Channel::deleteOperator(Users *removed, Users *remover, std::string host) {
 		}
 	}
 	
-}
-
-std::vector<Users *> Channel::getUserList() const {
-	return this->userList;
-}
-
-std::vector<Users *> Channel::getOperatorList() const {
-	return this->operatorList;	
 }
 
 bool Channel::isOperator(const Users *user) {
