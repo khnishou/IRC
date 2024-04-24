@@ -31,8 +31,8 @@ Channel &Channel::operator=(const Channel &cp) {
 
 std::string Channel::getName() const { return this->_name; }
 std::string Channel::getTopic() const { return this->_topic; }
-uint8_t Channel::getModes() const { return this->_modes; }
 std::string Channel::getPassword() const { return this->_password; }
+uint8_t Channel::getModes() const { return this->_modes; }
 std::vector<Users *> Channel::getUserList() const { return this->_userList; }
 std::vector<Users *> Channel::getOperatorList() const { return this->_operatorList; }
 
