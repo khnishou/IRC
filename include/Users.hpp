@@ -25,31 +25,31 @@ class Channel;
 
 class Users {
 	private:
-		std::string 				hostName;
-		std::string 				nickName;
-		std::string 				userName;
-		std::string 				modes;
-		std::string					buffer;
-		int 							permissionLevel;
-		int							socketDescriptor;
-		uint8_t						status;
-		std::vector<Channel *>	invite_lst;
+		std::string 				_hostName;
+		std::string 				_nickName;
+		std::string 				_userName;
+		std::string 				_modes;
+		std::string					_buffer;
+		int 						_permissionLevel;
+		int							_socketDescriptor;
+		uint8_t						_status;
+		std::vector<Channel *>		_invite_lst;
+
 	public:
 		Users(std::string hostname, int socketDescriptor);
-		~Users();
 		Users(const Users &cp);
+		~Users();
 		Users &operator=(const Users &cp);
 
-		// GETTERS
-		std::string getHostName() const;
-		std::string getNickName() const;
-		std::string getUserName() const;
-		std::string getModes() const;
-		std::string getBuffer() const;
-		int 			getPermissionLevel() const;
-		int			getSocketDescriptor() const;
-		uint8_t		getStatus() const;
-		// SETTERS
+		std::string		getHostName() const;
+		std::string		getNickName() const;
+		std::string		getUserName() const;
+		std::string		getModes() const;
+		std::string		getBuffer() const;
+		int				getPermissionLevel() const;
+		int				getSocketDescriptor() const;
+		uint8_t			getStatus() const;
+
 		void			setHostName(std::string hostname);
 		void			setNickName(std::string nname);
 		void			setUserName(std::string uname);
@@ -59,11 +59,10 @@ class Users {
 		void			setSocketDescriptor(int sd);
 		void			setStatus(uint8_t stat);
 		void			unsetStatus(uint8_t stat);
-		// OTHER
+
 		void			invite(Channel *channel);
 		bool			is_invited(std::string cname);
 		void			remove_invite(std::string cname);
-
 };
 
 #endif

@@ -17,34 +17,26 @@
 //****************************************************************************//
 
 Users::Users(std::string hostname, int socketDescriptor) : 
-hostName(hostname), nickName("default"), userName("default"), modes("default"), 
-buffer(""), permissionLevel(0), socketDescriptor(socketDescriptor), status(0)
-{}
+_hostName(hostname), _nickName("default"), _userName("default"), _modes("default"), 
+_buffer(""), _permissionLevel(0), _socketDescriptor(socketDescriptor), _status(0) { }
 
-Users::~Users() {
-}
+Users::Users(const Users &cp) : 
+_hostName(cp.getHostName()), _nickName(cp.getNickName()), _userName(cp.getUserName()),
+_modes(cp.getModes()), _buffer(cp.getBuffer()), _permissionLevel(cp.getPermissionLevel()),
+_socketDescriptor(cp.getSocketDescriptor()), _status(cp.getStatus()) { }
 
-Users::Users(const Users &cp) {
-	this->hostName = cp.getHostName();
-	this->nickName = cp.getNickName();
-   this->userName = cp.getUserName();
-   this->modes = cp.getModes();
-	this->buffer = cp.getBuffer();
-   this->permissionLevel = cp.getPermissionLevel();
-   this->socketDescriptor = cp.getSocketDescriptor();
-	this->status = cp.getStatus();
-}
+Users::~Users() { }
 
 Users &Users::operator=(const Users &cp) {
 	if (this != &cp) {
-		this->hostName = cp.getHostName();
-		this->nickName = cp.getNickName();
-		this->userName = cp.getUserName();
-		this->modes = cp.getModes();
-		this->buffer = cp.getBuffer();
-		this->permissionLevel = cp.getPermissionLevel();
-		this->socketDescriptor = cp.getSocketDescriptor();
-		this->status = cp.getStatus();
+		this->_hostName = cp.getHostName();
+		this->_nickName = cp.getNickName();
+		this->_userName = cp.getUserName();
+		this->_modes = cp.getModes();
+		this->_buffer = cp.getBuffer();
+		this->_permissionLevel = cp.getPermissionLevel();
+		this->_socketDescriptor = cp.getSocketDescriptor();
+		this->_status = cp.getStatus();
 	}
 	return *this;
 }
@@ -53,73 +45,24 @@ Users &Users::operator=(const Users &cp) {
 //                              Accessor Methods                              //
 //****************************************************************************//
 
-std::string Users::getNickName() const {
-	return this->nickName;	
-}
+std::string	Users::getNickName() const { return this->_nickName; }
+std::string	Users::getUserName() const { return this->_userName; }
+std::string	Users::getHostName() const { return this->_hostName; }
+std::string	Users::getModes() const { return this->_modes; }
+std::string	Users::getBuffer() const { return this->_buffer; }
+uint8_t		Users::getStatus() const { return this->_status; }
+int			Users::getPermissionLevel() const { return this->_permissionLevel; }
+int			Users::getSocketDescriptor() const { return this->_socketDescriptor; }
 
-std::string Users::getUserName() const {
-	return this->userName;
-}
-
-std::string Users::getHostName() const {
-	return this->hostName;
-}
-
-std::string Users::getModes() const {
-	return this->modes;
-}
-
-std::string Users::getBuffer() const {
-	return this->buffer;
-}
-
-uint8_t Users::getStatus() const {
-	return this->status;
-}
-
-int Users::getPermissionLevel() const {
-	return this->permissionLevel;
-}
-
-int	Users::getSocketDescriptor() const {
-	return this->socketDescriptor;
-}
-
-void Users::setHostName(std::string hostname) {
-	this->hostName = hostname;
-}
-
-void Users::setNickName(std::string nname) {
-	this->nickName = nname;
-}
-
-void Users::setUserName(std::string uname) {
-	this->userName = uname;
-}
-
-void Users::setModes(std::string mode) {
-	this->modes = mode;
-}
-
-void Users::setBuffer(std::string buf) {
-	this->buffer = buf;
-}
-
-void Users::setPermissionLevel(int permissionLevel) {
-	this->permissionLevel = permissionLevel;
-}
-
-void Users::setSocketDescriptor(int sd) {
-	this->socketDescriptor = sd;
-}
-
-void Users::setStatus(uint8_t stat) {
-	this->status |= stat;
-}
-
-void Users::unsetStatus(uint8_t stat) {
-	this->status &= ~stat;
-}
+void		Users::setHostName(std::string hostname) { this->_hostName = hostname; }
+void		Users::setNickName(std::string nname) { this->_nickName = nname; }
+void		Users::setUserName(std::string uname) { this->_userName = uname; }
+void		Users::setModes(std::string mode) { this->_modes = mode; }
+void		Users::setBuffer(std::string buf) { this->_buffer = buf; }
+void		Users::setPermissionLevel(int permissionLevel) { this->_permissionLevel = permissionLevel; }
+void		Users::setSocketDescriptor(int sd) { this->_socketDescriptor = sd; }
+void		Users::setStatus(uint8_t stat) { this->_status |= stat; }
+void		Users::unsetStatus(uint8_t stat) { this->_status &= ~stat; }
 
 //****************************************************************************//
 //                               Other Function                               //
@@ -127,11 +70,11 @@ void Users::unsetStatus(uint8_t stat) {
 
 void Users::invite(Channel *channel) {
 	if (this->is_invited(channel->getName()) == false)
-		this->invite_lst.push_back(channel);
+		this->_invite_lst.push_back(channel);
 }
 
 bool Users::is_invited(std::string cname) {
-	for (std::vector<Channel *>::iterator it = this->invite_lst.begin(); it != this->invite_lst.end(); ++it) {
+	for (std::vector<Channel *>::iterator it = this->_invite_lst.begin(); it != this->_invite_lst.end(); ++it) {
 		if ((*it)->getName() == cname)
 			return true;
 	}
@@ -140,10 +83,10 @@ bool Users::is_invited(std::string cname) {
 
 void Users::remove_invite(std::string cname) {
 	if (this->is_invited(cname) == true) {
-		for (std::vector<Channel *>::iterator it = this->invite_lst.begin();
-				it != this->invite_lst.end(); ++it) {
+		for (std::vector<Channel *>::iterator it = this->_invite_lst.begin();
+				it != this->_invite_lst.end(); ++it) {
 			if ((*it)->getName() == cname) {
-				this->invite_lst.erase(it);
+				this->_invite_lst.erase(it);
 				return ;
 			}
 		}
