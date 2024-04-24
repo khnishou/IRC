@@ -237,7 +237,7 @@ uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *
 				if (param[++itParam].empty())
 					; // error need more param or set userMax to default
 				else
-					; // check channel->setUserMax(param[++itParam]); // error if param not <int>
+					; // check channel->setChanLimit(param[++itParam]); // error if param not <int> or set it to default
 			}
 			mode = setTheUnset(mode, FLAG_L, setUnset);
 		}
