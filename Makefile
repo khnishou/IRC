@@ -19,14 +19,14 @@ $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJ_DIR)
+	@$(RM) $(OBJ_DIR)
 
 fclean: clean
-	$(RM) $(NAME) 
+	@$(RM) $(NAME) 
 
 re: fclean all
 .PHONY: all clean fclean re
