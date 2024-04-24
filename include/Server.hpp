@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/23 17:38:00 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/24 12:21:31 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ class Server {
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
 		void			c_join(std::vector<std::string> param, Users *user);
+		void			c_restart(std::vector<std::string> param, Users *user);
 		void			c_quit(std::vector<std::string> param, Users *user);
 };
 

@@ -170,6 +170,16 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	// RPL_ENDOFNAMES (366)
 }
 
+void Server::c_restart(std::vector<std::string> param, Users *user) {
+	// check priv first
+	this->state = START;
+	this->fds.clear();
+	close(this->serverSocket);
+	// need 2 delete users and channels for leaks first
+	this->all_channels.clear();
+	this->all_users.clear();
+}
+
 void Server::c_quit(std::vector<std::string> param, Users *user) {
-	
+	removeUserFromServer(user);
 }

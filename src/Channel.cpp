@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 14:06:56 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/24 11:35:23 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/24 12:23:59 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 //                          Constructor & Destructor                          //
 //****************************************************************************//
 
-Channel::Channel(std::string name) : name(name), topic(""), modes(0) {
+Channel::Channel(std::string name) : name(name), topic(""), modes(0), password("") {
 }
 
 Channel::~Channel() {
@@ -27,6 +27,7 @@ Channel::Channel(const Channel &cp) {
 	this->name = cp.getName();
 	this->topic = cp.getTopic();
 	this->modes = cp.getModes();
+	this->password = cp.getPassword();
 	this->userList = cp.getUserList();
 	this->operatorList = cp.getOperatorList();
 }
@@ -36,6 +37,7 @@ Channel &Channel::operator=(const Channel &cp) {
 		this->name = cp.getName();
 		this->topic = cp.getTopic();
 		this->modes = cp.getModes();
+		this->password = cp.getPassword();
 		this->userList = cp.getUserList();
 		this->operatorList = cp.getOperatorList();
 	}
@@ -58,6 +60,10 @@ uint8_t Channel::getModes() const {
 	return this->modes;
 }
 
+std::string Channel::getPassword() const {
+	return this->password;
+}
+
 void Channel::setTopic(const std::string topic) {
 	this->topic = topic;
 }
@@ -66,6 +72,9 @@ void Channel::setMode(const uint8_t mode) {
 	this->modes = mode;
 }
 
+void Channel::setPassword(const std::string pass) {
+	this->password = pass;
+}
 
 std::vector<Users *> Channel::getUserList() const {
 	return this->userList;

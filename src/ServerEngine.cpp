@@ -109,42 +109,28 @@ void Server::stop() { close(this->serverSocket); }
 
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
-	// handle source 
-	if (msg.command == "PASS") {
+	if (msg.command == "/PASS")
     	c_pass(msg.parameters, user);
-	}
-	else if (msg.command == "NICK") {
+	else if (msg.command == "/NICK")
     	c_nick(msg.parameters, user);
-	}
-	else if (msg.command == "USER") {
+	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
-		// add username setting command
-		// user len cant be over 18
-	}
-	else if (msg.command == "JOIN") {
+	else if (msg.command == "JOIN")
     	c_join(msg.parameters, user);
-		// add join command
-	}
-	else if (msg.command == "KICK") {
+	else if (msg.command == "/KICK")
     	c_kick(msg.parameters, user);
-  	}
-  	else if (msg.command == "INVITE") {
+  	else if (msg.command == "/INVITE")
     	c_invite(msg.parameters, user);
-  	} 
-	else if (msg.command == "TOPIC") {
+	else if (msg.command == "/TOPIC")
     	c_topic(msg.parameters, user);
-  	} 
-	else if (msg.command == "MODE") {
+	else if (msg.command == "/MODE")
 		c_mode(msg.parameters, user);
-  	}
-	else if (msg.command == "QUIT") {
-		// quit command
-		// this command allows a user to properly exit the server
-	}
-	else {
-		// invalid cmd
+	else if (msg.command == "/QUIT")
+		c_quit(msg.parameters, user);
+	else if (msg.command == "/RESTART")
+		c_restart(msg.parameters, user);
+	else
 		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
-	}
 }
 
 void	Server::send_2usr(int fd) {
