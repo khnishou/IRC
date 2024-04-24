@@ -42,7 +42,7 @@ void Channel::setMode(const uint8_t mode) { this->_modes = mode; }
 void Channel::setPassword(const std::string pass) { this->_password = pass; }
 
 //****************************************************************************//
-//                            User Accessor Methods                           //
+//                           User Accessor Methods                            //
 //****************************************************************************//
 
 void Channel::addUser(Users *user) {

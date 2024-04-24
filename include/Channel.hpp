@@ -20,6 +20,7 @@ class Channel {
 		uint8_t					_modes;
 		std::vector<Users *>	_userList;
 		std::vector<Users *>	_operatorList;
+
 	public:
 		Channel(std::string name);
 		Channel(const Channel &cp);
