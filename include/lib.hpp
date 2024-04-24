@@ -88,7 +88,7 @@ struct Message {
 int							skip_space(std::string str, int i);
 int							skip_arg(std::string str, int i);
 std::vector<std::string>	splitString(const std::string& str, char delimiter);
-uint8_t						initMode(std::string str, uint8_t mode);
+uint8_t                     setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset);
 bool                        isNickname(const std::string& nickname);
 std::string                 fill_vec(std::vector<std::string> param);
 Message                     parsing(std::string str);

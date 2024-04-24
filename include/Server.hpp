@@ -91,6 +91,9 @@ class Server {
 		void			c_join(std::vector<std::string> param, Users *user);
 		void			c_restart(std::vector<std::string> param, Users *user);
 		void			c_quit(std::vector<std::string> param, Users *user);
+
+		// UTILS // for now
+		uint8_t 		initMode(std::vector<std::string> param, uint8_t mode, Channel *channel);
 };
 
 #endif
