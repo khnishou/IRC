@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/24 12:21:31 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/25 13:20:18 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@
 class Users;
 class Channel;
 
+// general guideline, need 2 update my reply sending system to the user, apparently server should be able to send
+// multiple replies/error to a user on the same message
 class Server {
 	private:
 		int								port;

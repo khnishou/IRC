@@ -67,7 +67,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	top = fill_vec(param);
 	channel->setTopic(top);
 	std::string time; // use this to set time
-	// need to look into this, when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
+	// rpl is when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
 }
 
 void	Server::c_mode(std::vector<std::string> param, Users *user)
@@ -75,6 +75,7 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	uint8_t mode;
 	int i;
 
+	// need 2 revisit this logic, if its unsetting a mode than no params must be provided, if trying to set then need params
 	if (!(param.size() >= 1))
     	return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461) 
 	i = 0;
@@ -89,7 +90,7 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	if (!channel->isOperator(user))
     	return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	channel->setMode(mode);
-	// check should return an RPL value
+	// success rpl value basically sends a message on the channel to every user saying what the new modes are
 }
 
 void	Server::c_pass(std::vector<std::string> param, Users *user)
@@ -113,7 +114,7 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 		return (user->setBuffer(ERR_NICKNAMEINUSE(this->host, user->getNickName(), param[0]))); // (433)
 	user->setNickName(param[0]);
 	user->setStatus(NICK_FLAG);
-	// return (0); // check should return an RPL value
+	// RPL is, if first time no reply, however if changing nick then need 2 inform everyone that shares channels with this user
 }
 
 void	Server::c_user(std::vector<std::string> param, Users *user)
@@ -126,7 +127,7 @@ void	Server::c_user(std::vector<std::string> param, Users *user)
 	if (param.size() >= 4)
 		;// check  set realName
 	user->setStatus(USER_FLAG);
-	// return (0); // check should return an RPL value
+	// RPL logic is same as nick
 }
 
 void	Server::c_join(std::vector<std::string> param, Users *user)
