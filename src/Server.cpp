@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/23 17:38:51 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/25 13:40:35 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ bool	Server::nickNameExists(std::string nname) {
 	return false;
 }
 
+// change this, use size and position accessor instead of iterator, iterator could cause issues since removing stuff from vector
 void Server::removeUserFromServer(Users *user) {
 	for (std::vector<pollfd>::iterator it = this->fds.begin(); it != this->fds.end(); it++) {
 		if ((*it).fd == this->serverSocket)
