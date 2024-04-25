@@ -125,6 +125,8 @@ void Server::executeCmd(Message msg, Users *user) {
     	c_topic(msg.parameters, user);
 	else if (msg.command == "/MODE")
 		c_mode(msg.parameters, user);
+	else if (msg.command == "/PRIVMSG")
+		c_privmsg(msg.parameters, user);
 	else if (msg.command == "/QUIT")
 		c_quit(msg.parameters, user);
 	else if (msg.command == "/RESTART")

@@ -170,6 +170,10 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	// RPL_ENDOFNAMES (366)
 }
 
+void Server::c_privmsg(std::vector<std::string> param, Users *user) {
+	
+}
+
 void Server::c_restart(std::vector<std::string> param, Users *user) {
 	// check priv first
 	this->state = START;

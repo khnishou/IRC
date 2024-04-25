@@ -6,7 +6,7 @@
 /*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/25 13:20:18 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/25 13:43:50 by smallem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,14 +83,15 @@ class Server {
   		void			executeCmd(Message msg, Users *user);
 
 		// COMMANDS
-		void			c_kick(std::vector<std::string> param, Users *user);
-		void			c_invite(std::vector<std::string> param, Users *user);
-		void			c_topic(std::vector<std::string> param, Users *user);
-		void			c_mode(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
 		void			c_join(std::vector<std::string> param, Users *user);
+		void			c_invite(std::vector<std::string> param, Users *user);
+		void			c_kick(std::vector<std::string> param, Users *user);
+		void			c_topic(std::vector<std::string> param, Users *user);
+		void			c_mode(std::vector<std::string> param, Users *user);
+		void			c_privmsg(std::vector<std::string> param, Users *user);
 		void			c_restart(std::vector<std::string> param, Users *user);
 		void			c_quit(std::vector<std::string> param, Users *user);
 
