@@ -13,10 +13,10 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	split = splitString(param[1], ',');
 	std::string str = fill_vec(param, param.begin() + 2);
-	for (size_t i = 0; i < split.size(); i++) { // check -1
+	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), split[i], channel->getName()))); // (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), split[i], channel->getName()))); // (441) // check maybe add a new
 		if (!channel->isUser(toKick) && !channel->isOperator(toKick))
 			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
 		if (channel->isUser(toKick))
