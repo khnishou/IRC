@@ -7,22 +7,25 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
 		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
+	if (!channel->isUser(user) && !channel->isOperator(user))
+		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
-	if (!channel->isUser(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
 	split = splitString(param[1], ',');
+	std::string str = fill_vec(param, param.begin() + 2);
 	for (size_t i = 0; i < split.size(); i++) { // check -1
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), split[i], channel->getName()))); // (441) // check repetition
 		if (!channel->isUser(toKick) && !channel->isOperator(toKick))
 			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
 		if (channel->isUser(toKick))
 			channel->deleteUser(toKick, user, this->getHost());
 		else if (channel->isOperator(toKick))
 			channel->deleteOperator(toKick, user, this->getHost());
+		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName())); // add reason later
 	}
+	channel->broadcastMsg(str);
 }
 
 void	Server::c_invite(std::vector<std::string> param, Users *user) {
@@ -62,7 +65,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
 	std::string top;
-	top = fill_vec(param);
+	top = fill_vec(param, param.begin());
 	channel->setTopic(top);
 	std::time_t currTime = std::time(NULL);
 	std::string time = std::ctime(&currTime);
