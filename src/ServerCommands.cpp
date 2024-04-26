@@ -12,7 +12,11 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	split = splitString(param[1], ',');
-	std::string str = fill_vec(param, param.begin() + 2);
+	std::string str;
+	if (param.size() < 4)
+		str = "defaul reason"; // check the default reason
+	else
+		str = fill_vec(param, param.begin() + 2).substr();
 	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
@@ -23,9 +27,9 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 			channel->deleteUser(toKick, user, this->getHost());
 		else if (channel->isOperator(toKick))
 			channel->deleteOperator(toKick, user, this->getHost());
-		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName())); // add reason later
+		// toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName())); // add reason later
+		// channel->broadcastMsg(str);
 	}
-	channel->broadcastMsg(str);
 }
 
 void	Server::c_invite(std::vector<std::string> param, Users *user) {
