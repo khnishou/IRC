@@ -73,6 +73,8 @@ class Server {
 		size_t 			getNumberOfUsers();
 		std::vector<Channel *>	getChanList(Users *user);
 		bool			nickNameExists(std::string nname);
+		void			addChan(Channel *channel);
+		void			addUser(Users *user);
 		
 		// message forwarding i guess
 		void			send_2usr(int fd);

@@ -92,6 +92,14 @@ std::vector<Channel *> Server::getChanList(Users *user) {
 	return lst;
 }
 
+void	Server::addChan(Channel *channel) {
+	this->all_channels.push_back(channel);
+}
+
+void	Server::addUser(Users *user) {
+	this->all_users.push_back(user);
+}
+
 //****************************************************************************//
 //                               Other Function                               //
 //****************************************************************************//
