@@ -1,7 +1,16 @@
 #include "../include/Server.hpp"
 
 void	Server::c_cap(std::vector<std::string> param, Users *user) {
-
+	if (param.size() > 1) {
+		if (param[0] == "END" && (user->getStatus() & CAPON_FLAG)) {
+			user->setStatus(CAPOFF_FLAG);
+			user->unsetStatus(CAPON_FLAG);
+		}
+		else if (param[0] == "LS") {
+			user->setBuffer(RPL_CAP(this->host));
+			user->setStatus(CAPON_FLAG);
+		}
+	}
 }
 
 void	Server::c_part(std::vector<std::string> param, Users *user) {

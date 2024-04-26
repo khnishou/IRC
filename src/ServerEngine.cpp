@@ -107,20 +107,48 @@ void Server::start() {
 
 void Server::stop() { close(this->serverSocket); }
 
+bool Server::allowed(Message msg, Users *user) {
+	
+	if (msg.command == "CAP")
+		return (true);
+	else if (user->getStatus() & CAPOFF_FLAG)
+	{
+		if (msg.command == "PASS")
+			return (true);
+		else if (user->getStatus() & PASS_FLAG)
+		{
+			if (msg.command == "NICK" || msg.command == "USER")
+				return (true);
+			else if ((user->getStatus() & NICK_FLAG) && (user->getStatus() & USER_FLAG))
+				return (true);
+			else
+				return (false);
+		}
+		else
+			return (false);
+	}
+	else
+		return (false);
+}
+
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
+	if (allowed(msg, user) == false) {
+		user->setBuffer(ERR_NOTREGISTERED(this->host));
+		return ;
+	}
 	if (msg.command == "/CAP")
 		c_cap(msg.parameters, user);
 	else if (msg.command == "/PASS")
     	c_pass(msg.parameters, user);
 	else if (msg.command == "/NICK")
     	c_nick(msg.parameters, user);
+	else if (msg.command == "/USER")
+    	c_user(msg.parameters, user);
 	else if (msg.command == "/PING")
     	c_ping(msg.parameters, user);
 	else if (msg.command == "/PONG")
     	c_pong(msg.parameters, user);
-	else if (msg.command == "/USER")
-    	c_user(msg.parameters, user);
 	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
 	else if (msg.command == "/PART")

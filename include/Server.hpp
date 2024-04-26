@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 16:13:17 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/26 18:12:47 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ class Server {
 		bool			nickNameExists(std::string nname);
 		void			addChan(Channel *channel);
 		void			addUser(Users *user);
-		
+
 		// message forwarding i guess
 		void			send_2usr(int fd);
 		void			sendAllChan(std::vector<Channel *> lst, std::string msg);
@@ -84,6 +84,7 @@ class Server {
 		void			removeUserFromServer(Users *user);
 		void			handleMsg(Users *user, size_t i);
   		void			executeCmd(Message msg, Users *user);
+		bool			allowed(Message msg, Users *user);
 
 		// COMMANDS
 		void			c_cap(std::vector<std::string> param, Users *user);
@@ -107,3 +108,4 @@ class Server {
 };
 
 #endif
+
