@@ -1,9 +1,10 @@
 *.o
 *.d
 IRC
-ircserv
+ircserv*
 test.cpp
 .vscode/settings.json
 3
 4
 5
+test*
