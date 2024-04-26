@@ -115,7 +115,7 @@ void Server::executeCmd(Message msg, Users *user) {
     	c_nick(msg.parameters, user);
 	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
-	else if (msg.command == "JOIN")
+	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
 	else if (msg.command == "/KICK")
     	c_kick(msg.parameters, user);
