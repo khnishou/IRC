@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 13:00:33 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/26 19:04:14 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,12 @@ void Server::removeUserFromServer(Users *user) {
 	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
 		if ((*it)->isOperator(user)) {
 			(*it)->deleteOperator(user, NULL, this->getHost());
+			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName()));
 			break ;
 		}
 		else if ((*it)->isUser(user)) {
 			(*it)->deleteUser(user, NULL, this->getHost());
+			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName()));
 			break ;
 		}
 	}

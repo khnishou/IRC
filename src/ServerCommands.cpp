@@ -1,5 +1,22 @@
 #include "../include/Server.hpp"
 
+void	Server::c_cap(std::vector<std::string> param, Users *user) {
+	if (param.size() > 1) {
+		if (param[0] == "END" && (user->getStatus() & CAPON_FLAG)) {
+			user->setStatus(CAPOFF_FLAG);
+			user->unsetStatus(CAPON_FLAG);
+		}
+		else if (param[0] == "LS") {
+			user->setBuffer(RPL_CAP(this->host));
+			user->setStatus(CAPON_FLAG);
+		}
+	}
+}
+
+void	Server::c_part(std::vector<std::string> param, Users *user) {
+
+}
+
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	std::vector<std::string> split;
 	if (!(param.size() >= 3))
@@ -197,7 +214,10 @@ void Server::c_restart(std::vector<std::string> param, Users *user) {
 	this->state = START;
 	this->fds.clear();
 	close(this->serverSocket);
-	// need 2 delete users and channels for leaks first
+	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it)
+		delete (*it);
+	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it)
+		delete (*it);
 	this->all_channels.clear();
 	this->all_users.clear();
 }

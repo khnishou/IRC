@@ -107,16 +107,54 @@ void Server::start() {
 
 void Server::stop() { close(this->serverSocket); }
 
+bool Server::allowed(Message msg, Users *user) {
+	
+	if (msg.command == "CAP")
+		return (true);
+	else if (user->getStatus() & CAPOFF_FLAG)
+	{
+		if (msg.command == "PASS")
+			return (true);
+		else if (user->getStatus() & PASS_FLAG)
+		{
+			if (msg.command == "NICK" || msg.command == "USER")
+				return (true);
+			else if ((user->getStatus() & NICK_FLAG) && (user->getStatus() & USER_FLAG))
+				return (true);
+			else
+				return (false);
+		}
+		else
+			return (false);
+	}
+	else
+		return (false);
+}
+
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
-	if (msg.command == "/PASS")
+	if (allowed(msg, user) == false) {
+		user->setBuffer(ERR_NOTREGISTERED(this->host));
+		return ;
+	}
+	if (msg.command == "/CAP")
+		c_cap(msg.parameters, user);
+	else if (msg.command == "/PASS")
     	c_pass(msg.parameters, user);
 	else if (msg.command == "/NICK")
     	c_nick(msg.parameters, user);
 	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
+	else if (msg.command == "/PING") {
+		if (msg.parameters.size() == 1)
+    		user->setBuffer(RPL_PING(this->host, ""));
+		else
+			user->setBuffer(RPL_PING(this->host, msg.parameters[0]));
+	}
 	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
+	else if (msg.command == "/PART")
+		c_part(msg.parameters, user);
 	else if (msg.command == "/KICK")
     	c_kick(msg.parameters, user);
   	else if (msg.command == "/INVITE")

@@ -59,9 +59,11 @@
 #define RPL_KICK(src_nick, src_usr, src_host, chan, targ)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + targ + "\r\n"
 
 // USER STATES
-#define PASS_FLAG (1 << 0)
-#define NICK_FLAG (1 << 1)
-#define USER_FLAG (1 << 2)
+#define PASS_FLAG   (1 << 0)
+#define NICK_FLAG   (1 << 1)
+#define USER_FLAG   (1 << 2)
+#define CAPON_FLAG  (1 << 3)
+#define CAPOFF_FLAG (1 << 4)
 
 // MODE STATES
 #define FLAG_I		(1 << 0)
