@@ -109,14 +109,22 @@ void Server::stop() { close(this->serverSocket); }
 
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
-	if (msg.command == "/PASS")
+	if (msg.command == "/CAP")
+		c_cap(msg.parameters, user);
+	else if (msg.command == "/PASS")
     	c_pass(msg.parameters, user);
 	else if (msg.command == "/NICK")
     	c_nick(msg.parameters, user);
+	else if (msg.command == "/PING")
+    	c_ping(msg.parameters, user);
+	else if (msg.command == "/PONG")
+    	c_pong(msg.parameters, user);
 	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
 	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
+	else if (msg.command == "/PART")
+		c_part(msg.parameters, user);
 	else if (msg.command == "/KICK")
     	c_kick(msg.parameters, user);
   	else if (msg.command == "/INVITE")

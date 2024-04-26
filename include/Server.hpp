@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 13:02:37 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/26 16:13:17 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,10 +86,14 @@ class Server {
   		void			executeCmd(Message msg, Users *user);
 
 		// COMMANDS
+		void			c_cap(std::vector<std::string> param, Users *user);
+		void			c_ping(std::vector<std::string> param, Users *user);
+		void			c_pong(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
 		void			c_join(std::vector<std::string> param, Users *user);
+		void			c_part(std::vector<std::string> param, Users *user);
 		void			c_invite(std::vector<std::string> param, Users *user);
 		void			c_kick(std::vector<std::string> param, Users *user);
 		void			c_topic(std::vector<std::string> param, Users *user);

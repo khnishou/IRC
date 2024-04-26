@@ -1,5 +1,21 @@
 #include "../include/Server.hpp"
 
+void	Server::c_cap(std::vector<std::string> param, Users *user) {
+
+}
+
+void	Server::c_part(std::vector<std::string> param, Users *user) {
+
+}
+
+void	Server::c_ping(std::vector<std::string> param, Users *user) {
+
+}
+
+void	Server::c_pong(std::vector<std::string> param, Users *user) {
+
+}
+
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	std::vector<std::string> split;
 	if (!(param.size() >= 3))
