@@ -50,6 +50,9 @@ class Channel {
 
 		bool 					isUser(const Users *user);
 		bool 					isOperator(const Users *user);
+
+
+		void					broadcastMsg(std::string msg);
 };
 
 #endif

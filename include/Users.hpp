@@ -17,6 +17,7 @@ class Users {
 		std::string 				_hostName;
 		std::string 				_nickName;
 		std::string 				_userName;
+		std::string					_real;
 		std::string 				_modes;
 		std::string					_buffer;
 		int 						_permissionLevel;
@@ -33,6 +34,7 @@ class Users {
 		std::string		getHostName() const;
 		std::string		getNickName() const;
 		std::string		getUserName() const;
+		std::string		getReal() const;
 		std::string		getModes() const;
 		std::string		getBuffer() const;
 		int				getPermissionLevel() const;
@@ -42,12 +44,14 @@ class Users {
 		void			setHostName(std::string hostname);
 		void			setNickName(std::string nname);
 		void			setUserName(std::string uname);
+		void			setReal(std::string real);
 		void			setModes(std::string mode);
 		void			setBuffer(std::string buf);
 		void			setPermissionLevel(int permissionLevel);
 		void			setSocketDescriptor(int sd);
 		void			setStatus(uint8_t stat);
 		void			unsetStatus(uint8_t stat);
+		void			clearBuff();
 
 		void			invite(Channel *channel);
 		bool			is_invited(std::string cname);
