@@ -39,7 +39,6 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	if (!channel->isUser(toAdd))
 		return (user->setBuffer(ERR_USERONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (443)
 	channel->addUser(toAdd);
-	// no error occured, setting the correct replies on the executing user and receiving user
 	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName()));
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
 	toAdd->invite(channel);
@@ -60,14 +59,15 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	}
 		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
 	// this check is not enough, need to check for permissions differently, doesnt need to be operator in channel to change topic
-	if (!channel->isOperator(user)) // add cond here for priv check
+	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); //  (482)
-	// add param vector together on string and then set
 	std::string top;
 	top = fill_vec(param);
 	channel->setTopic(top);
-	std::string time; // use this to set time
-	// rpl is when topic being set/ changed notify everyone in channel using RPL_TOPIC followed by RPL_TOPICWHOTIME
+	std::time_t currTime = std::time(NULL);
+	std::string time = std::ctime(&currTime);
+	channel->broadcastMsg(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()));
+	channel->broadcastMsg(RPL_TOPICWHOTIME(this->host, channel->getName(), user->getNickName(), time));
 }
 
 void	Server::c_mode(std::vector<std::string> param, Users *user)
@@ -112,22 +112,29 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 		return (user->setBuffer(ERR_ERRONEUSNICKNAME(this->host, user->getNickName(), param[0]))); // (432)
 	if (nickNameExists(param[0]))
 		return (user->setBuffer(ERR_NICKNAMEINUSE(this->host, user->getNickName(), param[0]))); // (433)
+	if (!(user->getStatus() & NICK_FLAG)) {
+		user->setStatus(NICK_FLAG);
+		if (user->getStatus() & USER_FLAG)
+			user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
+	}
+	else
+		this->sendAllChan(this->getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
 	user->setNickName(param[0]);
-	user->setStatus(NICK_FLAG);
-	// RPL is, if first time no reply, however if changing nick then need 2 inform everyone that shares channels with this user
 }
 
 void	Server::c_user(std::vector<std::string> param, Users *user)
 {
+	// this username that is being set needs to be prefixed with ~, cuz not using ident protocol
 	if (!(param.size() >= 1))
-		return ; // error ERR_NEEDMOREPARAMS (461)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER"))); // (461)
 	if (user->getStatus() & USER_FLAG)
-		return ; // error ERR_ALREADYREGISTERED (462)
+		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
 	user->setUserName(param[0]);
-	if (param.size() >= 4)
-		;// check  set realName
+	if (param.size() == 4 && param[1] == "0" && param[2] == "*")
+		user->setReal(param[3]);
 	user->setStatus(USER_FLAG);
-	// RPL logic is same as nick
+	if (user->getStatus() & NICK_FLAG)
+		user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
 }
 
 void	Server::c_join(std::vector<std::string> param, Users *user)
@@ -137,33 +144,35 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	std::vector<std::string> channels;
 
 	if (!(param.size() >= 1))
-		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
 	channels = splitString(param[0], ',');
 	if (channels.size() > CHANLIMIT)
-		; // error ERR_TOOMANYCHANNELS (405)
+		return (user->setBuffer(ERR_TOOMANYCHANNELS(this->host, user->getNickName(), channels[0]))); // (405)
 	if (!(param.size() >= 2))
 		keys = splitString(param[1], ',');
 	i = 0;
 	while (i < channels.size()) // check add -1 
 	{
 		Channel *channel = getChannel(channels[i]);
-		if (!channel)
+		if (!channel) {
+			channel = new Channel(channels[i]);
 			this->all_channels.push_back(channel);
+		}
 		else if (channel->getModes() & FLAG_I)
-			; // error ERR_INVITEONLYCHAN (473)
+			user->setBuffer(ERR_INVITEONLYCHAN(this->host, user->getNickName(), channel->getName())); // (473)
 		else if (!(channel->getModes() & FLAG_K) ||
 			(!(keys.empty()) && !(keys[i].empty()) && keys[i] == channel->getPassword()))
 		{
 			if (channel->getUserList().size() > USERLIMIT)
-				; // error ERR_CHANNELISFULL (471)
+				user->setBuffer(ERR_CHANNELISFULL(this->host, user->getNickName(), channel->getName())); // (471)
 			else
 				channel->addUser(user);
 		}
 		else
-			; // error ERR_BADCHANNELKEY (475)
+			user->setBuffer(ERR_BADCHANNELKEY(this->host, user->getNickName(), channel->getName())); // (475)
 		i++;
 	}
-	// check add RPL msg
+	// check add RPL msg, these are for each channel joined, will implement when changing how buffer works.
 	// RPL_TOPIC (332)
 	// RPL_TOPICWHOTIME (333)
 	// RPL_NAMREPLY (353)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/25 13:43:50 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/26 13:02:37 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,12 @@ class Server {
 		std::string		getPassword() const;
 		Channel 		*getChannel(const std::string cname);
 		size_t 			getNumberOfUsers();
-		
+		std::vector<Channel *>	getChanList(Users *user);
 		bool			nickNameExists(std::string nname);
 		
 		// message forwarding i guess
 		void			send_2usr(int fd);
+		void			sendAllChan(std::vector<Channel *> lst, std::string msg);
 
 		int				addNewClient();
 		void			removeUserFromServer(Users *user);

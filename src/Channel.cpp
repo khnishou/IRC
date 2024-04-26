@@ -117,3 +117,10 @@ bool Channel::isOperator(const Users *user) {
 	}
 	return false;
 }
+
+void	Channel::broadcastMsg(std::string msg) {
+	for (std::vector<Users *>::iterator it = this->_userList.begin(); it != this->_userList.end(); ++it)
+		(*it)->setBuffer(msg);
+	for (std::vector<Users *>::iterator it = this->_operatorList.begin(); it != this->_operatorList.end(); ++it)
+		(*it)->setBuffer(msg);
+}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smallem <smallem@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/25 13:40:35 by smallem          ###   ########.fr       */
+/*   Updated: 2024/04/26 13:00:33 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,15 @@ Channel *Server::getChannel(const std::string cname) {
 			return *it;
 	}
 	return NULL;
+}
+
+std::vector<Channel *> Server::getChanList(Users *user) {
+	std::vector<Channel *> lst;
+	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
+		if ((*it)->isOperator(user) || (*it)->isUser(user))
+			lst.push_back(*it);
+	}
+	return lst;
 }
 
 //****************************************************************************//

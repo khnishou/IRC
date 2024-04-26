@@ -115,7 +115,7 @@ void Server::executeCmd(Message msg, Users *user) {
     	c_nick(msg.parameters, user);
 	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
-	else if (msg.command == "JOIN")
+	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
 	else if (msg.command == "/KICK")
     	c_kick(msg.parameters, user);
@@ -135,6 +135,11 @@ void Server::executeCmd(Message msg, Users *user) {
 		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
 }
 
+void Server::sendAllChan(std::vector<Channel *> lst, std::string msg) {
+	for (std::vector<Channel *>::iterator it = lst.begin(); it != lst.end(); ++it)
+		(*it)->broadcastMsg(msg);
+}
+
 void	Server::send_2usr(int fd) {
 	if (fd == this->serverSocket || fd == -1)
 		return ;
@@ -146,7 +151,7 @@ void	Server::send_2usr(int fd) {
 		std::cout << "SENT: \"" << msg << "\"" << std::endl;
 	else
 		std::cerr << "Error: send: did not send all data" << std::endl;
-	user->setBuffer("");
+	user->clearBuff();
 }
 
 int Server::addNewClient() {
