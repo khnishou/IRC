@@ -145,10 +145,12 @@ void Server::executeCmd(Message msg, Users *user) {
     	c_nick(msg.parameters, user);
 	else if (msg.command == "/USER")
     	c_user(msg.parameters, user);
-	else if (msg.command == "/PING")
-    	c_ping(msg.parameters, user);
-	else if (msg.command == "/PONG")
-    	c_pong(msg.parameters, user);
+	else if (msg.command == "/PING") {
+		if (msg.parameters.size() == 1)
+    		user->setBuffer(RPL_PING(this->host, ""));
+		else
+			user->setBuffer(RPL_PING(this->host, msg.parameters[0]));
+	}
 	else if (msg.command == "/JOIN")
     	c_join(msg.parameters, user);
 	else if (msg.command == "/PART")

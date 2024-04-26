@@ -6,7 +6,7 @@
 /*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 18:12:47 by ibenhoci         ###   ########.fr       */
+/*   Updated: 2024/04/26 18:55:33 by ibenhoci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,6 @@ class Server {
 
 		// COMMANDS
 		void			c_cap(std::vector<std::string> param, Users *user);
-		void			c_ping(std::vector<std::string> param, Users *user);
-		void			c_pong(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
