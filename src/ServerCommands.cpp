@@ -33,7 +33,7 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (param.size() < 4)
 		str = "defaul reason"; // check the default reason
 	else
-		str = fill_vec(param, param.begin() + 2).substr();
+		str = fill_vec(param, param.begin() + 2).substr(0, KICKLEN); // check fill_vec returning wrong output
 	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
