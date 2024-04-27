@@ -50,20 +50,20 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 }
 
 void	Server::c_invite(std::vector<std::string> param, Users *user) {
-	if (!(param.size() >= 2))
+	if (!(param.size() >= 2)) // check should be if (param.size() != 2) but should check the error message in this case
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
 	Channel *channel = getChannel(param[1]);
 	if (!channel)
 		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
-	if (!channel->isUser(user))
+	if (!channel->isUser(user) && !channel->isOperator(user))
 		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); //  (442)
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
   	Users *toAdd = getUserByUn(param[0]);
-	if (!channel->isUser(toAdd))
+	if (channel->isUser(toAdd) || channel->isOperator(toAdd))
 		return (user->setBuffer(ERR_USERONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (443)
 	channel->addUser(toAdd);
-	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName()));
+	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName())); // (341)
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
 	toAdd->invite(channel);
 }
