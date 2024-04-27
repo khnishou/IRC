@@ -120,7 +120,7 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 
 void	Server::c_pass(std::vector<std::string> param, Users *user)
 {
-	if (!(param.size() >= 1))
+	if (!(param.size() == 1)) // check what if password have spaces?
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PASS"))); // (461)
 	if (user->getStatus() & PASS_FLAG)
 		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
