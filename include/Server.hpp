@@ -88,7 +88,7 @@ class Server {
   		void			executeCmd(Message msg, Users *user);
 		bool			allowed(Message msg, Users *user);
 
-		// COMMANDS
+		// COMMANDS // check maybe the naming for the cmds is not allowed (c_cmd -> cCmd)
 		void			c_cap(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
