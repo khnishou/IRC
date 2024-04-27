@@ -85,7 +85,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 			return (user->setBuffer(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
 	}
 	std::string top;
-	top = fill_vec(param, param.begin()); // check should start from param[1]
+	top = fill_vec(param, param.begin()).substr(0, TOPICLEN); // check should start from param[1]
 	channel->setTopic(top);
 	std::time_t currTime = std::time(NULL);
 	std::string time = std::ctime(&currTime);

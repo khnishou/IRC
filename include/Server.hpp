@@ -33,6 +33,7 @@
 #define CHANLIMIT	5
 #define USERLIMIT	20
 #define KICKLEN		255
+#define TOPICLEN	307
 
 class Users;
 class Channel;
