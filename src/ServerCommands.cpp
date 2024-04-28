@@ -131,7 +131,7 @@ void	Server::c_pass(std::vector<std::string> param, Users *user)
 
 void	Server::c_nick(std::vector<std::string> param, Users *user)
 {
-	if (!(param.size() >= 1))
+	if (!(param.size() == 1)) // check what if nickname have spaces
 		return (user->setBuffer(ERR_NONICKNAMEGIVEN(user->getNickName()))); // (431)
 	if (!isNickname(param[0]))
 		return (user->setBuffer(ERR_ERRONEUSNICKNAME(this->host, user->getNickName(), param[0]))); // (432)
