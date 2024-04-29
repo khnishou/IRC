@@ -137,37 +137,37 @@ void Server::executeCmd(Message msg, Users *user) {
 		user->setBuffer(ERR_NOTREGISTERED(this->host));
 		return ;
 	}
-	if (msg.command == "/CAP")
+	if (msg.command == "CAP")
 		c_cap(msg.parameters, user);
-	else if (msg.command == "/PASS")
+	else if (msg.command == "PASS")
     	c_pass(msg.parameters, user);
-	else if (msg.command == "/NICK")
+	else if (msg.command == "NICK")
     	c_nick(msg.parameters, user);
-	else if (msg.command == "/USER")
+	else if (msg.command == "USER")
     	c_user(msg.parameters, user);
-	else if (msg.command == "/PING") {
+	else if (msg.command == "PING") {
 		if (msg.parameters.size() == 1)
     		user->setBuffer(RPL_PING(this->host, ""));
 		else
 			user->setBuffer(RPL_PING(this->host, msg.parameters[0]));
 	}
-	else if (msg.command == "/JOIN")
+	else if (msg.command == "JOIN")
     	c_join(msg.parameters, user);
-	else if (msg.command == "/PART")
+	else if (msg.command == "PART")
 		c_part(msg.parameters, user);
-	else if (msg.command == "/KICK")
+	else if (msg.command == "KICK")
     	c_kick(msg.parameters, user);
-  	else if (msg.command == "/INVITE")
+  	else if (msg.command == "INVITE")
     	c_invite(msg.parameters, user);
-	else if (msg.command == "/TOPIC")
+	else if (msg.command == "TOPIC")
     	c_topic(msg.parameters, user);
-	else if (msg.command == "/MODE")
+	else if (msg.command == "MODE")
 		c_mode(msg.parameters, user);
-	else if (msg.command == "/PRIVMSG")
+	else if (msg.command == "PRIVMSG")
 		c_privmsg(msg.parameters, user);
-	else if (msg.command == "/QUIT")
+	else if (msg.command == "QUIT")
 		c_quit(msg.parameters, user);
-	else if (msg.command == "/RESTART")
+	else if (msg.command == "RESTART")
 		c_restart(msg.parameters, user);
 	else
 		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
