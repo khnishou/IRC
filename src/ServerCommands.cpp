@@ -205,7 +205,22 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 }
 
 void Server::c_privmsg(std::vector<std::string> param, Users *user) {
+	if (param.size() < 2)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PRIVMSG")));
 	
+	// Users *targ;
+	// Channel *targ_channel;
+
+	// if (param[0][0] == '#') {
+	// 	targ_channel = this->getChannel(param[0]);
+	// 	if (!targ_channel)
+	// 		return (user->setBuffer());
+	// }
+	// else {
+	// 	targ = this->getUserByUn(param[0]);
+	// 	if (!targ)
+	// 		return (user->setBuffer());
+	// }
 }
 
 void Server::c_restart(std::vector<std::string> param, Users *user) {
