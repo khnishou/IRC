@@ -56,7 +56,7 @@
 #define RPL_NOTICE(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " NOTICE " + dis_nick + " :" + msg + "\r\n"
 #define RPL_QUIT(src_nick, src_usr, src_host, reason)					":" + src_nick + "!" + src_usr + "@" + src_host + " " + reason + "\r\n"
 #define RPL_MODECHAN(src_nick, src_usr, src_host, chan, mode, nick) 	":" + src_nick + "!" + src_usr + "@" + src_host + " MODE " + chan + " " + mode + " " + nick + "\r\n"
-#define RPL_KICK(src_nick, src_usr, src_host, chan, targ)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + targ + "\r\n"
+#define RPL_KICK(src_nick, src_usr, src_host, chan, targ, reason)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + reason + "\r\n"
 
 // USER STATES
 #define PASS_FLAG   (1 << 0)
