@@ -39,7 +39,7 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (param.size() < 4) 
 		reason = "Good boy points have dropped to 0!"; // check the default reason
 	else
-		reason = fill_vec(param, param.begin() + 2).substr();
+		reason = fill_vec(&param, param.begin() + 2).substr();
 	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
@@ -91,7 +91,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 			return (user->setBuffer(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
 	}
 	std::string top;
-	top = fill_vec(param, param.begin()).substr(0, TOPICLEN); // check should start from param[1]
+	top = fill_vec(&param, param.begin() + 1).substr(0, TOPICLEN);
 	channel->setTopic(top);
 	std::time_t currTime = std::time(NULL);
 	std::string time = std::ctime(&currTime);
