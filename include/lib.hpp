@@ -92,6 +92,7 @@ struct Message {
 
 int							skip_space(std::string str, int i);
 int							skip_arg(std::string str, int i);
+bool                        checkSplit(const std::string& str, char del);
 std::vector<std::string>	splitString(const std::string& str, char delimiter);
 uint8_t                     setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset);
 bool                        isNickname(const std::string& nickname);

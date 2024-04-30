@@ -1,14 +1,31 @@
 
 #include "../include/Lib.hpp"
 
-std::vector<std::string> splitString(const std::string& str, char delimiter) {
-    std::vector<std::string> tokens;
-    std::istringstream iss(str);
-    std::string token;
-    while (std::getline(iss, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
+bool checkSplit(const std::string& str, char del) {
+  return !str.empty() && str.front() != del && str.back() != del;
+}
+
+std::vector<std::string> splitString(const std::string& str, char del)
+{
+    std::vector<std::string> split;
+	int start = 0;
+
+	if (!str.empty())
+	{
+		int i = 0;
+
+		while (str[i])
+		{
+			while (str[i] && str[i] == del)
+				i++;
+			start = i;
+			while (str[i] && str[i] != del)
+				i++;
+			if (start != i)
+				split.push_back(str.substr(start + 1, i - start));
+		}
+	}
+	return split;
 }
 
 int skip_space(std::string str, int i)
