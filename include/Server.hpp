@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/19 12:11:00 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 18:55:33 by ibenhoci         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
@@ -51,8 +40,8 @@ class Server {
 		int								serverSocket;
 		char							buffer[1024];
 		ssize_t							bytesReceived;
-		std::vector<Users *>			all_users;
-		std::vector<Channel *>			all_channels;
+		std::vector<Users *>			all_users;		// check change names
+		std::vector<Channel *>			all_channels;	// check change names
 		std::vector<struct pollfd>		fds;
 		Server();
 		
@@ -73,6 +62,8 @@ class Server {
 		Users 			*getUserByFd(int fd);
 		std::string		getHost() const;
 		std::string		getPassword() const;
+		std::vector<Users *> getAllUsers() const;
+		std::vector<Channel *> getAllChannels() const;
 		Channel 		*getChannel(const std::string cname);
 		size_t 			getNumberOfUsers();
 		std::vector<Channel *>	getChanList(Users *user);
