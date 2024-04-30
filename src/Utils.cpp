@@ -22,7 +22,7 @@ std::vector<std::string> splitString(const std::string& str, char del)
 			while (str[i] && str[i] != del)
 				i++;
 			if (start != i)
-				split.push_back(str.substr(start + 1, i - start));
+				split.push_back(str.substr(start, i - start));
 		}
 	}
 	return split;
@@ -72,12 +72,12 @@ uint8_t setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset)
 	return (mode);
 }
 
-std::string fill_vec(std::vector<std::string> param,std::vector<std::string>::iterator ite) {
+std::string fill_vec(std::vector<std::string> *param, std::vector<std::string>::iterator ite) {
 	std::string res;
 
-	for (std::vector<std::string>::iterator it = ite; it != param.end(); ++it) {
+	for (std::vector<std::string>::iterator it = ite; it != param->end(); ++it) {
 		res += *it;
-		if (it != param.end() - 1)
+		if (it != param->end() - 1)
 			res += " ";
 	}
 	return res;
