@@ -30,7 +30,7 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
 	split = splitString(param[1], ',');
 	std::string reason;
-	if (param.size() < 4)
+	if (param.size() < 4) 
 		reason = "Good boy points have dropped to 0!"; // check the default reason
 	else
 		reason = fill_vec(param, param.begin() + 2).substr();
@@ -159,9 +159,9 @@ void	Server::c_user(std::vector<std::string> param, Users *user) // check handle
 	if (username.empty())
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER"))); // error no username "USER ~" or (461)
 	if (!(user->getStatus() & USER_FLAG)) {
-	user->setStatus(USER_FLAG);
-	if (user->getStatus() & NICK_FLAG)
-		user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
+		user->setStatus(USER_FLAG);
+		if (user->getStatus() & NICK_FLAG)
+			user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
 	}
 	else
 		this->sendAllChan(this->getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
@@ -170,38 +170,41 @@ void	Server::c_user(std::vector<std::string> param, Users *user) // check handle
 
 void	Server::c_join(std::vector<std::string> param, Users *user)
 {
-	int i;
+	int i_key;
+	int i_chn;
 	std::vector<std::string> keys;
 	std::vector<std::string> channels;
 
-	if (!(param.size() >= 1))
+	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
 	channels = splitString(param[0], ',');
-	if (channels.size() > CHANLIMIT)
-		return (user->setBuffer(ERR_TOOMANYCHANNELS(this->host, user->getNickName(), channels[0]))); // (405)
-	if (!(param.size() >= 2))
+	// if (channels.size() > CHANLIMIT) // check no such max channels a user can join at once
+	// 	return (user->setBuffer(ERR_TOOMANYCHANNELS(this->host, user->getNickName(), channels[0]))); // (405)
+	if (param.size() == 2)
 		keys = splitString(param[1], ',');
-	i = 0;
-	while (i < channels.size()) // check add -1 
+	i_key = 0;
+	i_chn = 0;
+	while (i_chn < channels.size()) // check add -1 
 	{
-		Channel *channel = getChannel(channels[i]);
+		Channel *channel = getChannel(channels[i_chn]);
 		if (!channel) {
-			channel = new Channel(channels[i]);
+			channel = new Channel(channels[i_chn]); // check use a function instead
 			this->all_channels.push_back(channel);
 		}
 		else if (channel->getModes() & FLAG_I)
 			user->setBuffer(ERR_INVITEONLYCHAN(this->host, user->getNickName(), channel->getName())); // (473)
 		else if (!(channel->getModes() & FLAG_K) ||
-			(!(keys.empty()) && !(keys[i].empty()) && keys[i] == channel->getPassword()))
+			(!(keys.empty()) && !(keys[i_key].empty()) && keys[i_key] == channel->getPassword()))
 		{
-			if (channel->getUserList().size() > USERLIMIT)
-				user->setBuffer(ERR_CHANNELISFULL(this->host, user->getNickName(), channel->getName())); // (471)
-			else
+			if (channel->getUserList().size() < channel->getUserLimit())
 				channel->addUser(user);
+			else
+				user->setBuffer(ERR_CHANNELISFULL(this->host, user->getNickName(), channel->getName())); // (471)
+			i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
 		}
 		else
 			user->setBuffer(ERR_BADCHANNELKEY(this->host, user->getNickName(), channel->getName())); // (475)
-		i++;
+		i_chn++;
 	}
 	// check add RPL msg, these are for each channel joined, will implement when changing how buffer works.
 	// RPL_TOPIC (332)
