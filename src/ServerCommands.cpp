@@ -147,19 +147,25 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 	user->setNickName(param[0]);
 }
 
-void	Server::c_user(std::vector<std::string> param, Users *user)
+void	Server::c_user(std::vector<std::string> param, Users *user) // check handle realname
 {
-	// this username that is being set needs to be prefixed with ~, cuz not using ident protocol
-	if (!(param.size() >= 1))
+	std::string username;
+	if (param.size() == 0)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER"))); // (461)
-	if (user->getStatus() & USER_FLAG)
-		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
-	user->setUserName(param[0]);
-	if (param.size() == 4 && param[1] == "0" && param[2] == "*")
-		user->setReal(param[3]);
+	if (param[0][0] == '~') // check ignore the '~' if available
+		username = param[0].substr(1);
+	else
+		username = param[0].substr(0);
+	if (username.empty())
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER"))); // error no username "USER ~" or (461)
+	if (!(user->getStatus() & USER_FLAG)) {
 	user->setStatus(USER_FLAG);
 	if (user->getStatus() & NICK_FLAG)
 		user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
+	}
+	else
+		this->sendAllChan(this->getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
+	user->setUserName(username);
 }
 
 void	Server::c_join(std::vector<std::string> param, Users *user)
