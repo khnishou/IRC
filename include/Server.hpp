@@ -93,6 +93,7 @@ class Server {
 		// COMMANDS // check maybe the naming for the cmds is not allowed (c_cmd -> cCmd)
 		void			c_cap(std::vector<std::string> param, Users *user);
 		void			c_pass(std::vector<std::string> param, Users *user);
+		void			c_ping(std::vector<std::string> param, Users *user);
 		void			c_nick(std::vector<std::string> param, Users *user);
 		void			c_user(std::vector<std::string> param, Users *user);
 		void			c_join(std::vector<std::string> param, Users *user);
