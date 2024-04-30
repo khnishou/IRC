@@ -184,34 +184,48 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
 	channels = splitString(param[0], ',');
-	// if (channels.size() > CHANLIMIT) // check no such max channels a user can join at once
-	// 	return (user->setBuffer(ERR_TOOMANYCHANNELS(this->host, user->getNickName(), channels[0]))); // (405)
 	if (param.size() == 2)
 		keys = splitString(param[1], ',');
 	i_key = 0;
 	i_chn = 0;
-	while (i_chn < channels.size()) // check add -1 
+	while (i_chn < channels.size())
 	{
 		Channel *channel = getChannel(channels[i_chn]);
 		if (!channel) {
-			channel = new Channel(channels[i_chn]); // check use a function instead
-			this->all_channels.push_back(channel);
+			if (getAllChannels().size() > CHANLIMIT)
+				; // check in case the number of channels in the server > then the limit of channels in server
+			else
+			{
+				channel = new Channel(channels[i_chn]); // check use a function instead
+				this->all_channels.push_back(channel);
+				channel->addOperator(user);
+			}
 		}
 		else if (channel->getModes() & FLAG_I)
 			user->setBuffer(ERR_INVITEONLYCHAN(this->host, user->getNickName(), channel->getName())); // (473)
 		else if (!(channel->getModes() & FLAG_K) ||
 			(!(keys.empty()) && !(keys[i_key].empty()) && keys[i_key] == channel->getPassword()))
 		{
-			if (channel->getUserList().size() < channel->getUserLimit())
+			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() < channel->getUserLimit()))
 				channel->addUser(user);
 			else
 				user->setBuffer(ERR_CHANNELISFULL(this->host, user->getNickName(), channel->getName())); // (471)
-			i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
 		}
 		else
 			user->setBuffer(ERR_BADCHANNELKEY(this->host, user->getNickName(), channel->getName())); // (475)
+		i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
 		i_chn++;
 	}
+// If a client’s JOIN command to the server is successful, the server MUST send, in this order:
+
+// 1\ A JOIN message with the client as the message <source> and the channel they
+//    have joined as the first parameter of the message.
+// 2\ The channel’s topic (with RPL_TOPIC (332) and optionally RPL_TOPICWHOTIME (333)), 
+//    and no message if the channel does not have a topic.
+// 3\ A list of users currently joined to the channel (with one or more RPL_NAMREPLY (353)
+//	  numerics followed by a single RPL_ENDOFNAMES (366) numeric). These RPL_NAMREPLY messages
+//    sent by the server MUST include the requesting client that has just joined the channel.
+	
 	// check add RPL msg, these are for each channel joined, will implement when changing how buffer works.
 	// RPL_TOPIC (332)
 	// RPL_TOPICWHOTIME (333)
