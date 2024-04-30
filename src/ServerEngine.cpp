@@ -185,9 +185,7 @@ void	Server::send_2usr(int fd) {
 	std::string msg = user->getBuffer();
 	if (msg.empty())
 		return ;
-	if (send(fd, msg.c_str(), msg.size(), 0) == (long)msg.size())
-		std::cout << "SENT: \"" << msg << "\"" << std::endl;
-	else
+	if (send(fd, msg.c_str(), msg.size(), 0) != (long)msg.size())
 		std::cerr << "Error: send: did not send all data" << std::endl;
 	user->clearBuff();
 }
@@ -234,7 +232,6 @@ int Server::addNewClient() {
 
 void Server::handleMsg(Users *user, size_t i) {
 	this->bytesReceived = recv(user->getSocketDescriptor(), this->buffer, sizeof(this->buffer), 0);
-
 	if (this->bytesReceived <= 0) {
 		if (this->bytesReceived == 0)
 			std::cout << "Connection closed." << std::endl;
@@ -244,11 +241,16 @@ void Server::handleMsg(Users *user, size_t i) {
 	}
 	else {
 		// those needs to be changed to handle split messages and incomplete messages
-		std::string msg(buffer, bytesReceived - 1);
-		Message cont = parsing(msg);
-		executeCmd(cont, user);
-		// send reply if buffer not empty to client 
-		std::cout << "Received: " << msg << std::endl;
-		std::cout << "Reply code: " << user->getBuffer() << std::endl;
+		
+		std::string msg(buffer, bytesReceived);
+		std::vector<std::string> vec = splitString(msg, '\n');
+
+		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
+			Message cont = parsing(*it);
+			executeCmd(cont, user);
+		// 	// send reply if buffer not empty to client 
+			std::cout << "Received: " << *it << std::endl;
+			std::cout << "Reply code: " << user->getBuffer() << std::endl;
+		}
 	}
 }

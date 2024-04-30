@@ -22,7 +22,7 @@ int skip_arg(std::string str, int i)
 {
 	int j;
 	j = i;
-  while (str[j] && str[j] != ' ')
+  while (str[j] && str[j] != ' ' && str[j] != '\r')
 	j++;
   return (j - i);
 }
@@ -95,7 +95,7 @@ Message parsing(std::string str) {
 		i += len;
 		i = skip_space(str, i);
    }
-	while (str[i])
+	while (str[i] && str[i] != '\r')
 	{
 		len = skip_arg(str, i);
 		msg.parameters.push_back(str.substr(i, len));
