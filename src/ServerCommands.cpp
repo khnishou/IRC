@@ -246,6 +246,8 @@ void Server::c_restart(std::vector<std::string> param, Users *user) {
 }
 
 void Server::c_quit(std::vector<std::string> param, Users *user) {
+	user->setBuffer(RPL_QUIT(user->getNickName(), user->getUserName(), user->getHostName(), "QUIT: " + "quitting..."));
+	send_2usr(user->getSocketDescriptor());
 	removeUserFromServer(user);
 }
 

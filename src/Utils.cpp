@@ -22,7 +22,7 @@ std::vector<std::string> splitString(const std::string& str, char del)
 			while (str[i] && str[i] != del)
 				i++;
 			if (start != i)
-				split.push_back(str.substr(start + 1, i - start));
+				split.push_back(str.substr(start, i - start));
 		}
 	}
 	return split;
