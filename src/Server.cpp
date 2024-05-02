@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ibenhoci <ibenhoci@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/19 12:12:02 by smallem           #+#    #+#             */
-/*   Updated: 2024/04/26 19:04:14 by ibenhoci         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "../include/Server.hpp"
 #include <algorithm>
@@ -54,6 +43,14 @@ std::string Server::getHost() const {
 
 std::string Server::getPassword() const { 
 	return this->password;
+}
+
+std::vector<Users *> Server::getAllUsers() const { 
+	return this->all_users;
+}
+
+std::vector<Channel *> Server::getAllChannels() const { 
+	return this->all_channels;
 }
 
 Users *Server::getUserByFd(int fd) {
