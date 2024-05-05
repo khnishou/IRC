@@ -8,9 +8,9 @@
 
 Server::Server() {}
 
-Server::Server(int port, std::string password) : port(port), password(password) {
+Server::Server(int port, std::string password) : _port(port), _password(password) {
 	std::cout << "-------CREATING SERVER-------" << std::endl;
-	this->state = START;
+	this->_state = START;
 }
 
 Server::Server(const Server &cp) { *this = cp; }
@@ -29,33 +29,20 @@ Server::~Server() {
 //                              Accessor Methods                              //
 //****************************************************************************//
 
-SERVER_STATE Server::getState() const {
-	return this->state;
-}
-
-size_t	Server::getNumberOfUsers() {
-	return this->all_users.size();
-}
-
-std::string Server::getHost() const { 
-	return this->host; 
-}
-
-std::string Server::getPassword() const { 
-	return this->password;
-}
-
-std::vector<Users *> Server::getAllUsers() const { 
-	return this->all_users;
-}
-
-std::vector<Channel *> Server::getAllChannels() const { 
-	return this->all_channels;
-}
+int Server::getPort() const { return this->_port; }
+SERVER_STATE Server::getState() const { return this->_state; }
+int	Server::getServerSocket() const { return this->_serverSocket; }
+size_t	Server::getNumberOfUsers() { return this->_allUsers.size(); }
+ssize_t Server::getBytesReceived() const { return this->_bytesReceived; }
+std::string Server::getHost() const { return this->_host; }
+std::string Server::getPassword() const { return this->_password; }
+std::vector<Users *> Server::getAllUsers() const { return this->_allUsers; }
+std::vector<Channel *> Server::getAllChannels() const { return this->_allChannels; }
+std::vector<struct pollfd>	Server::getFds() const { return this->_fds; }
 
 Users *Server::getUserByFd(int fd) {
-	for (std::vector<Users *>::iterator it = this->all_users.begin(); 
-			it != this->all_users.end(); ++it) {
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin(); 
+			it != this->_allUsers.end(); ++it) {
 		if ((*it)->getSocketDescriptor() == fd)
 			return *it;
 	}
@@ -63,8 +50,8 @@ Users *Server::getUserByFd(int fd) {
 }
 
 Users *Server::getUserByUn(const std::string username) {
-	for (std::vector<Users *>::iterator it = this->all_users.begin();
-			it != this->all_users.end(); ++it) {
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin();
+			it != this->_allUsers.end(); ++it) {
 		if ((*it)->getUserName() == username)
 			return *it;
 	}
@@ -72,8 +59,8 @@ Users *Server::getUserByUn(const std::string username) {
 }
 
 Channel *Server::getChannel(const std::string cname) {
-	for (std::vector<Channel *>::iterator it = this->all_channels.begin();
-			it != this->all_channels.end(); ++it) {
+	for (std::vector<Channel *>::iterator it = this->_allChannels.begin();
+			it != this->_allChannels.end(); ++it) {
 		if ((*it)->getName() == cname)
 			return *it;
 	}
@@ -82,27 +69,27 @@ Channel *Server::getChannel(const std::string cname) {
 
 std::vector<Channel *> Server::getChanList(Users *user) {
 	std::vector<Channel *> lst;
-	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
+	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
 		if ((*it)->isOperator(user) || (*it)->isUser(user))
 			lst.push_back(*it);
 	}
 	return lst;
 }
 
-void	Server::addChan(Channel *channel) {
-	this->all_channels.push_back(channel);
-}
+void	Server::setState(SERVER_STATE state) { this->_state = state; }
+void	Server::setServerSocket(int serverSocket) { this->_serverSocket = serverSocket; }
+void	Server::setHost(std::string host) { this->_host = host; }
+void	Server::setBytesReceived(int BytesReceived) { this->_bytesReceived = BytesReceived; }
 
-void	Server::addUser(Users *user) {
-	this->all_users.push_back(user);
-}
+void	Server::addChan(Channel *channel) {	this->_allChannels.push_back(channel); }
+void	Server::addUser(Users *user) { this->_allUsers.push_back(user); }
 
 //****************************************************************************//
 //                               Other Function                               //
 //****************************************************************************//
 
 bool	Server::nickNameExists(std::string nname) {
-	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin(); it != this->_allUsers.end(); ++it) {
 		if ((*it)->getNickName() == nname)
 			return true;
 	}
@@ -111,22 +98,22 @@ bool	Server::nickNameExists(std::string nname) {
 
 // change this, use size and position accessor instead of iterator, iterator could cause issues since removing stuff from vector
 void Server::removeUserFromServer(Users *user) {
-	for (std::vector<pollfd>::iterator it = this->fds.begin(); it != this->fds.end(); it++) {
-		if ((*it).fd == this->serverSocket)
+	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+		if ((*it).fd == this->_serverSocket)
 			continue ;
 		if ((*it).fd == user->getSocketDescriptor()) {
 			close(user->getSocketDescriptor());
-			this->fds.erase(it);
+			this->_fds.erase(it);
 			break ;
 		}
 	}
-	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it) {
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin(); it != this->_allUsers.end(); ++it) {
 		if ((*it) == user) {
-			this->all_users.erase(it);
+			this->_allUsers.erase(it);
 			break ;
 		}
 	}
-	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it) {
+	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
 		if ((*it)->isOperator(user)) {
 			(*it)->deleteOperator(user, NULL, this->getHost());
 			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName()));

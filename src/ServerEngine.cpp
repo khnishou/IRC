@@ -9,18 +9,18 @@ void Server::init() {
 		std::cerr << "Error: gethostname: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	this->host = std::string(name);
+	setHost(std::string(name));
 	
 	// creating the socket
-	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (this->serverSocket == -1) {
+	setServerSocket(socket(AF_INET, SOCK_STREAM, 0));
+	if (getServerSocket() == -1) {
 		std::cerr << "Error: socket: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// setting socket options
 	int opt = 1;
-	if (setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))
+	if (setsockopt(getServerSocket(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))
 			== -1) {
 		std::cerr << "Error: setsockopt: " << std::strerror(errno) << std::endl;
 		// might have to close socket first think on this later, same remqrks bellow
@@ -28,7 +28,7 @@ void Server::init() {
 	}
 
 	// set socket to nonblocking mode
-	if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(getServerSocket(), F_SETFL, O_NONBLOCK) == -1) {
 		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -41,15 +41,15 @@ void Server::init() {
 	std::memset(&serverAdr, 0, sizeof(serverAdr));
 	serverAdr.sin_family = AF_INET;
 	serverAdr.sin_addr.s_addr = INADDR_ANY;
-	serverAdr.sin_port = htons(this->port);
-	if (bind(this->serverSocket, (struct sockaddr *)&serverAdr, sizeof(serverAdr))
+	serverAdr.sin_port = htons(getPort());
+	if (bind(getServerSocket(), (struct sockaddr *)&serverAdr, sizeof(serverAdr))
 			== -1) {
 		std::cerr << "Error: bind: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);			
 	}
 
 	// start listening to incoming connections, secnod arg is max allowed connections
-	if (listen(this->serverSocket, 128) == -1) {
+	if (listen(getServerSocket(), 128) == -1) {
 		std::cerr << "Error: listen: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -57,14 +57,14 @@ void Server::init() {
 
 	// add the server socket to the pollfd array 
 	struct pollfd sfd;
-	sfd.fd = this->serverSocket;
+	sfd.fd = getServerSocket();
 	sfd.events = POLLIN;
-	this->fds.push_back(sfd);
+	getFds().push_back(sfd);
 	// now server is ready, consider later myb adding a default starting channel.
 	Channel *general = new Channel("#GENERAL");
 	// general->setMode(); figure out which modes to open this channel with
 	general->setTopic("--GENERAL IRCSERV CHANNEL--");
-	this->all_channels.push_back(general);
+	getAllChannels().push_back(general);
 }
 
 void Server::start() {
@@ -72,40 +72,40 @@ void Server::start() {
 	Users	*user;
 
 	std::cout << "-------------IRCSERVER ON-------------" << std::endl;
-	this->state = ON;
-	while (this->state == ON) {
+	setState(ON);
+	while (getState() == ON) {
 		// We listen for incoming connections or incoming anything really
-		activity = poll(&(this->fds[0]), this->fds.size(), -1);	
+		activity = poll(&(getFds()[0]), getFds().size(), -1);	
 		if (activity < 0) {
 			std::cout << "Error: poll: " << std::strerror(errno) << std::endl;
 			// probably have some stuff to free here first
 			exit(EXIT_FAILURE);
 		}
 		// Check for events occuring on already connected clients
-		for (size_t i = 0; i < this->fds.size(); ++i) {
-			if (this->fds[i].revents & POLLIN) {
-				if (this->fds[i].fd == this->serverSocket) {
+		for (size_t i = 0; i < getFds().size(); ++i) {
+			if (getFds()[i].revents & POLLIN) {
+				if (getFds()[i].fd == getServerSocket()) {
 					if (addNewClient() == -1)
 						continue ;
 				}
 				else {
-					user = getUserByFd(this->fds[i].fd);
+					user = getUserByFd(getFds()[i].fd);
 					if (user)
 						handleMsg(user, i);
 				}
 			}
 			// send outgoing error messages/replies or even private messages
-			if (i < this->fds.size() && this->fds[i].revents & POLLOUT)
-				this->send_2usr(this->fds[i].fd);
+			if (i < getFds().size() && getFds()[i].revents & POLLOUT)
+				send_2usr(getFds()[i].fd);
 		}
 	}
-	if (this->state == OFF)
+	if (getState() == OFF)
 		std::cout << "-------------IRCSERVER OFF-------------" << std::endl;
-	else if (this->state == START)
+	else if (getState() == START)
 		std::cout << "-------------IRCSERVER STARTING-------------" << std::endl;
 }
 
-void Server::stop() { close(this->serverSocket); }
+void Server::stop() { close(getServerSocket()); }
 
 bool Server::allowed(Message msg, Users *user) {
 	
@@ -134,7 +134,7 @@ bool Server::allowed(Message msg, Users *user) {
 void Server::executeCmd(Message msg, Users *user) {
 	// handle tag
 	if (allowed(msg, user) == false) {
-		user->setBuffer(ERR_NOTREGISTERED(this->host));
+		user->setBuffer(ERR_NOTREGISTERED(getHost()));
 		return ;
 	}
 	if (msg.command == "CAP")
@@ -166,7 +166,7 @@ void Server::executeCmd(Message msg, Users *user) {
 	else if (msg.command == "RESTART")
 		c_restart(msg.parameters, user);
 	else
-		user->setBuffer(ERR_UNKNOWNCOMMAND(this->host, user->getNickName(), msg.command));
+		user->setBuffer(ERR_UNKNOWNCOMMAND(getHost(), user->getNickName(), msg.command));
 }
 
 void Server::sendAllChan(std::vector<Channel *> lst, std::string msg) {
@@ -175,9 +175,9 @@ void Server::sendAllChan(std::vector<Channel *> lst, std::string msg) {
 }
 
 void	Server::send_2usr(int fd) {
-	if (fd == this->serverSocket || fd == -1)
+	if (fd == getServerSocket() || fd == -1)
 		return ;
-	Users *user = this->getUserByFd(fd);
+	Users *user = getUserByFd(fd);
 	std::string msg = user->getBuffer();
 	if (msg.empty())
 		return ;
@@ -189,7 +189,7 @@ void	Server::send_2usr(int fd) {
 int Server::addNewClient() {
 	struct sockaddr_in clientAdr;
 	socklen_t clientAddrSize = sizeof(clientAdr);
-	int clientSocket = accept(this->serverSocket, (struct sockaddr *)&clientAdr, &clientAddrSize);
+	int clientSocket = accept(getServerSocket(), (struct sockaddr *)&clientAdr, &clientAddrSize);
 	if (clientSocket == -1) {
 		std::cerr << "Error: accept: " << std::strerror(errno) << std::endl;
 		return -1;
@@ -198,7 +198,7 @@ int Server::addNewClient() {
 		std::cout << "NEW CONNECTION" << std::endl;
 
 	// setting client socket to non-blocking not sure tho
-	if (fcntl(this->serverSocket, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(getServerSocket(), F_SETFL, O_NONBLOCK) == -1) {
 		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -213,7 +213,7 @@ int Server::addNewClient() {
     pollfd new_client_fd;
     new_client_fd.fd = clientSocket;
     new_client_fd.events = POLLIN | POLLOUT;
-    fds.push_back(new_client_fd);
+    getFds().push_back(new_client_fd);
 
 	// create new user and add to list
 	Users *user = new Users(std::string(name), clientSocket);
@@ -222,23 +222,23 @@ int Server::addNewClient() {
 		close(clientSocket);
 		return -1;
 	}	
-	this->all_users.push_back(user);
+	getAllUsers().push_back(user);
 	return 0;
 }
 
 void Server::handleMsg(Users *user, size_t i) {
-	this->bytesReceived = recv(user->getSocketDescriptor(), this->buffer, sizeof(this->buffer), 0);
-	if (this->bytesReceived <= 0) {
-		if (this->bytesReceived == 0)
+	setBytesReceived(recv(user->getSocketDescriptor(), this->_buffer, sizeof(this->_buffer), 0)); // check better use a getter than "this" op
+	if (getBytesReceived() <= 0) {
+		if (getBytesReceived() == 0)
 			std::cout << "Connection closed." << std::endl;
 		else
 			std::cerr << "Error: recv: " << std::strerror(errno) << std::endl;
-		this->removeUserFromServer(user);
+		removeUserFromServer(user);
 	}
 	else {
 		// those needs to be changed to handle split messages and incomplete messages
 		
-		std::string msg(buffer, bytesReceived);
+		std::string msg(_buffer, getBytesReceived()); // check change _buffer
 		std::vector<std::string> vec = splitString(msg, '\n');
 
 		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {

@@ -7,7 +7,7 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 			user->unsetStatus(CAPON_FLAG);
 		}
 		else if (param[0] == "LS") {
-			user->setBuffer(RPL_CAP(this->host));
+			user->setBuffer(RPL_CAP(getHost()));
 			user->setStatus(CAPON_FLAG);
 		}
 	}
@@ -23,9 +23,9 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 	{
 		Channel *channel = getChannel(*it);
 		if (!channel)
-			return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), *it))); // (403) // check the buffer should be joined with the old one (we might need to check all the errors inside loops)
+			return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), *it))); // (403) // check the buffer should be joined with the old one (we might need to check all the errors inside loops)
 		if (!channel->isUser(user) && !channel->isOperator(user))
-			return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check the buffer should be joined with the old one
+			return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442) // check the buffer should be joined with the old one
 		if (param.size() > 1)
 			std::string reason = fill_vec(&param, param.begin() + 1);
 		// check leaving a channel
@@ -35,8 +35,8 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 
 void	Server::c_ping(std::vector<std::string> param, Users *user) {
 	if (param.size() == 1)
-		return (user->setBuffer(RPL_PING(this->host, "")));
-	user->setBuffer(RPL_PING(this->host, param[0]));
+		return (user->setBuffer(RPL_PING(getHost(), "")));
+	user->setBuffer(RPL_PING(getHost(), param[0]));
 }
 
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
@@ -45,11 +45,11 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "KICK"))); // (461)
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
-		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // (403)
 	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442) // check 441 before 442
 	if (!channel->isOperator(user))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	if (checkSplit(param[1], ','))
 		; // error ",arg1,,arg2,"
 	split = splitString(param[1], ',');
@@ -61,13 +61,13 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByUn(split[i]);
 		if (!toKick)
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), split[i], channel->getName()))); // (441) // check maybe add a new
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(getHost(), user->getNickName(), split[i], channel->getName()))); // (441) // check maybe add a new
 		if (!channel->isUser(toKick) && !channel->isOperator(toKick))
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(this->host, user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(getHost(), user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
 		if (channel->isUser(toKick))
-			channel->deleteUser(toKick, user, this->getHost());
+			channel->deleteUser(toKick, user, getHost());
 		else if (channel->isOperator(toKick))
-			channel->deleteOperator(toKick, user, this->getHost());
+			channel->deleteOperator(toKick, user, getHost());
 		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason)); // add reason later
 		channel->broadcastMsg(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason));
 	}
@@ -78,16 +78,16 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
 	Channel *channel = getChannel(param[1]);
 	if (!channel)
-		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // (403)
 	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); //  (442)
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); //  (442)
 	if (!channel->isOperator(user))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
   	Users *toAdd = getUserByUn(param[0]);
 	if (channel->isUser(toAdd) || channel->isOperator(toAdd))
-		return (user->setBuffer(ERR_USERONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (443)
+		return (user->setBuffer(ERR_USERONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (443)
 	channel->addUser(toAdd);
-	user->setBuffer(RPL_INVITING(this->host, user->getNickName(), toAdd->getNickName(), channel->getName())); // (341)
+	user->setBuffer(RPL_INVITING(getHost(), user->getNickName(), toAdd->getNickName(), channel->getName())); // (341)
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
 	toAdd->invite(channel);
 }
@@ -97,24 +97,24 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "TOPIC"))); // (461)
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
-		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // (403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // (403)
 	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user) && (channel->getModes() & FLAG_T))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	if (param.size() == 1) {
 		if (channel->getTopic().empty())
-			return (user->setBuffer(RPL_NOTOPIC(this->host, user->getNickName(), channel->getName()))); // (331)
+			return (user->setBuffer(RPL_NOTOPIC(getHost(), user->getNickName(), channel->getName()))); // (331)
 		else
-			return (user->setBuffer(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
+			return (user->setBuffer(RPL_TOPIC(getHost(), user->getNickName(), channel->getName(), channel->getTopic()))); // (332)
 	}
 	std::string top;
 	top = fill_vec(&param, param.begin() + 1).substr(0, TOPICLEN);
 	channel->setTopic(top);
 	std::time_t currTime = std::time(NULL);
 	std::string time = std::ctime(&currTime);
-	channel->broadcastMsg(RPL_TOPIC(this->host, user->getNickName(), channel->getName(), channel->getTopic()));
-	channel->broadcastMsg(RPL_TOPICWHOTIME(this->host, channel->getName(), user->getNickName(), time));
+	channel->broadcastMsg(RPL_TOPIC(getHost(), user->getNickName(), channel->getName(), channel->getTopic()));
+	channel->broadcastMsg(RPL_TOPICWHOTIME(getHost(), channel->getName(), user->getNickName(), time));
 }
 
 void	Server::c_mode(std::vector<std::string> param, Users *user)
@@ -128,16 +128,16 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	i = 0;
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
-		return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), param[0]))); // 403)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // 403)
 	if (param.size() < 2)
 		return ; // RPL_CHANNELMODEIS (324)
 	mode = initMode(param, mode, channel);
 	if (mode & (1 << 7))
-		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(this->host, user->getNickName()))); //(501)
+		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(getHost(), user->getNickName()))); //(501)
 	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user)) // check extra priv
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	channel->setMode(mode);
 	// success rpl value basically sends a message on the channel to every user saying what the new modes are
 }
@@ -148,7 +148,7 @@ void	Server::c_pass(std::vector<std::string> param, Users *user)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PASS"))); // (461)
 	if (user->getStatus() & PASS_FLAG)
 		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
-	if (param[0] != this->getPassword())
+	if (param[0] != getPassword())
 		return (user->setBuffer(ERR_PASSWDMISMATCH(user->getNickName()))); // (464)
 	user->setStatus(PASS_FLAG);
 }
@@ -158,16 +158,16 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 	if (!(param.size() == 1)) // check what if nickname have spaces
 		return (user->setBuffer(ERR_NONICKNAMEGIVEN(user->getNickName()))); // (431)
 	if (!isNickname(param[0]) || param[0].length() > NICKLEN) // check if nickname is longer than NICKLEN throw an error
-		return (user->setBuffer(ERR_ERRONEUSNICKNAME(this->host, user->getNickName(), param[0]))); // (432)
+		return (user->setBuffer(ERR_ERRONEUSNICKNAME(getHost(), user->getNickName(), param[0]))); // (432)
 	if (nickNameExists(param[0]))
-		return (user->setBuffer(ERR_NICKNAMEINUSE(this->host, user->getNickName(), param[0]))); // (433)
+		return (user->setBuffer(ERR_NICKNAMEINUSE(getHost(), user->getNickName(), param[0]))); // (433)
 	if (!(user->getStatus() & NICK_FLAG)) {
 		user->setStatus(NICK_FLAG);
 		if (user->getStatus() & USER_FLAG)
-			user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
+			user->setBuffer(RPL_WELCOME(getHost(), user->getNickName(), user->getUserName(), user->getHostName()));
 	}
 	else
-		this->sendAllChan(this->getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
+		sendAllChan(getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
 	user->setNickName(param[0]);
 }
 
@@ -185,10 +185,10 @@ void	Server::c_user(std::vector<std::string> param, Users *user) // check handle
 	if (!(user->getStatus() & USER_FLAG)) {
 		user->setStatus(USER_FLAG);
 		if (user->getStatus() & NICK_FLAG)
-			user->setBuffer(RPL_WELCOME(this->host, user->getNickName(), user->getUserName(), user->getHostName()));
+			user->setBuffer(RPL_WELCOME(getHost(), user->getNickName(), user->getUserName(), user->getHostName()));
 	}
 	else
-		this->sendAllChan(this->getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
+		sendAllChan(getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
 	user->setUserName(username);
 }
 
@@ -221,22 +221,22 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 			else
 			{
 				channel = new Channel(channels[i_chn]); // check use a function instead
-				this->all_channels.push_back(channel);
+				getAllChannels().push_back(channel);
 				channel->addOperator(user);
 			}
 		}
 		else if (channel->getModes() & FLAG_I)
-			user->setBuffer(ERR_INVITEONLYCHAN(this->host, user->getNickName(), channel->getName())); // (473)
+			user->setBuffer(ERR_INVITEONLYCHAN(getHost(), user->getNickName(), channel->getName())); // (473)
 		else if (!(channel->getModes() & FLAG_K) ||
 			(!(keys.empty()) && !(keys[i_key].empty()) && keys[i_key] == channel->getPassword()))
 		{
 			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() < channel->getUserLimit()))
 				channel->addUser(user);
 			else
-				user->setBuffer(ERR_CHANNELISFULL(this->host, user->getNickName(), channel->getName())); // (471)
+				user->setBuffer(ERR_CHANNELISFULL(getHost(), user->getNickName(), channel->getName())); // (471)
 		}
 		else
-			user->setBuffer(ERR_BADCHANNELKEY(this->host, user->getNickName(), channel->getName())); // (475)
+			user->setBuffer(ERR_BADCHANNELKEY(getHost(), user->getNickName(), channel->getName())); // (475)
 		i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
 		i_chn++;
 	}
@@ -265,12 +265,12 @@ void Server::c_privmsg(std::vector<std::string> param, Users *user) {
 	// Channel *targ_channel;
 
 	// if (param[0][0] == '#') {
-	// 	targ_channel = this->getChannel(param[0]);
+	// 	targ_channel = getChannel(param[0]);
 	// 	if (!targ_channel)
 	// 		return (user->setBuffer());
 	// }
 	// else {
-	// 	targ = this->getUserByUn(param[0]);
+	// 	targ = getUserByUn(param[0]);
 	// 	if (!targ)
 	// 		return (user->setBuffer());
 	// }
@@ -278,15 +278,16 @@ void Server::c_privmsg(std::vector<std::string> param, Users *user) {
 
 void Server::c_restart(std::vector<std::string> param, Users *user) {
 	// check priv first
-	this->state = START;
-	this->fds.clear();
-	close(this->serverSocket);
-	for (std::vector<Users *>::iterator it = this->all_users.begin(); it != this->all_users.end(); ++it)
+	setState(START);
+	getFds().clear();
+
+	close(getServerSocket());
+	for (std::vector<Users *>::iterator it = getAllUsers().begin(); it != getAllUsers().end(); ++it) //check better work with a copy (getAllUsers())
 		delete (*it);
-	for (std::vector<Channel *>::iterator it = this->all_channels.begin(); it != this->all_channels.end(); ++it)
+	for (std::vector<Channel *>::iterator it = getAllChannels().begin(); it != getAllChannels().end(); ++it) //check better work with a copy (getAllUsers())
 		delete (*it);
-	this->all_channels.clear();
-	this->all_users.clear();
+	getAllChannels().clear();
+	getAllUsers().clear();
 }
 
 void Server::c_quit(std::vector<std::string> param, Users *user) {
