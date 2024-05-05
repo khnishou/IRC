@@ -2,7 +2,14 @@
 #include "../include/Lib.hpp"
 
 bool checkSplit(const std::string& str, char del) {
-  return !str.empty() && str.front() != del && str.back() != del;
+  	if (str.empty() || str.front() == del || str.back() == del)
+		return (false);
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (i && str[i] == del && str[i - 1] == del)
+			return (false);
+	}
+	return (true);
 }
 
 std::vector<std::string> splitString(const std::string& str, char del)

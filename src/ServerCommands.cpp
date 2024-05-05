@@ -16,6 +16,8 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART"))); // (461)
+	if (checkSplit(param[0], ','))
+		; // error ",arg1,arg2," leading and ending ','
 	std::vector<std::string> split = splitString(param[0], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
 	{
@@ -46,6 +48,8 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check 441 before 442
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(this->host, user->getNickName(), channel->getName()))); // (482)
+	if (checkSplit(param[1], ','))
+		; // error ",arg1,arg2," leading and ending ','
 	split = splitString(param[1], ',');
 	std::string reason;
 	if (param.size() < 4) 
@@ -195,9 +199,15 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 
 	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
+	if (checkSplit(param[0], ','))
+		; // error ",arg1,arg2," leading and ending ','
 	channels = splitString(param[0], ',');
 	if (param.size() == 2)
+	{
+		if (checkSplit(param[1], ','))
+			; // error ",arg1,arg2," leading and ending ','
 		keys = splitString(param[1], ',');
+	}
 	i_key = 0;
 	i_chn = 0;
 	while (i_chn < channels.size())
