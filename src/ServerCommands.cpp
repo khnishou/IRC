@@ -23,9 +23,11 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 	{
 		Channel *channel = getChannel(*it);
 		if (!channel)
-			return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), *it))); // (403)
+			return (user->setBuffer(ERR_NOSUCHCHANNEL(this->host, user->getNickName(), *it))); // (403) // check the buffer should be joined with the old one (we might need to check all the errors inside loops)
 		if (!channel->isUser(user) && !channel->isOperator(user))
-			return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442)
+			return (user->setBuffer(ERR_NOTONCHANNEL(this->host, user->getNickName(), channel->getName()))); // (442) // check the buffer should be joined with the old one
+		if (param.size() > 1)
+			std::string reason = fill_vec(&param, param.begin() + 1);
 		// check leaving a channel
 		// check RPL leaving a channel
 	}
