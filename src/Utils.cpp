@@ -90,6 +90,39 @@ std::string fill_vec(std::vector<std::string> *param, std::vector<std::string>::
 	return res;
 }
 
+static int paramLen(std::string cmd)
+{
+	if (cmd == "CAP")
+		return (1);
+	else if (cmd == "PASS")
+		return (1);
+	else if (cmd == "NICK")
+		return (0);
+	else if (cmd == "USER")
+		return (4);
+	else if (cmd == "PING")
+		return (1);
+	else if (cmd == "JOIN")
+		return (1);
+	else if (cmd == "PART")
+		return (1);
+	else if (cmd == "KICK")
+		return (2);
+  	else if (cmd == "INVITE")
+		return (2);
+	else if (cmd == "TOPIC")
+		return (1);
+	else if (cmd == "MODE")
+		return (3); // check might change
+	else if (cmd == "PRIVMSG")
+		return (1);
+	else if (cmd == "QUIT")
+		return (0);
+	else if (cmd == "RESTART")
+		return (0);
+	return (-1);
+}
+
 Message parsing(std::string str) {
 
    Message msg;
@@ -111,18 +144,28 @@ Message parsing(std::string str) {
         msg.source = str.substr(i + 1, len - 1);
 		i += len;
 		i = skip_space(str, i);
-   }
+	}
 	if (str[i])
 	{
 		len = skip_arg(str, i);
       msg.command = str.substr(i, len);
 		i += len;
 		i = skip_space(str, i);
-   }
+	}
+	int argsLen = paramLen(msg.command);
 	while (str[i] && str[i] != '\r')
 	{
 		len = skip_arg(str, i);
-		msg.parameters.push_back(str.substr(i, len));
+		if (argsLen > 0)
+		{
+			msg.parameters.push_back(str.substr(i, len));
+			argsLen--;
+		}
+		else if (!(argsLen < 0))
+		{
+			msg.parameters.push_back(str.substr(i));
+			break ;
+		}
 		i += len;
 		i = skip_space(str, i);
 	}

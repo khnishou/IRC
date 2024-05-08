@@ -34,7 +34,7 @@ fclean: clean
 
 test: $(OBJS_TEST)
 	@$(CC) $(CFLAGS) -o $(NAME_TEST) $(OBJS_TEST)
-	@clear
+	# @clear
 
 re: fclean all
 .PHONY: all clean fclean re
