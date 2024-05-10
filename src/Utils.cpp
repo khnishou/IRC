@@ -113,7 +113,7 @@ static int paramLen(std::string cmd)
 	else if (cmd == "TOPIC")
 		return (1);
 	else if (cmd == "MODE")
-		return (3); // check might change
+		return (-1); // check might change
 	else if (cmd == "PRIVMSG")
 		return (1);
 	else if (cmd == "QUIT")
@@ -156,12 +156,12 @@ Message parsing(std::string str) {
 	while (str[i] && str[i] != '\r')
 	{
 		len = skip_arg(str, i);
-		if (argsLen > 0)
+		if (argsLen)
 		{
 			msg.parameters.push_back(str.substr(i, len));
 			argsLen--;
 		}
-		else if (!(argsLen < 0))
+		else
 		{
 			msg.parameters.push_back(str.substr(i));
 			break ;
