@@ -49,10 +49,19 @@ Users *Server::getUserByFd(int fd) {
 	return NULL;
 }
 
-Users *Server::getUserByUn(const std::string username) {
+Users *Server::getUserByUn(const std::string uname) {
 	for (std::vector<Users *>::iterator it = this->_allUsers.begin();
 			it != this->_allUsers.end(); ++it) {
-		if ((*it)->getUserName() == username)
+		if ((*it)->getUserName() == uname)
+			return *it;
+	}
+	return NULL;
+}
+
+Users *Server::getUserByNn(const std::string nname) {
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin();
+			it != this->_allUsers.end(); ++it) {
+		if ((*it)->getNickName() == nname)
 			return *it;
 	}
 	return NULL;

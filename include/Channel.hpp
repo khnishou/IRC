@@ -51,6 +51,11 @@ class Channel {
 		bool 					isUser(const Users *user);
 		bool 					isOperator(const Users *user);
 
+		bool					haveMultOps();
+		bool					haveUsers();
+		bool					channelEmpty();
+		std::string			convertMode();
+		std::string			getNickNameList();
 
 		void					broadcastMsg(std::string msg);
 };

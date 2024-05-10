@@ -17,19 +17,23 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART"))); // (461)
 	if (checkSplit(param[0], ','))
-		; // error ",arg1,,arg2,"
+		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	std::vector<std::string> split = splitString(param[0], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
 	{
 		Channel *channel = getChannel(*it);
 		if (!channel)
-			return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), *it))); // (403) // check the buffer should be joined with the old one (we might need to check all the errors inside loops)
+			return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), *it))); // (403)
 		if (!channel->isUser(user) && !channel->isOperator(user))
-			return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442) // check the buffer should be joined with the old one
+			return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 		if (param.size() > 1)
 			std::string reason = fill_vec(&param, param.begin() + 1);
-		// check leaving a channel
-		// check RPL leaving a channel
+		if (channel->isUser(user))
+			channel->deleteUser(user, NULL, "");
+		else
+			channel->deleteOperator(user, NULL, "");
+		// after removing this guy, update channel
+		channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName()));
 	}
 }
 
@@ -47,34 +51,34 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (!channel)
 		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // (403)
 	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442) // check 441 before 442
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	if (checkSplit(param[1], ','))
-		; // error ",arg1,,arg2,"
+		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	split = splitString(param[1], ',');
 	std::string reason;
 	if (param.size() < 4) 
-		reason = "Good boy points have dropped to 0!"; // check the default reason
+		reason = "Good boy points have dropped to 0!";
 	else
 		reason = fill_vec(&param, param.begin() + 2).substr();
 	for (size_t i = 0; i < split.size(); i++) {
-		Users *toKick = getUserByUn(split[i]);
+		Users *toKick = getUserByNn(split[i]);
 		if (!toKick)
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(getHost(), user->getNickName(), split[i], channel->getName()))); // (441) // check maybe add a new
+			return (user->setBuffer(ERR_NOSUCHNICK(getHost(), user->getNickName(), split[i]))); // (401) 
 		if (!channel->isUser(toKick) && !channel->isOperator(toKick))
-			return (user->setBuffer(ERR_USERNOTINCHANNEL(getHost(), user->getNickName(), toKick->getNickName(), channel->getName()))); // (441) // check repetition
+			return (user->setBuffer(ERR_USERNOTINCHANNEL(getHost(), user->getNickName(), toKick->getNickName(), channel->getName()))); // (441)
 		if (channel->isUser(toKick))
 			channel->deleteUser(toKick, user, getHost());
 		else if (channel->isOperator(toKick))
 			channel->deleteOperator(toKick, user, getHost());
-		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason)); // add reason later
+		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason));
 		channel->broadcastMsg(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason));
 	}
 }
 
 void	Server::c_invite(std::vector<std::string> param, Users *user) {
-	if (!(param.size() >= 2)) // check should be if (param.size() != 2) but should check the error message in this case
+	if (!(param.size() >= 2))
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "INVITE"))); // (461)
 	Channel *channel = getChannel(param[1]);
 	if (!channel)
@@ -83,13 +87,15 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); //  (442)
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
-  	Users *toAdd = getUserByUn(param[0]);
+  	Users *toAdd = getUserByNn(param[0]);
+	if (toAdd == NULL)
+		return (user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), param[0])));
 	if (channel->isUser(toAdd) || channel->isOperator(toAdd))
 		return (user->setBuffer(ERR_USERONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (443)
 	channel->addUser(toAdd);
 	user->setBuffer(RPL_INVITING(getHost(), user->getNickName(), toAdd->getNickName(), channel->getName())); // (341)
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
-	toAdd->invite(channel);
+	// prob broadcast on chan, also send him reply about chan topic
 }
 
 void	Server::c_topic(std::vector<std::string> param, Users *user) {
@@ -122,7 +128,6 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	uint8_t mode;
 	int i;
 
-	// need 2 revisit this logic, if its unsetting a mode than no params must be provided, if trying to set then need params
 	if (!(param.size() >= 1))
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461)
 	i = 0;
@@ -130,21 +135,21 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	if (!channel)
 		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // 403)
 	if (param.size() < 2)
-		return ; // RPL_CHANNELMODEIS (324)
+		return (user->setBuffer(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode()))); // (324)
+	if (!channel->isUser(user) && !channel->isOperator(user))
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
+	if (!channel->isOperator(user))
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	mode = initMode(param, mode, channel);
 	if (mode & (1 << 7))
 		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(getHost(), user->getNickName()))); //(501)
-	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
-	if (!channel->isOperator(user)) // check extra priv
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
 	channel->setMode(mode);
-	// success rpl value basically sends a message on the channel to every user saying what the new modes are
+	channel->broadcastMsg(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode())); // (324)
 }
 
 void	Server::c_pass(std::vector<std::string> param, Users *user)
 {
-	if (!(param.size() == 1)) // check what if password have spaces?
+	if (!(param.size() == 1))
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PASS"))); // (461)
 	if (user->getStatus() & PASS_FLAG)
 		return (user->setBuffer(ERR_ALREADYREGISTRED(user->getNickName()))); // (462)
@@ -155,9 +160,9 @@ void	Server::c_pass(std::vector<std::string> param, Users *user)
 
 void	Server::c_nick(std::vector<std::string> param, Users *user)
 {
-	if (!(param.size() == 1)) // check what if nickname have spaces
+	if (!(param.size() == 1))
 		return (user->setBuffer(ERR_NONICKNAMEGIVEN(user->getNickName()))); // (431)
-	if (!isNickname(param[0]) || param[0].length() > NICKLEN) // check if nickname is longer than NICKLEN throw an error
+	if (!isNickname(param[0]) || param[0].length() > NICKLEN)
 		return (user->setBuffer(ERR_ERRONEUSNICKNAME(getHost(), user->getNickName(), param[0]))); // (432)
 	if (nickNameExists(param[0]))
 		return (user->setBuffer(ERR_NICKNAMEINUSE(getHost(), user->getNickName(), param[0]))); // (433)
@@ -174,8 +179,11 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 void	Server::c_user(std::vector<std::string> param, Users *user) // check handle realname
 {
 	std::string username;
-	if (param.size() == 0)
+	if (param.size() < 4)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER"))); // (461)
+	if (param[1] != "0" || param[2] != "*")
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "USER")));
+	user->setReal(param[3]);
 	if (param[0][0] == '~') // check ignore the '~' if available
 		username = param[0].substr(1);
 	else
@@ -202,12 +210,12 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
 	if (checkSplit(param[0], ','))
-		; // error ",arg1,,arg2,"
+		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	channels = splitString(param[0], ',');
 	if (param.size() == 2)
 	{
 		if (checkSplit(param[1], ','))
-			; // error ",arg1,,arg2,"
+			user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 		keys = splitString(param[1], ',');
 	}
 	i_key = 0;
@@ -216,8 +224,11 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	{
 		Channel *channel = getChannel(channels[i_chn]);
 		if (!channel) {
-			if (getAllChannels().size() > CHANLIMIT)
-				; // check in case the number of channels in the server > then the limit of channels in server
+			if (getAllChannels().size() > CHANLIMIT) {
+				user->setBuffer(ERR_TOOMANYCHANNELS(this->getHost(), user->getNickName(), channels[i_chn]));
+				// check increments
+				continue ;
+			}
 			else
 			{
 				channel = new Channel(channels[i_chn]); // check use a function instead
@@ -230,8 +241,15 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 		else if (!(channel->getModes() & FLAG_K) ||
 			(!(keys.empty()) && !(keys[i_key].empty()) && keys[i_key] == channel->getPassword()))
 		{
-			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() < channel->getUserLimit()))
+			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() < channel->getUserLimit())) {
 				channel->addUser(user);
+				channel->broadcastMsg(RPL_JOIN(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName()));
+				if (!channel->getTopic().empty())
+					user->setBuffer(RPL_TOPIC(this->getHost(), user->getNickName(), channel->getName(), channel->getTopic()));
+				std::string reply = RPL_NAMREPLY(this->getHost(), user->getNickName(), channel->getName()) + channel->getNickNameList();
+				user->setBuffer(reply);
+				user->setBuffer(RPL_ENDOFNAMES(this->getHost(), user->getNickName(), channel->getName()));
+			}
 			else
 				user->setBuffer(ERR_CHANNELISFULL(getHost(), user->getNickName(), channel->getName())); // (471)
 		}
@@ -240,40 +258,32 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 		i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
 		i_chn++;
 	}
-// If a client’s JOIN command to the server is successful, the server MUST send, in this order:
-
-// 1\ A JOIN message with the client as the message <source> and the channel they
-//    have joined as the first parameter of the message.
-// 2\ The channel’s topic (with RPL_TOPIC (332) and optionally RPL_TOPICWHOTIME (333)), 
-//    and no message if the channel does not have a topic.
-// 3\ A list of users currently joined to the channel (with one or more RPL_NAMREPLY (353)
-//	  numerics followed by a single RPL_ENDOFNAMES (366) numeric). These RPL_NAMREPLY messages
-//    sent by the server MUST include the requesting client that has just joined the channel.
-	
-	// check add RPL msg, these are for each channel joined, will implement when changing how buffer works.
-	// RPL_TOPIC (332)
-	// RPL_TOPICWHOTIME (333)
-	// RPL_NAMREPLY (353)
-	// RPL_ENDOFNAMES (366)
 }
 
 void Server::c_privmsg(std::vector<std::string> param, Users *user) {
 	if (param.size() < 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PRIVMSG")));
 	
-	// Users *targ;
-	// Channel *targ_channel;
-
-	// if (param[0][0] == '#') {
-	// 	targ_channel = getChannel(param[0]);
-	// 	if (!targ_channel)
-	// 		return (user->setBuffer());
-	// }
-	// else {
-	// 	targ = getUserByUn(param[0]);
-	// 	if (!targ)
-	// 		return (user->setBuffer());
-	// }
+	Users *targ;
+	Channel *targ_channel;
+	std::vector<std::string> lst = splitString(param[0], ',');
+	for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it) {
+		if ((*it)[0] == '#') {
+			targ_channel = getChannel(*it);
+			if (!targ_channel)
+				user->setBuffer(ERR_NOSUCHCHANNEL(this->getHost(), user->getNickName(), *it));
+			else if (!targ_channel->isOperator(user) && !targ_channel->isUser(user))
+				user->setBuffer(ERR_CANNOTSENDTOCHAN(this->getHost(), user->getNickName(), targ_channel->getName()));
+			else
+				targ_channel->broadcastMsg(RPL_PRIVMSG(user->getNickName(), user->getUserName(), user->getHostName(), targ_channel->getName(), param[1]));
+		}
+		else {
+			targ = getUserByNn(*it);
+			if (!targ)
+				user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), *it));
+			targ->setBuffer(RPL_PRIVMSG(user->getNickName(), user->getUserName(), user->getHostName(), targ->getNickName(), param[1]));
+		}
+	}
 }
 
 void Server::c_restart(std::vector<std::string> param, Users *user) {
@@ -337,9 +347,9 @@ uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *
 			else
 			{
 				if (setUnset & FLAG_SET)
-					channel->addOperator(getUserByUn(param[itParam]));
+					channel->addOperator(getUserByNn(param[itParam]));
 				else if (setUnset & FLAG_UNSET)
-					; // check channel->deleteOperator(getUserByUn(param[itParam]));
+					; // check channel->deleteOperator(getUserByNn(param[itParam]));
 			}
 			// check mode = setTheUnset(mode, FLAG_O, setUnset); // we don t need to set/unset it anymore but still there
 		}

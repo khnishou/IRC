@@ -59,7 +59,7 @@ void		Users::clearBuff() { this->_buffer.clear(); };
 //****************************************************************************//
 //                               Other Function                               //
 //****************************************************************************//
-
+// these are useless, check again before deleting them
 void Users::invite(Channel *channel) {
 	if (this->is_invited(channel->getName()) == false)
 		this->_invite_lst.push_back(channel);

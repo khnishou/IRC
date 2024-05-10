@@ -61,6 +61,7 @@ class Server {
 		int							getServerSocket() const;
 		SERVER_STATE				getState() const;
 		Users*						getUserByUn(const std::string uname);
+		Users*						getUserByNn(const std::string nname);
 		Users*						getUserByFd(int fd);
 		ssize_t						getBytesReceived() const;
 		std::string					getHost() const;

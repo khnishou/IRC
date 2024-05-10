@@ -118,6 +118,56 @@ bool Channel::isOperator(const Users *user) {
 	return false;
 }
 
+bool	Channel::haveMultOps() {
+	unsigned int count = this->_operatorList.size();
+
+	if (count > 1)
+		return true;
+	return false;
+}
+
+bool Channel::haveUsers() {
+	if (this->_userList.size() == 0)
+		return false;
+	return true;
+}
+
+bool	Channel::channelEmpty() {
+	if (this->_userList.size() + this->_operatorList.size() == 0)
+		return true;
+	return false;
+}
+
+std::string Channel::convertMode() {
+	uint8_t m = this->_modes;
+	std::string mode = "+";
+
+	if (m & FLAG_I)
+		mode += "i";
+	if (m & FLAG_T)
+		mode += "t";
+	if (m & FLAG_K)
+		mode += "k";
+	if (m & FLAG_L)
+		mode += "l";
+	return mode;
+}
+
+std::string Channel::getNickNameList() {
+	std::string nnlist = "";
+	for (std::vector<Users *>::iterator it = this->_operatorList.begin(); it != this->_operatorList.end(); ++it) {
+		nnlist += "@" + (*it)->getNickName();
+		if (it + 1 != this->_operatorList.end())
+			nnlist += " ";
+	}
+	for (std::vector<Users *>::iterator it = this->_userList.begin(); it != this->_userList.end(); ++it) {
+		nnlist += "@" + (*it)->getNickName();
+		if (it + 1 != this->_userList.end())
+			nnlist += " ";
+	}
+	return nnlist;
+}
+
 void	Channel::broadcastMsg(std::string msg) {
 	for (std::vector<Users *>::iterator it = this->_userList.begin(); it != this->_userList.end(); ++it)
 		(*it)->setBuffer(msg);

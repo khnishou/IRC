@@ -42,7 +42,7 @@
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "!" + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"
-#define RPL_MODECHANNEL(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
+#define RPL_CHANNELMODEIS(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
 #define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
@@ -51,6 +51,7 @@
 #define RPL_ENDOFNAMES(src, nick, chan)									":" + src + " 366 " + nick + " " + chan + " :END of NAMES list\r\n"
 #define	RPL_YOUREOPER(src)												":" + src + " 381 " + "PASS :You are now an IRC operator\r\n"
 #define	RPL_QUOT(src, chan, quot)										":QUOTBOT!BOT@" + src + " NOTICE " + chan + " :" + quot + "\r\n"
+#define RPL_INPUTWARNING(src, nick)                                     ":" + src + " " + nick + " :Empty parameters will be ingored...\r\n"
 //MAKE IT A NOTICE
 
 // COMMAND REPLIES	
