@@ -81,6 +81,8 @@ class Server {
 		bool						nickNameExists(std::string nname);
 		void						addChan(Channel *channel);
 		void						addUser(Users *user);
+		void						addPfds(struct pollfd sfd);
+		void						removePfds(struct pollfd sfd);
 
 		// message forwarding i guess
 		void						send_2usr(int fd);

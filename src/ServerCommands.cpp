@@ -169,10 +169,10 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 	if (!(user->getStatus() & NICK_FLAG)) {
 		user->setStatus(NICK_FLAG);
 		if (user->getStatus() & USER_FLAG)
-			user->setBuffer(RPL_WELCOME(getHost(), user->getNickName(), user->getUserName(), user->getHostName()));
+			user->setBuffer(RPL_WELCOME(getHost(), param[0], user->getUserName(), user->getHostName()));
 	}
 	else
-		sendAllChan(getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
+		sendAllChan(getChanList(user), RPL_NICKCHANGE(param[0], user->getUserName(), user->getHostName(), param[0]));
 	user->setNickName(param[0]);
 }
 
@@ -193,10 +193,10 @@ void	Server::c_user(std::vector<std::string> param, Users *user) // check handle
 	if (!(user->getStatus() & USER_FLAG)) {
 		user->setStatus(USER_FLAG);
 		if (user->getStatus() & NICK_FLAG)
-			user->setBuffer(RPL_WELCOME(getHost(), user->getNickName(), user->getUserName(), user->getHostName()));
+			user->setBuffer(RPL_WELCOME(getHost(), user->getNickName(), username, user->getHostName()));
 	}
 	else
-		sendAllChan(getChanList(user), RPL_NICKCHANGE(user->getNickName(), user->getUserName(), user->getHostName(), param[0]));
+		sendAllChan(getChanList(user), RPL_NICKCHANGE(user->getNickName(), username, user->getHostName(), param[0]));
 	user->setUserName(username);
 }
 
@@ -209,7 +209,7 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 
 	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
-	if (checkSplit(param[0], ','))
+	if (!checkSplit(param[0], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	channels = splitString(param[0], ',');
 	if (param.size() == 2)
