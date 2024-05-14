@@ -171,3 +171,13 @@ Message parsing(std::string str) {
 	}
    return msg;
 }
+
+bool isUint(const std::string& str)
+{
+	if (str.empty() || str[0] == '-' || str[0] == '+')
+		return (false);
+	for (size_t i = 0; i < str.length(); i++)
+		if (!isdigit(str[i]))
+    		return (false);
+	return (std::stod(str) >= 0);
+}

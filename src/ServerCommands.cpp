@@ -308,65 +308,79 @@ void Server::c_quit(std::vector<std::string> param, Users *user) {
 
 uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *channel) // check we might need to create a utils file for Server
 {
-	int		i;
-	int		len;
-	int		itParam;
-	uint8_t	setUnset;
-	uint8_t	flag;
+	size_t it;
+	size_t j;
+	size_t i = 1;
+	uint8_t setUnset;
 
-	itParam = 1;
-	setUnset = 0;
-	flag = 0;
-	i = 0;
-	len = param[1].length();
-	while (i < param[1].length())
+	for (; i < param.size(); i++)
 	{
-		if (param[1][i] == '+')
-			setUnset = FLAG_SET;
-		else if (param[1][i] == '-')
-			setUnset = FLAG_UNSET;
-		else if (param[1][i] == 'i') // type D
-			mode = setTheUnset(mode, FLAG_I, setUnset);
-		else if (param[1][i] == 't') // type D
-			mode = setTheUnset(mode, FLAG_T, setUnset);
-		else if (param[1][i] == 'k')
+		setUnset = 0;
+		it = 0;
+		for (j = 0; j < param[i].length(); j++)
 		{
-			if (setUnset & FLAG_SET)
-			{
-				if (param[++itParam].empty())
-					; // error need more param or set password to default
-				else
-					channel->setPassword(param[++itParam]);
-			}
-			mode = setTheUnset(mode, FLAG_K, setUnset);
-		}
-		else if (param[1][i] == 'o')
-		{
-			if (param[++itParam].empty())
-				; // error need more param or do nothing
-			else
+			if (setUnset == 0 && param[i][j] == '+')
+				setUnset = FLAG_SET;
+			else if (setUnset == 0 && param[i][j] == '-')
+				setUnset = FLAG_UNSET;
+			else if ((setUnset & FLAG_SET || setUnset & FLAG_UNSET) && param[i][j] == 'i') // type D
+				mode = setTheUnset(mode, FLAG_I, setUnset);
+			else if ((setUnset & FLAG_SET || setUnset & FLAG_UNSET) && param[i][j] == 't') // type D
+				mode = setTheUnset(mode, FLAG_T, setUnset);
+			else if ((setUnset & FLAG_SET || setUnset & FLAG_UNSET) && param[i][j] == 'k') // type C
 			{
 				if (setUnset & FLAG_SET)
-					channel->addOperator(getUserByNn(param[itParam]));
-				else if (setUnset & FLAG_UNSET)
-					; // check channel->deleteOperator(getUserByNn(param[itParam]));
+				{
+					if (i + ++it < param.size())
+						channel->setPassword(param[i + it++]);
+					else
+					{
+						; // error need more param or set password to default
+						return (FLAG_ERR);
+					}
+				}
+				mode = setTheUnset(mode, FLAG_K, setUnset);
 			}
-			// check mode = setTheUnset(mode, FLAG_O, setUnset); // we don t need to set/unset it anymore but still there
-		}
-		else if (param[1][i] == 'l')
-		{
-			if (setUnset & FLAG_SET)
+			else if ((setUnset & FLAG_SET || setUnset & FLAG_UNSET) && param[i][j] == 'l') // type C
 			{
-				if (param[++itParam].empty())
-					; // error need more param or set userMax to default
-				else
-					; // check channel->setChanLimit(param[++itParam]); // error if param not <int> or set it to default
+				if (setUnset & FLAG_SET)
+				{
+					if (i + ++it < param.size() && isUint(param[i + it]))
+						channel->setUserLimit(std::stod(param[i + it]));
+					else
+					{
+						; // error need more param or invalid param or set userMax to default
+						return (FLAG_ERR);
+					}
+				}
+				mode = setTheUnset(mode, FLAG_L, setUnset);
 			}
-			mode = setTheUnset(mode, FLAG_L, setUnset);
+			else if ((setUnset & FLAG_SET || setUnset & FLAG_UNSET) && param[i][j] == 'o') // type B
+			{
+				if (i + ++it < param.size())
+				{
+					// if (checkSplit(param[1], ','))
+					// 	; // error ",arg1,,arg2,"
+					// std::vector<std::string> users = splitString(param[i + it], ',');
+					if (setUnset & FLAG_SET)
+						channel->addOperator(getUserByUn(param[i + it]));
+					else if (setUnset & FLAG_UNSET)
+						channel->deleteOperator(getUserByUn(param[i + it])); // check
+				}
+				else
+				{
+					; // error need more param or do nothing
+					return (FLAG_ERR);
+				}
+			}
+			else
+			{
+				std::cout << RED << "error: " << param[i] << std::endl;
+				return (FLAG_ERR);
+
+			}
 		}
-		else
-			return (FLAG_ERR);
-		i++;
+		i += it;
 	}
 	return (mode);
 }
