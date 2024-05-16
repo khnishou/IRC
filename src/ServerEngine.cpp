@@ -207,7 +207,7 @@ int Server::addNewClient() {
 
 	// get hostname info
 	char name[1000];
-	if (getnameinfo((struct sockaddr*)&clientAdr, clientAddrSize, name, sizeof(name), 0, 0, NI_NAMEREQD) != 0) {
+	if (getnameinfo((struct sockaddr*)&clientAdr, clientAddrSize, name, sizeof(name), 0, 0, NI_NUMERICHOST) != 0) {
 		std::cerr << "Error: getnameinfo: " << std::strerror(errno) << std::endl;
 	}
 	// Add the new client socket to the vector
@@ -222,7 +222,7 @@ int Server::addNewClient() {
 		close(clientSocket);
 		removePfds(new_client_fd);
 		return -1;
-	}	
+	}
 	addUser(user);
 	return 0;
 }

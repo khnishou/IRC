@@ -292,12 +292,12 @@ void Server::c_restart(std::vector<std::string> param, Users *user) {
 	getFds().clear();
 
 	close(getServerSocket());
-	for (std::vector<Users *>::iterator it = getAllUsers().begin(); it != getAllUsers().end(); ++it) //check better work with a copy (getAllUsers())
+	for (std::vector<Users *>::iterator it = this->_allUsers.begin(); it != this->_allUsers.end(); ++it) //check better work with a copy (getAllUsers())
 		delete (*it);
-	for (std::vector<Channel *>::iterator it = getAllChannels().begin(); it != getAllChannels().end(); ++it) //check better work with a copy (getAllUsers())
+	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) //check better work with a copy (getAllUsers())
 		delete (*it);
-	getAllChannels().clear();
-	getAllUsers().clear();
+	this->_allChannels.clear();
+	this->_allUsers.clear();
 }
 
 void Server::c_quit(std::vector<std::string> param, Users *user) {
@@ -365,7 +365,7 @@ uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *
 					if (setUnset & FLAG_SET)
 						channel->addOperator(getUserByUn(param[i + it]));
 					else if (setUnset & FLAG_UNSET)
-						channel->deleteOperator(getUserByUn(param[i + it])); // check
+						channel->deleteOperator(getUserByUn(param[i + it]), NULL, this->getHost()); // check
 				}
 				else
 				{
@@ -383,4 +383,21 @@ uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *
 		i += it;
 	}
 	return (mode);
+}
+
+void Server::c_dcc(std::vector<std::string> param, Users *user) {
+	if (param.size() != 4)
+		user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "DCC"));
+	if (param[0] != "SEND")
+		user->setBuffer(ERR_UNKNOWNCOMMAND(this->getHost(), user->getNickName(), "DCC: " + param[0]));
+	std::string fname = param[1];
+	std::string hostname = param[2];
+	int	port = std::atoi(param[3].c_str());
+	if (hostname.empty() || fname.empty() || param[3].size() == 0 || port < 0 || port > 65535)
+		return user->setBuffer(ERR_UNKNOWNERROR(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
+	Users *receiver = getUserByNn(hostname);
+	if (!receiver)
+		return user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), hostname));
+	user->setBuffer(RPL_RECEIVEDTREQ(this->getHost(), receiver->getNickName(), receiver->getHostName()));
+	receiver->setBuffer(RPL_TRANSFERREQ(this->getHost(), user->getNickName(), user->getHostName(), param[3], fname));
 }

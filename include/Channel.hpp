@@ -54,8 +54,8 @@ class Channel {
 		bool					haveMultOps();
 		bool					haveUsers();
 		bool					channelEmpty();
-		std::string			convertMode();
-		std::string			getNickNameList();
+		std::string				convertMode();
+		std::string				getNickNameList();
 
 		void					broadcastMsg(std::string msg);
 };

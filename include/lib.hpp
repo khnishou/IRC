@@ -14,6 +14,7 @@
 #define DEFAULT "\033[1;39m"
 
 //ERROR REPLIES
+#define ERR_UNKNOWNERROR(src, nick, cmd, msg)                           ":" + src + " 400 " + nick + " " + cmd + " :" + msg + "\r\n"
 #define ERR_NOSUCHNICK(src, nick, chan)									":" + src + " 401 " + nick + " " + chan + " :No such nick/channel\r\n"
 #define ERR_NOSUCHCHANNEL(src, nick, chan)								":" + src + " 403 " +  nick + " " + chan + " :No such channel\r\n"
 #define ERR_CANNOTSENDTOCHAN(src, nick, chan)							":" + src + " 404 " + nick + " " + chan + " :Cannot send to channel\r\n"
@@ -52,6 +53,9 @@
 #define	RPL_YOUREOPER(src)												":" + src + " 381 " + "PASS :You are now an IRC operator\r\n"
 #define	RPL_QUOT(src, chan, quot)										":QUOTBOT!BOT@" + src + " NOTICE " + chan + " :" + quot + "\r\n"
 #define RPL_INPUTWARNING(src, nick)                                     ":" + src + " " + nick + " :Empty parameters will be ingored...\r\n"
+#define RPL_RECEIVEDTREQ(src, targ_nick, targ_host)                     ":" + src + " " + targ_nick + "@" + targ_host +":Received your file transfer request\r\n"
+#define RPL_TRANSFERREQ(src, src_nick, src_host, src_port, fname)       ":" + src + " " + src_nick + "@" + src_host + " with port: " + src_port + " wants to send: " + fname + "\r\n"
+#define RPL_BOT(bot_name, bot_cmd, res)                                 ":" + bot_name + " " + bot_cmd + " :" + res + "\r\n"
 //MAKE IT A NOTICE
 
 // COMMAND REPLIES	
@@ -65,7 +69,7 @@
 #define RPL_NOTICE(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " NOTICE " + dis_nick + " :" + msg + "\r\n"
 #define RPL_QUIT(src_nick, src_usr, src_host, reason)					":" + src_nick + "!" + src_usr + "@" + src_host + " " + reason + "\r\n"
 #define RPL_MODECHAN(src_nick, src_usr, src_host, chan, mode, nick) 	":" + src_nick + "!" + src_usr + "@" + src_host + " MODE " + chan + " " + mode + " " + nick + "\r\n"
-#define RPL_KICK(src_nick, src_usr, src_host, chan, targ, reason)				":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + reason + "\r\n"
+#define RPL_KICK(src_nick, src_usr, src_host, chan, targ, reason)		":" + src_nick + "!" + src_usr + "@" + src_host + " KICK " + chan + " " + targ + " :" + reason + "\r\n"
 
 // USER STATES
 #define PASS_FLAG   (1 << 0)
