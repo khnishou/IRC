@@ -78,9 +78,9 @@
 #define FLAG_I		(1 << 0)
 #define FLAG_T		(1 << 1)
 #define FLAG_K		(1 << 2)
-#define FLAG_O		(1 << 3)
-#define FLAG_L		(1 << 4)
-#define FLAG_ERR	(1 << 7)
+#define FLAG_L		(1 << 3)
+#define ERR_PARAM	(1 << 6)
+#define ERR_SYNTAX	(1 << 7)
 
 // FlAG UTILS
 #define FLAG_SET	(1 << 0)
