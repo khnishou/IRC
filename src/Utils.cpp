@@ -37,18 +37,18 @@ std::vector<std::string> splitString(const std::string& str, char del)
 
 int skip_space(std::string str, int i)
 {
-  while (str[i] && str[i] == ' ') // is_space
-	i++;
-  return (i);
+	while (str[i] && str[i] == ' ') // is_space
+		i++;
+	return (i);
 }
 
 int skip_arg(std::string str, int i)
 {
 	int j;
 	j = i;
-  while (str[j] && str[j] != ' ' && str[j] != '\r')
-	j++;
-  return (j - i);
+  	while (str[j] && str[j] != ' ' && str[j] != '\r')
+		j++;
+  	return (j - i);
 }
 
 bool isNickname(const std::string& nickname)
@@ -113,7 +113,7 @@ static int paramLen(std::string cmd)
 	else if (cmd == "TOPIC")
 		return (1);
 	else if (cmd == "MODE")
-		return (-1); // check might change
+		return (-1);
 	else if (cmd == "PRIVMSG")
 		return (1);
 	else if (cmd == "QUIT")
@@ -148,7 +148,7 @@ Message parsing(std::string str) {
 	if (str[i])
 	{
 		len = skip_arg(str, i);
-      msg.command = str.substr(i, len);
+      	msg.command = str.substr(i, len);
 		i += len;
 		i = skip_space(str, i);
 	}
