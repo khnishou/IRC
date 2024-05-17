@@ -18,6 +18,7 @@
 #include "Users.hpp"
 #include "Channel.hpp"
 #include "Lib.hpp"
+#include "Bot.hpp"
 
 #define CHANLIMIT	25
 #define USERLIMIT	20
@@ -43,6 +44,7 @@ class Server {
 		std::vector<Users *>			_allUsers;		// check change names
 		std::vector<Channel *>			_allChannels;	// check change names
 		std::vector<struct pollfd>		_fds;
+		Bot								_bot;
 		Server();
 		
 	public:
@@ -81,6 +83,8 @@ class Server {
 		bool						nickNameExists(std::string nname);
 		void						addChan(Channel *channel);
 		void						addUser(Users *user);
+		void						addPfds(struct pollfd sfd);
+		void						removePfds(struct pollfd sfd);
 
 		// message forwarding i guess
 		void						send_2usr(int fd);
@@ -114,6 +118,7 @@ class Server {
 		int							mode_l(uint8_t setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
 		int							mode_o(uint8_t setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user);
 
+		void						c_dcc(std::vector<std::string> param, Users *user);
 		// UTILS // for now
 		uint8_t 					initMode(std::vector<std::string> param, uint8_t mode, Channel *channel, Users *user);
 };

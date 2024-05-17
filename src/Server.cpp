@@ -8,7 +8,7 @@
 
 Server::Server() {}
 
-Server::Server(int port, std::string password) : _port(port), _password(password) {
+Server::Server(int port, std::string password) : _port(port), _password(password), _buffer("") {
 	std::cout << "-------CREATING SERVER-------" << std::endl;
 	this->_state = START;
 }
@@ -92,7 +92,15 @@ void	Server::setBytesReceived(int BytesReceived) { this->_bytesReceived = BytesR
 
 void	Server::addChan(Channel *channel) {	this->_allChannels.push_back(channel); }
 void	Server::addUser(Users *user) { this->_allUsers.push_back(user); }
-
+void	Server::addPfds(struct pollfd sfd) {this->_fds.push_back(sfd); }
+void	Server::removePfds(struct pollfd sfd) {
+	for (std::vector<struct pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); ++it) {
+		if ((*it).fd == sfd.fd && ((*it).events == sfd.events)) {
+			this->_fds.erase(it);
+			return ;
+		}
+	}
+}
 //****************************************************************************//
 //                               Other Function                               //
 //****************************************************************************//
