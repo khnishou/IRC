@@ -7,7 +7,7 @@
 
 Users::Users(std::string hostname, int socketDescriptor) : 
 _hostName(hostname), _nickName("default"), _userName("default"), _real("default"),
-_modes("default"),  _buffer(""), _permissionLevel(0), _socketDescriptor(socketDescriptor), _status(0) { }
+_modes("default"),  _cmdBuffer(""), _buffer(""), _permissionLevel(0), _socketDescriptor(socketDescriptor), _status(0) { }
 
 Users::Users(const Users &cp) : 
 _hostName(cp.getHostName()), _nickName(cp.getNickName()), _userName(cp.getUserName()), _real(cp.getReal()),
@@ -41,6 +41,7 @@ std::string	Users::getHostName() const { return this->_hostName; }
 std::string Users::getReal() const { return this->_real; }
 std::string	Users::getModes() const { return this->_modes; }
 std::string	Users::getBuffer() const { return this->_buffer; }
+std::string Users::getCmdBuffer() const { return this->_cmdBuffer; }
 uint8_t		Users::getStatus() const { return this->_status; }
 int			Users::getPermissionLevel() const { return this->_permissionLevel; }
 int			Users::getSocketDescriptor() const { return this->_socketDescriptor; }
@@ -51,11 +52,14 @@ void		Users::setUserName(std::string uname) { this->_userName = uname; }
 void		Users::setReal(std::string real) { this->_real = real; }
 void		Users::setModes(std::string mode) { this->_modes = mode; }
 void		Users::setBuffer(std::string buf) { this->_buffer += buf; }
+void		Users::setCmdBuffer(std::string buf) { this->_cmdBuffer + buf; }
 void		Users::setPermissionLevel(int permissionLevel) { this->_permissionLevel = permissionLevel; }
 void		Users::setSocketDescriptor(int sd) { this->_socketDescriptor = sd; }
 void		Users::setStatus(uint8_t stat) { this->_status |= stat; }
 void		Users::unsetStatus(uint8_t stat) { this->_status &= ~stat; }
-void		Users::clearBuff() { this->_buffer.clear(); };
+void		Users::clearBuff() { this->_buffer.clear(); }
+void		Users::clearCmdBuff() { this->_cmdBuffer.clear(); }
+
 //****************************************************************************//
 //                               Other Function                               //
 //****************************************************************************//
