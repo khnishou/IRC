@@ -39,7 +39,7 @@ class Server {
 		std::string						_password;
 		SERVER_STATE					_state;
 		int								_serverSocket;
-		char							_buffer[1024];
+		char								_buffer[1024];
 		ssize_t							_bytesReceived;
 		std::vector<Users *>			_allUsers;		// check change names
 		std::vector<Channel *>			_allChannels;	// check change names
@@ -111,6 +111,7 @@ class Server {
 		void						c_privmsg(std::vector<std::string> param, Users *user);
 		void						c_restart(std::vector<std::string> param, Users *user);
 		void						c_quit(std::vector<std::string> param, Users *user);
+		void						c_bot(std::vector<std::string> param, Users *user);
 
 		int							mode_i(uint8_t setUnset, Channel *channel, Users *user);
 		int							mode_t(uint8_t setUnset, Channel *channel, Users *user);

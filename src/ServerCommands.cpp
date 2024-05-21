@@ -463,3 +463,24 @@ void Server::c_dcc(std::vector<std::string> param, Users *user) {
 	user->setBuffer(RPL_RECEIVEDTREQ(this->getHost(), receiver->getNickName(), receiver->getHostName()));
 	receiver->setBuffer(RPL_TRANSFERREQ(this->getHost(), user->getNickName(), user->getHostName(), param[3], fname));
 }
+
+void Server::c_bot(std::vector<std::string> param, Users *user) {
+	if (param.size() != 2)
+		user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "BOT"));
+	Channel *chan = NULL;
+	Users *usr = NULL;
+
+	if (param[0][0] == '#')
+		chan = getChannel(param[0].substr(1));
+	else if (param[0][0] == '@')
+		usr = getUserByNn(param[0].substr(1));
+
+	if (param[1] == "joke")
+		this->_bot.tellJoke(usr, chan);
+	else if (param[1] == "d20")
+		this->_bot.d20(usr, chan);
+	else if (param[1] == "coinflip")
+		this->_bot.coinFlip(usr, chan);
+	else if (param[1] == "eightball")
+		this->_bot.eightBall(usr, chan);
+}

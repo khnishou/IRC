@@ -167,6 +167,10 @@ void Server::executeCmd(Message msg, Users *user) {
 		c_quit(msg.parameters, user);
 	else if (msg.command == "RESTART")
 		c_restart(msg.parameters, user);
+	else if (msg.command == "BOT")
+		c_bot(msg.parameters, user);
+	else if (msg.command == "DCC")
+		c_dcc(msg.parameters, user);
 	else
 		user->setBuffer(ERR_UNKNOWNCOMMAND(getHost(), user->getNickName(), msg.command));
 }
