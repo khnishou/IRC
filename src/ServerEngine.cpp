@@ -173,6 +173,7 @@ void Server::executeCmd(Message msg, Users *user) {
 		c_dcc(msg.parameters, user);
 	else
 		user->setBuffer(ERR_UNKNOWNCOMMAND(getHost(), user->getNickName(), msg.command));
+	user->clearCmdBuff();
 }
 
 void Server::sendAllChan(std::vector<Channel *> lst, std::string msg) {
@@ -241,11 +242,12 @@ void Server::handleMsg(Users *user, size_t i) {
 		removeUserFromServer(user);
 	}
 	else {
-		// those needs to be changed to handle split messages and incomplete messages
-		
-		std::string msg(_buffer, getBytesReceived()); // check change _buffer
-		std::vector<std::string> vec = splitString(msg, '\n');
-
+		std::string msg(_buffer, getBytesReceived());
+		if (msg.rfind("\r\n") == std::string::npos) {
+			user->setCmdBuffer(msg);
+			return ;
+		}
+		std::vector<std::string> vec = splitString(user->getCmdBuffer() + msg, '\n');
 		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
 			Message cont = parsing(*it);
 			executeCmd(cont, user);
