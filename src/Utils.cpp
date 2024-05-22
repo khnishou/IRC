@@ -1,7 +1,8 @@
 
 #include "../include/Lib.hpp"
 
-bool checkSplit(const std::string& str, char del) {
+bool checkCSplit(const std::string& str, char del)
+{
   	if (str.empty() || str.front() == del || str.back() == del)
 		return (false);
 	for (size_t i = 0; i < str.size(); i++)
@@ -12,7 +13,7 @@ bool checkSplit(const std::string& str, char del) {
 	return (true);
 }
 
-std::vector<std::string> splitString(const std::string& str, char del)
+std::vector<std::string> cSplitStr(const std::string& str, char del)
 {
     std::vector<std::string> split;
 	int start = 0;
@@ -33,6 +34,39 @@ std::vector<std::string> splitString(const std::string& str, char del)
 		}
 	}
 	return split;
+}
+
+bool checkStrSplit(const std::string& str, std::string del)
+{
+	if (str.empty() || del.empty())
+		return (false);
+	if (str.rfind(del) == std::string::npos)
+		return (false);
+	if (str.substr(str.rfind(del)) != del)
+			return (false);
+	return (true);
+}
+
+std::vector<std::string> strSplitStr(const std::string& str, std::string del)
+{
+    std::vector<std::string> split;
+
+	if (!str.empty() && !del.empty())
+	{
+		int start = 0;
+		int i = 0;
+		while (str[i])
+		{
+			while (str[i] && str.substr(i, del.length()) != del)
+				i++;
+			if (str[i])
+				split.push_back(str.substr(start, i - start));
+			while (str[i] && str.substr(i, del.length()) == del)
+				i++;
+			start = (i + del.length() - 1);
+		}
+	}
+	return (split);
 }
 
 int skip_space(std::string str, int i)

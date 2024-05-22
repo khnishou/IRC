@@ -105,8 +105,10 @@ struct Message {
 
 int							skip_space(std::string str, int i);
 int							skip_arg(std::string str, int i);
-bool                        checkSplit(const std::string& str, char del);
-std::vector<std::string>	splitString(const std::string& str, char delimiter);
+bool                        checkCSplit(const std::string& str, char del);
+std::vector<std::string>    cSplitStr(const std::string& str, char del);
+bool                        checkStrSplit(const std::string& str, std::string del);
+std::vector<std::string>    strSplitStr(const std::string& str, std::string del);
 uint8_t                     setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset);
 bool                        isNickname(const std::string& nickname);
 std::string                 fill_vec(std::vector<std::string> *param, std::vector<std::string>::iterator ite);

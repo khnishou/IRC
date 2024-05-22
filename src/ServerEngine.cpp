@@ -243,11 +243,11 @@ void Server::handleMsg(Users *user, size_t i) {
 	}
 	else {
 		std::string msg(_buffer, getBytesReceived());
-		if (msg.rfind("\r\n") == std::string::npos) {
+		if (!checkStrSplit(msg, "\r\n")) {
 			user->setCmdBuffer(msg);
 			return ;
 		}
-		std::vector<std::string> vec = splitString(user->getCmdBuffer() + msg, '\n');
+		std::vector<std::string> vec = strSplitStr(user->getCmdBuffer() + msg, "\r\n");
 		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
 			Message cont = parsing(*it);
 			executeCmd(cont, user);

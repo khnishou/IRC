@@ -16,9 +16,9 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART"))); // (461)
-	if (checkSplit(param[0], ','))
+	if (checkCSplit(param[0], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
-	std::vector<std::string> split = splitString(param[0], ',');
+	std::vector<std::string> split = cSplitStr(param[0], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
 	{
 		Channel *channel = getChannel(*it);
@@ -54,9 +54,9 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
-	if (checkSplit(param[1], ','))
+	if (checkCSplit(param[1], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
-	split = splitString(param[1], ',');
+	split = cSplitStr(param[1], ',');
 	std::string reason;
 	if (param.size() < 4) 
 		reason = "Good boy points have dropped to 0!";
@@ -211,14 +211,14 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 
 	if (param.size() < 1 || param.size() > 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "JOIN"))); // (461)
-	if (!checkSplit(param[0], ','))
+	if (!checkCSplit(param[0], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
-	channels = splitString(param[0], ',');
+	channels = cSplitStr(param[0], ',');
 	if (param.size() == 2)
 	{
-		if (checkSplit(param[1], ','))
+		if (checkCSplit(param[1], ','))
 			user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
-		keys = splitString(param[1], ',');
+		keys = cSplitStr(param[1], ',');
 	}
 	i_key = 0;
 	i_chn = 0;
@@ -268,7 +268,7 @@ void Server::c_privmsg(std::vector<std::string> param, Users *user) {
 	
 	Users *targ;
 	Channel *targ_channel;
-	std::vector<std::string> lst = splitString(param[0], ',');
+	std::vector<std::string> lst = cSplitStr(param[0], ',');
 	for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it) {
 		if ((*it)[0] == '#') {
 			targ_channel = getChannel(*it);
@@ -362,9 +362,9 @@ int Server::mode_l(uint8_t setUnset, int i, int it, std::vector<std::string> par
 
 int Server::mode_o(uint8_t setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user)
 {
-	if (checkSplit(param[i], ','))
+	if (checkCSplit(param[i], ','))
 		return (-1);
-	std::vector<std::string> split = splitString(param[i], ',');
+	std::vector<std::string> split = cSplitStr(param[i], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
 	{
 		Users *op = getUserByNn(*it);
