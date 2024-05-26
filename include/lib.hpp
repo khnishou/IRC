@@ -43,7 +43,7 @@
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "!" + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"
-#define RPL_CHANNELMODEIS(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
+#define RPL_CHANNELMODEIS(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n" // check might create a function that return the right RPL
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
 #define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
