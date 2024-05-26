@@ -122,6 +122,7 @@ class Server {
 		void						c_dcc(std::vector<std::string> param, Users *user);
 		// UTILS // for now
 		uint8_t 					initMode(std::vector<std::string> param, uint8_t mode, Channel *channel, Users *user);
+		uint8_t						checkMode(std::vector<std::string> param);
 };
 
 #endif

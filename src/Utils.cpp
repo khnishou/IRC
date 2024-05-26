@@ -1,5 +1,6 @@
 
 #include "../include/Lib.hpp"
+#include <iostream>
 
 bool checkCSplit(const std::string& str, char del)
 {
@@ -206,7 +207,7 @@ Message parsing(std::string str) {
    return msg;
 }
 
-bool isUint(const std::string& str)
+bool isUint(const std::string& str) // check the function again
 {
 	if (str.empty() || str[0] == '-' || str[0] == '+')
 		return (false);

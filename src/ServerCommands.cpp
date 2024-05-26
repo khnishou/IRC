@@ -123,32 +123,6 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	channel->broadcastMsg(RPL_TOPICWHOTIME(getHost(), channel->getName(), user->getNickName(), time));
 }
 
-void	Server::c_mode(std::vector<std::string> param, Users *user)
-{
-	uint8_t mode;
-	int i;
-
-	if (param.size() < 1)
-		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461)
-	i = 0;
-	Channel *channel = getChannel(param[0]);
-	if (!channel)
-		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // 403)
-	if (param.size() < 2)
-		return (user->setBuffer(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode()))); // (324)
-	if (!channel->isUser(user) && !channel->isOperator(user))
-		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
-	if (!channel->isOperator(user))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
-	mode = initMode(param, mode, channel, user);
-	if (mode & ERR_PARAM)
-		return ;
-	if (mode & ERR_SYNTAX)
-		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(getHost(), user->getNickName()))); //(501) // check error/RPL printed inside initMode
-	channel->setMode(mode);
-	channel->broadcastMsg(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode())); // (324)
-}
-
 void	Server::c_pass(std::vector<std::string> param, Users *user)
 {
 	if (!(param.size() == 1))
@@ -308,21 +282,48 @@ void Server::c_quit(std::vector<std::string> param, Users *user) {
 	removeUserFromServer(user);
 }
 
+void	Server::c_mode(std::vector<std::string> param, Users *user)
+{
+	uint8_t mode;
+	int i;
+
+	if (param.size() < 1)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461)
+	i = 0;
+	Channel *channel = getChannel(param[0]);
+	if (!channel)
+		return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), param[0]))); // 403)
+	if (param.size() < 2)
+		return (user->setBuffer(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode()))); // (324)
+	if (!channel->isUser(user) && !channel->isOperator(user))
+		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
+	if (!channel->isOperator(user))
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
+	mode = checkMode(param);
+	if (mode & ERR_PARAM)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "MODE"))); //(461) 
+	if (mode & ERR_SYNTAX)
+		return (user->setBuffer(ERR_UMODEUNKNOWNFLAG(getHost(), user->getNickName()))); //(501) // check error/RPL printed inside initMode
+	mode = initMode(param, mode, channel, user);
+	channel->setMode(mode);
+	channel->broadcastMsg(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode())); // (324)
+}
+
 int Server::mode_i(uint8_t setUnset, Channel *channel, Users *user)
 {
 	if (setUnset & FLAG_SET)
-		; // check RPL invite flag set
+		user->setBuffer(user->getNickName() + " invite set" + "\n"); // check RPL invite flag set
 	else if (setUnset & FLAG_UNSET)
-		; // check RPL invite flag unset
+		user->setBuffer(user->getNickName() + " invite unset" + "\n"); // check RPL invite flag unset
 	return (0);
 }
 
 int Server::mode_t(uint8_t setUnset, Channel *channel, Users *user)
 {
 	if (setUnset & FLAG_SET)
-		; // check RPL topic private
+		user->setBuffer(user->getNickName() + " topic set" + "\n"); // check RPL topic private
 	else if (setUnset & FLAG_UNSET)
-		; // check RPL topic public
+		user->setBuffer(user->getNickName() + " topic unset" + "\n"); // check RPL topic public
 	return (0);
 }
 
@@ -333,13 +334,13 @@ int Server::mode_k(uint8_t setUnset, int i, int it, std::vector<std::string> par
 		if (i + ++it < param.size())
 		{
 			channel->setPassword(param[i + it++]);
-			; // check RPL password unset
+			user->setBuffer(user->getNickName() + " password set to " + channel->getPassword() + "\n"); // check RPL password unset
 		}
 		else
 			return (-1);
 	}
 	else if (setUnset & FLAG_UNSET)
-		; // check RPL password unset
+		user->setBuffer(user->getNickName() + " password unset" + "\n"); // check RPL password unset
 	return (it);
 }
 
@@ -350,38 +351,89 @@ int Server::mode_l(uint8_t setUnset, int i, int it, std::vector<std::string> par
 		if (i + ++it < param.size() && isUint(param[i + it]))
 		{
 			channel->setUserLimit(std::stod(param[i + it]));
-			; // check RPL users limit set to <std::stod(param[i + it])>
+			user->setBuffer(user->getNickName() + " user limit set to " + param[i + it] + "\n"); // check RPL users limit set to <std::stod(param[i + it])>
 		}
 		else
 			return (-1);
 	}
 	else if (setUnset & FLAG_UNSET)
-		; // check RPL users limit unset
+		user->setBuffer(user->getNickName() + " user limit unset" + "\n"); // check RPL users limit unset
 	return (it);
 }
 
 int Server::mode_o(uint8_t setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user)
 {
-	if (checkCSplit(param[i], ','))
-		return (-1);
 	std::vector<std::string> split = cSplitStr(param[i], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
 	{
 		Users *op = getUserByNn(*it);
 		if (!op)
-			; // check error user not found
-		if (!channel->isUser(op) && !channel->isOperator(op))
-			; // check error user is not in the channel
-		if ((setUnset & FLAG_SET) && channel->isUser(op))
+			std::cout << RED << "error : user not found" << DEFAULT << std::endl; // check error user not found
+		else if (!channel->isUser(op) && !channel->isOperator(op))
+			std::cout << RED << "error : user is not in the channel" << DEFAULT << std::endl; // check error user is not in the channel
+		else if ((setUnset & FLAG_SET) && channel->isUser(op))
 		{
 			channel->addOperator(op);
-			; // check RPL add op to channel
+			std::cout << GREEN << "RPL : add op to channel" << DEFAULT << std::endl; // check RPL add op to channel
 		}
 		else if (setUnset & FLAG_UNSET && channel->isOperator(op))
 		{
 			channel->deleteOperator(op, NULL, this->getHost());
-			; // check RPL delete op from channel
+			std::cout << GREEN << "RPL : delete op from channel" << DEFAULT << std::endl; // check RPL delete op from channel
 		}
+	}
+	return (0);
+}
+
+uint8_t Server::checkMode(std::vector<std::string> param)
+{
+	size_t it;
+	size_t j;
+	size_t i;
+	uint8_t setUnset;
+
+	for (i = 1; i < param.size(); i++)
+	{
+		setUnset = 0;
+		it = 0;
+		for (j = 0; j < param[i].length(); j++)
+		{
+			if (!setUnset && param[i][j] == '+')
+				setUnset = FLAG_SET;
+			else if (!setUnset && param[i][j] == '-')
+				setUnset = FLAG_UNSET;
+			else if (setUnset && (param[i][j] == 'i' || param[i][j] == 't')) // type D
+				;
+			else if (setUnset && param[i][j] == 'k') // type C
+			{
+				if ((setUnset & FLAG_SET) && !(i + ++it < param.size()))
+					return (ERR_PARAM);
+			}
+			else if (setUnset && param[i][j] == 'l') // type C
+			{
+				if ((setUnset & FLAG_SET))
+				{
+					++it;
+					if (!(i + it < param.size()))
+						return (ERR_PARAM); // check might change it into an inner error
+					else if (!isUint(param[i + it]))
+						return (ERR_SYNTAX);
+				}
+			}
+			else if (setUnset && param[i][j] == 'o') // type B
+			{
+				if (i + ++it < param.size())
+				{
+					if (!checkCSplit(param[i + it], ','))
+						return (ERR_SYNTAX); // check error syntax error
+				}
+				else
+					return (ERR_PARAM); // check error param error
+			}
+			else
+				return (ERR_SYNTAX); // check error syntax error
+		}
+		i += it;
 	}
 	return (0);
 }
@@ -433,8 +485,7 @@ uint8_t Server::initMode(std::vector<std::string> param, uint8_t mode, Channel *
 			{
 				if (i + ++it < param.size())
 				{
-					if (mode_o(setUnset, i + it, param, channel, user))
-						return (ERR_SYNTAX); // check error syntax error
+					mode_o(setUnset, i + it, param, channel, user);
 				}
 				else
 					return (ERR_PARAM); // check error param error
