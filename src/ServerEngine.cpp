@@ -255,5 +255,6 @@ void Server::handleMsg(Users *user, size_t i) {
 			std::cout << "Received: " << *it << std::endl;
 			std::cout << "Reply code: " << user->getBuffer() << std::endl;
 		}
+		user->clearCmdBuff();
 	}
 }
