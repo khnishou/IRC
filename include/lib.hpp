@@ -56,6 +56,9 @@
 #define RPL_RECEIVEDTREQ(src, targ_nick, targ_host)                     ":" + src + " " + targ_nick + "@" + targ_host +":Received your file transfer request\r\n"
 #define RPL_TRANSFERREQ(src, src_nick, src_host, src_port, fname)       ":" + src + " " + src_nick + "@" + src_host + " with port: " + src_port + " wants to send: " + fname + "\r\n"
 #define RPL_BOT(bot_name, bot_cmd, res)                                 ":" + bot_name + " " + bot_cmd + " :" + res + "\r\n"
+#define RPL_PASS(host)                                                  ":" + host + " : Password is correct! Please proceed to choose a nickname and username!\r\n"
+#define RPL_NICK(host, new_nick)                                        ":" + host + " : Your nickname now is: " + new_nick + "\r\n"
+#define RPL_USER(host, new_user)                                        ":" + host + " : Your username now is: " + new_user + "\r\n"
 //MAKE IT A NOTICE
 
 // COMMAND REPLIES	

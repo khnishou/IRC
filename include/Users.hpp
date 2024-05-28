@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unistd.h>
 #include "Channel.hpp"
 #include "Lib.hpp"
 
@@ -43,23 +44,23 @@ class Users {
 		uint8_t			getStatus() const;
 		std::string		getCmdBuffer() const;
 	
-		void			setHostName(std::string hostname);
-		void			setNickName(std::string nname);
-		void			setUserName(std::string uname);
-		void			setReal(std::string real);
-		void			setModes(std::string mode);
-		void			setBuffer(std::string buf);
-		void			setCmdBuffer(std::string buf);
-		void			setPermissionLevel(int permissionLevel);
-		void			setSocketDescriptor(int sd);
-		void			setStatus(uint8_t stat);
-		void			unsetStatus(uint8_t stat);
-		void			clearBuff();
-		void			clearCmdBuff();
+		void				setHostName(std::string hostname);
+		void				setNickName(std::string nname);
+		void				setUserName(std::string uname);
+		void				setReal(std::string real);
+		void				setModes(std::string mode);
+		void				setBuffer(std::string buf);
+		void				setCmdBuffer(std::string buf);
+		void				setPermissionLevel(int permissionLevel);
+		void				setSocketDescriptor(int sd);
+		void				setStatus(uint8_t stat);
+		void				unsetStatus(uint8_t stat);
+		void				clearBuff();
+		void				clearCmdBuff();
 	
-		void			invite(Channel *channel);
-		bool			is_invited(std::string cname);
-		void			remove_invite(std::string cname);
+		void				invite(Channel *channel);
+		bool				is_invited(std::string cname);
+		void				remove_invite(std::string cname);
 };
 
 #endif

@@ -19,7 +19,7 @@ void Bot::setName(const std::string name) { this->_name = name; }
 void Bot::tellJoke(Users *user, Channel *channel) {
    srand(static_cast<unsigned int>(time(0)));
 	int	val = (rand() % 100) + 1;
-	std::ifstream file("example.txt");
+	std::ifstream file("jokes.txt");
     int i = 0;
     std::string joke;
     while (std::getline(file, joke)) {
