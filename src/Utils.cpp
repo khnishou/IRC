@@ -180,7 +180,7 @@ Message parsing(std::string str) {
 	if (str[i] && str[i] == ':')
 	{
 		len = skip_arg(str, i);
-        msg.source = str.substr(i + 1, len - 1);
+      msg.source = str.substr(i + 1, len - 1);
 		i += len;
 		i = skip_space(str, i);
 	}
@@ -211,7 +211,7 @@ Message parsing(std::string str) {
    return msg;
 }
 
-bool isUint(const std::string& str) // check the function again
+bool isUint(const std::string& str)
 {
 	if (str.empty() || str[0] == '-' || str[0] == '+' || str.length() > 4)
 		return (false);

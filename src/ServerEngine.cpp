@@ -164,6 +164,7 @@ void	Server::send_2usr(int fd) {
 		return ;
 	if (send(fd, msg.c_str(), msg.size(), 0) != (long)msg.size())
 		std::cerr << "Error: send: did not send all data" << std::endl;
+	std::cout << GREEN << "SENT: " << DEFAULT << msg << std::endl;
 	user->clearBuff();
 }
 
@@ -176,7 +177,7 @@ int Server::addNewClient() {
 		return -1;
 	}
 	else
-		std::cout << "NEW CONNECTION" << std::endl;
+		std::cout << BLUE << "NEW CONNECTION" << DEFAULT << std::endl;
 
 	if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1) {
 		std::cerr << "Error: fcntl: " << strerror(errno) << std::endl;
@@ -226,8 +227,7 @@ void Server::handleMsg(Users *user, size_t i) {
 		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
 			Message cont = parsing(*it);
 			executeCmd(cont, user);
-			std::cout << "Received: " << *it << std::endl;
-			std::cout << "Reply code: " << user->getBuffer() << std::endl;
+			std::cout << YELLOW << "Received: " << DEFAULT << *it << std::endl;
 		}
 	}
 }
