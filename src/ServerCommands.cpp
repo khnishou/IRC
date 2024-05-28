@@ -62,7 +62,8 @@ void	Server::c_ping(std::vector<std::string> param, Users *user) {
 
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	std::vector<std::string> split;
-	if (!(param.size() >= 3))
+	// if (!(param.size() >= 3))
+	if (param.size() < 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "KICK")));
 	Channel *channel = getChannel(param[0]);
 	if (!channel)
@@ -249,7 +250,7 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 				else
 					user->setBuffer(RPL_NOTOPIC(this->getHost(), user->getNickName(), channel->getName()));
 				std::string reply = RPL_NAMREPLY(this->getHost(), user->getNickName(), channel->getName()) + channel->getNickNameList();
-				user->setBuffer(reply);
+				user->setBuffer(reply + "\r\n");
 				user->setBuffer(RPL_ENDOFNAMES(this->getHost(), user->getNickName(), channel->getName()));
 			}
 			else

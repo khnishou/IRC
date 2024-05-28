@@ -112,10 +112,10 @@ bool Server::allowed(Message msg, Users *user) {
 }
 
 void Server::executeCmd(Message msg, Users *user) {
-	if (allowed(msg, user) == false) {
-		user->setBuffer(ERR_NOTREGISTERED(getHost()));
-		return ;
-	}
+	// if (allowed(msg, user) == false) {
+	// 	user->setBuffer(ERR_NOTREGISTERED(getHost()));
+	// 	return ;
+	// }
 	if (msg.command == "CAP")
 		c_cap(msg.parameters, user);
 	else if (msg.command == "PASS")
@@ -216,17 +216,18 @@ void Server::handleMsg(Users *user, size_t i) {
 	}
 	else {
 		std::string msg(_buffer, getBytesReceived());
-		if (!checkStrSplit(msg, "\r\n")) {
-			user->setCmdBuffer(msg);
+		user->setCmdBuffer(msg);
+		if (!checkStrSplit(user->getCmdBuffer(), "\r\n"))
 			return ;
-		}
-		std::vector<std::string> vec = strSplitStr(user->getCmdBuffer() + msg, "\r\n");
+		std::vector<std::string> vec = strSplitStr(user->getCmdBuffer(), "\r\n");
+		std::string tmp = user->getCmdBuffer().substr(user->getCmdBuffer().rfind("\r\n") + 2);
+		user->clearCmdBuff();
+		user->setCmdBuffer(tmp);
 		for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
 			Message cont = parsing(*it);
 			executeCmd(cont, user);
 			std::cout << "Received: " << *it << std::endl;
 			std::cout << "Reply code: " << user->getBuffer() << std::endl;
 		}
-		user->clearCmdBuff();
 	}
 }

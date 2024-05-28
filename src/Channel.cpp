@@ -87,9 +87,10 @@ void Channel::deleteOperator(Users *removed, Users *remover, std::string host) {
 			it != this->_operatorList.end(); ++it) {
 		if ((*it)->getNickName() == removed->getNickName()) {
 			this->_operatorList.erase(it);
-			return ;
+			break ;
 		}
 	}
+// dprintf(2, YELLOW"con = %d\n", );
 	if (this->_operatorList.empty() && !this->_userList.empty()) {
 		Users *user = *(this->_userList.begin());
 		this->_userList.erase(this->_userList.begin());
@@ -158,12 +159,12 @@ std::string Channel::convertMode() {
 std::string Channel::getNickNameList() {
 	std::string nnlist = "";
 	for (std::vector<Users *>::iterator it = this->_operatorList.begin(); it != this->_operatorList.end(); ++it) {
-		nnlist += "@" + (*it)->getNickName();
+		nnlist += " @" + (*it)->getNickName();
 		if (it + 1 != this->_operatorList.end())
 			nnlist += " ";
 	}
 	for (std::vector<Users *>::iterator it = this->_userList.begin(); it != this->_userList.end(); ++it) {
-		nnlist += "@" + (*it)->getNickName();
+		nnlist += " @" + (*it)->getNickName();
 		if (it + 1 != this->_userList.end())
 			nnlist += " ";
 	}

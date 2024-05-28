@@ -43,14 +43,14 @@ bool checkStrSplit(const std::string& str, std::string del)
 		return (false);
 	if (str.rfind(del) == std::string::npos)
 		return (false);
-	if (str.substr(str.rfind(del)) != del)
-			return (false);
+	// if (str.substr(str.rfind(del)) != del)
+	// 		return (false);
 	return (true);
 }
 
 std::vector<std::string> strSplitStr(const std::string& str, std::string del)
 {
-    std::vector<std::string> split;
+   std::vector<std::string> split;
 
 	if (!str.empty() && !del.empty())
 	{
@@ -136,7 +136,7 @@ static int paramLen(std::string cmd)
 	else if (cmd == "USER")
 		return (4);
 	else if (cmd == "PING")
-		return (1);
+		return (0);
 	else if (cmd == "JOIN")
 		return (1);
 	else if (cmd == "PART")
@@ -156,9 +156,9 @@ static int paramLen(std::string cmd)
 	else if (cmd == "RESTART")
 		return (0);
 	else if (cmd == "BOT")
-		return (2);
+		return (0);
 	else if (cmd == "DCC")
-		return (4);
+		return (-1);
 	return (-1);
 }
 
