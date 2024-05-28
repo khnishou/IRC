@@ -22,7 +22,16 @@ Server &Server::operator=(const Server &cp) {
 }
 
 Server::~Server() {
-	// LOOK INTO THIS LATER, THIS CHANGED BECAUSE OF NEWLY ADDED SERVER STATE
+	close(_serverSocket);
+	for (std::vector<Users *>::iterator it = _allUsers.begin(); it != _allUsers.end(); ++it)
+		delete *it;
+	_allUsers.clear();
+	for (std::vector<Channel *>::iterator it = _allChannels.begin(); it != _allChannels.end(); ++it)
+		delete *it;
+	_allChannels.clear();
+	for (std::vector<struct pollfd>::iterator it = _fds.begin(); it != _fds.end(); ++it)
+		close((*it).fd);
+	_fds.clear();
 }
 
 //****************************************************************************//
@@ -144,3 +153,4 @@ void Server::removeUserFromServer(Users *user) {
 	}
 	delete user;
 }
+
