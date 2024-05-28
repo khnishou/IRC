@@ -155,6 +155,10 @@ static int paramLen(std::string cmd)
 		return (0);
 	else if (cmd == "RESTART")
 		return (0);
+	else if (cmd == "BOT")
+		return (2);
+	else if (cmd == "DCC")
+		return (4);
 	return (-1);
 }
 

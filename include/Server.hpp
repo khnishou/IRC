@@ -85,6 +85,7 @@ class Server {
 		void								addUser(Users *user);
 		void								addPfds(struct pollfd sfd);
 		void								removePfds(struct pollfd sfd);
+		int								check_channel(Channel *channel);
 
 		// message forwarding i guess
 		void								send_2usr(int fd);
@@ -112,16 +113,12 @@ class Server {
 		void								c_quit(std::vector<std::string> param, Users *user);
 		void								c_bot(std::vector<std::string> param, Users *user);
 
-		int								mode_i(int setUnset, Channel *channel, Users *user);
-		int								mode_t(int setUnset, Channel *channel, Users *user);
-		int								mode_k(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
-		int								mode_l(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
 		int								mode_o(int setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user);
 
 		void								c_dcc(std::vector<std::string> param, Users *user);
 		// UTILS // for now
-		int 							initMode(std::vector<std::string> param, int mode, Channel *channel, Users *user);
-		int							checkMode(std::vector<std::string> param);
+		int 								initMode(std::vector<std::string> param, int mode, Channel *channel, Users *user);
+		int								checkMode(std::vector<std::string> param);
 };
 
 #endif

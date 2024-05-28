@@ -58,13 +58,11 @@ void Channel::addUser(Users *user) {
 	this->_userList.push_back(user);
 }
 
-// tghese functions the two bellow need to send msg to everyoen on server saying who got kickced
 void Channel::deleteUser(Users *removed, Users *remover, std::string host) {
 	for (std::vector<Users *>::iterator it = this->_userList.begin();
 			it != this->_userList.end(); ++it) {
 		if ((*it)->getNickName() == removed->getNickName()) {
 			this->_userList.erase(it);
-			// here add check if remover exists meaning got kicked or voluntarily left
 			return ;
 		}
 	}
@@ -89,11 +87,15 @@ void Channel::deleteOperator(Users *removed, Users *remover, std::string host) {
 			it != this->_operatorList.end(); ++it) {
 		if ((*it)->getNickName() == removed->getNickName()) {
 			this->_operatorList.erase(it);
-			// same note as above
 			return ;
 		}
 	}
-	
+	if (this->_operatorList.empty() && !this->_userList.empty()) {
+		Users *user = *(this->_userList.begin());
+		this->_userList.erase(this->_userList.begin());
+		this->_operatorList.push_back(user);
+		user->setBuffer(RPL_YOUREOPER(host, this->getName()));
+	}
 }
 
 //****************************************************************************//

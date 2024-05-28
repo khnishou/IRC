@@ -112,11 +112,10 @@ bool Server::allowed(Message msg, Users *user) {
 }
 
 void Server::executeCmd(Message msg, Users *user) {
-	// if (allowed(msg, user) == false) {
-	// 	user->setBuffer(ERR_NOTREGISTERED(getHost()));
-	// 	// might need to add clear cmd buff here
-	// 	return ;
-	// }
+	if (allowed(msg, user) == false) {
+		user->setBuffer(ERR_NOTREGISTERED(getHost()));
+		return ;
+	}
 	if (msg.command == "CAP")
 		c_cap(msg.parameters, user);
 	else if (msg.command == "PASS")

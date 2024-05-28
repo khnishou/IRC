@@ -120,7 +120,6 @@ bool	Server::nickNameExists(std::string nname) {
 	return false;
 }
 
-// change this, use size and position accessor instead of iterator, iterator could cause issues since removing stuff from vector
 void Server::removeUserFromServer(Users *user) {
 	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it).fd == this->_serverSocket)
@@ -139,6 +138,8 @@ void Server::removeUserFromServer(Users *user) {
 	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
 		if ((*it)->isOperator(user)) {
 			(*it)->deleteOperator(user, NULL, this->getHost());
+			if (!check_channel(*it))
+				break ;
 			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName(), "just left..."));
 			break ;
 		}

@@ -13,6 +13,19 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 	}
 }
 
+int	Server::check_channel(Channel *channel) {
+	if (channel->getUserList().empty() && channel->getOperatorList().empty()) {
+		for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
+			if ((*it) == channel) {
+				this->_allChannels.erase(it);
+				delete channel;
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
 void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART")));
@@ -32,6 +45,8 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 			channel->deleteUser(user, NULL, "");
 		else
 			channel->deleteOperator(user, NULL, "");
+		if (!check_channel(channel))
+			return ;
 		if (param.size() == 1)
 			channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), "gonee... :'( "));
 		else
@@ -75,6 +90,8 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		else if (channel->isOperator(toKick))
 			channel->deleteOperator(toKick, user, getHost());
 		toKick->setBuffer(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason));
+		if (!check_channel(channel))
+			return ;
 		channel->broadcastMsg(RPL_KICK(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), toKick->getNickName(), reason));
 	}
 }
@@ -306,28 +323,6 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	channel->broadcastMsg(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode()));
 }
 
-int Server::mode_k(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user)
-{
-	if (setUnset & FLAG_SET)
-	{
-		it++;
-		channel->setPassword(param[i + it]);
-	}
-	return (it);
-}
-
-int Server::mode_l(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user)
-{
-	if (setUnset & FLAG_SET)
-	{
-		if (isUint(param[i + ++it]))
-			channel->setUserLimit(strtod(param[i + it].c_str(), NULL));
-		else
-			user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "MODE_L", "Invalid paramter"));
-	}
-	return (it);
-}
-
 int Server::mode_o(int setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user)
 {
 	if (!checkCSplit(param[i], ','))
@@ -349,6 +344,8 @@ int Server::mode_o(int setUnset, int i, std::vector<std::string> param, Channel 
 		{
 			channel->deleteOperator(op, NULL, this->getHost());
 			op->setBuffer(RPL_NOLONGEROP(op->getNickName(), channel->getName()));
+			if (!check_channel(channel))
+				;
 		}
 	}
 	return (0);
@@ -414,12 +411,19 @@ int Server::initMode(std::vector<std::string> param, int mode, Channel *channel,
 				mode = setTheUnset(mode, FLAG_T, setUnset);
 			else if (setUnset && param[i][j] == 'k')
 			{
-				it = mode_k(setUnset, i, it, param, channel, user);
+				if (setUnset & FLAG_SET)
+					channel->setPassword(param[i + ++it]);
 				mode = setTheUnset(mode, FLAG_K, setUnset);
 			}
 			else if (setUnset && param[i][j] == 'l')
 			{
-				it = mode_l(setUnset, i, it, param, channel, user);
+				if (setUnset & FLAG_SET)
+				{
+					if (isUint(param[i + ++it]))
+						channel->setUserLimit(strtod(param[i + it].c_str(), NULL));
+					else
+						user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "MODE_L", "Invalid paramter"));
+				}
 				mode = setTheUnset(mode, FLAG_L, setUnset);
 			}
 			else if (setUnset && param[i][j] == 'o')
@@ -439,7 +443,7 @@ void Server::c_dcc(std::vector<std::string> param, Users *user) {
 	std::string hostname = param[2];
 	int	port = std::atoi(param[3].c_str());
 	if (hostname.empty() || fname.empty() || param[3].size() == 0 || port < 0 || port > 65535)
-		return user->setBuffer(ERR_UNKNOWNERROR(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
+		return user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
 	Users *receiver = getUserByNn(hostname);
 	if (!receiver)
 		return user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), hostname));
