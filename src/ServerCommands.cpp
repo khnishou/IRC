@@ -16,7 +16,7 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART"))); // (461)
-	if (checkCSplit(param[0], ','))
+	if (!checkCSplit(param[0], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	std::vector<std::string> split = cSplitStr(param[0], ',');
 	for (std::vector<std::string>::iterator it = split.begin(); it != split.end(); ++it)
@@ -33,7 +33,10 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 		else
 			channel->deleteOperator(user, NULL, "");
 		// after removing this guy, update channel
-		channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName()));
+		if (param.size() == 1)
+			channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), "gonee... :'( "));
+		else
+			channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), param[1]));
 	}
 }
 
@@ -54,7 +57,7 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName()))); // (442)
 	if (!channel->isOperator(user))
 		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
-	if (checkCSplit(param[1], ','))
+	if (!checkCSplit(param[1], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	split = cSplitStr(param[1], ',');
 	std::string reason;
@@ -190,7 +193,7 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 	channels = cSplitStr(param[0], ',');
 	if (param.size() == 2)
 	{
-		if (checkCSplit(param[1], ','))
+		if (!checkCSplit(param[1], ','))
 			user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 		keys = cSplitStr(param[1], ',');
 	}
@@ -208,7 +211,8 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 			else
 			{
 				channel = new Channel(channels[i_chn]); // check use a function instead
-				getAllChannels().push_back(channel);
+				// getAllChannels().push_back(channel);
+				addChan(channel);
 				channel->addOperator(user);
 			}
 		}

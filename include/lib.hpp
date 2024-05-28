@@ -64,7 +64,7 @@
 #define	RPL_NICKCHANGE(nick, user, user_host, nw_nick)					":" + nick + "!" + user + "@" + user_host + " " + "NICK" + " :" + nw_nick + "\r\n"
 #define RPL_JOIN(nick, user, user_host, chan)							":" + nick + "!" + user + "@" + user_host + " JOIN " + chan + " * :" + user + "\r\n"
 #define	RPL_INVITE(src_nick, src_usr, src_host, targ, chan) 			":" + src_nick + "!" + src_usr + "@" + src_host + " INVITE " + targ + " :" + chan + "\r\n"
-#define RPL_PART(src_nick, src_usr, src_host, chan)						":" + src_nick + "!" + src_usr + "@" + src_host + " PART " + chan + " :gonee... :'( \r\n"
+#define RPL_PART(src_nick, src_usr, src_host, chan, reason)						":" + src_nick + "!" + src_usr + "@" + src_host + " PART " + chan + " :" + reason + "\r\n"
 #define RPL_PRIVMSG(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " PRIVMSG " + dis_nick + " :" + msg + "\r\n"
 #define RPL_NOTICE(src_nick, src_usr, src_host, dis_nick, msg)			":" + src_nick + "!" + src_usr + "@" + src_host + " NOTICE " + dis_nick + " :" + msg + "\r\n"
 #define RPL_QUIT(src_nick, src_usr, src_host, reason)					":" + src_nick + "!" + src_usr + "@" + src_host + " " + reason + "\r\n"
