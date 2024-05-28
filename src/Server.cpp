@@ -139,12 +139,12 @@ void Server::removeUserFromServer(Users *user) {
 	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
 		if ((*it)->isOperator(user)) {
 			(*it)->deleteOperator(user, NULL, this->getHost());
-			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName()));
+			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName(), "just left..."));
 			break ;
 		}
 		else if ((*it)->isUser(user)) {
 			(*it)->deleteUser(user, NULL, this->getHost());
-			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName()));
+			(*it)->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), (*it)->getName(), "just left..."));
 			break ;
 		}
 	}
