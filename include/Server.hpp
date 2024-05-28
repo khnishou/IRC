@@ -109,7 +109,6 @@ class Server {
 		void								c_topic(std::vector<std::string> param, Users *user);
 		void								c_mode(std::vector<std::string> param, Users *user);
 		void								c_privmsg(std::vector<std::string> param, Users *user);
-		void								c_restart(std::vector<std::string> param, Users *user);
 		void								c_quit(std::vector<std::string> param, Users *user);
 		void								c_bot(std::vector<std::string> param, Users *user);
 

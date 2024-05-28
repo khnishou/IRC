@@ -52,7 +52,7 @@ void		Users::setUserName(std::string uname) { this->_userName = uname; }
 void		Users::setReal(std::string real) { this->_real = real; }
 void		Users::setModes(std::string mode) { this->_modes = mode; }
 void		Users::setBuffer(std::string buf) { this->_buffer += buf; }
-void		Users::setCmdBuffer(std::string buf) { this->_cmdBuffer + buf; }
+void		Users::setCmdBuffer(std::string buf) { this->_cmdBuffer += buf; }
 void		Users::setPermissionLevel(int permissionLevel) { this->_permissionLevel = permissionLevel; }
 void		Users::setSocketDescriptor(int sd) { this->_socketDescriptor = sd; }
 void		Users::setStatus(uint8_t stat) { this->_status |= stat; }

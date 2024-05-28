@@ -39,8 +39,8 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 
 void	Server::c_ping(std::vector<std::string> param, Users *user) {
 	if (param.size() == 1)
-		return (user->setBuffer(RPL_PING(getHost(), "")));
-	user->setBuffer(RPL_PING(getHost(), param[0]));
+		return (user->setBuffer(RPL_PING(getHost(), param[0])));
+	user->setBuffer(RPL_PING(getHost(), ""));
 }
 
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
@@ -267,21 +267,6 @@ void Server::c_privmsg(std::vector<std::string> param, Users *user) {
 			targ->setBuffer(RPL_PRIVMSG(user->getNickName(), user->getUserName(), user->getHostName(), targ->getNickName(), param[1]));
 		}
 	}
-}
-
-void Server::c_restart(std::vector<std::string> param, Users *user) {
-
-	setState(START);
-	// here need to first notify everyone on the server that it is restarting and then proceed to wipe everyone off it
-	getFds().clear();
-	close(getServerSocket());
-
-	for (std::vector<Users *>::iterator it = this->_allUsers.begin(); it != this->_allUsers.end(); ++it)
-		delete (*it);
-	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it)
-		delete (*it);
-	this->_allChannels.clear();
-	this->_allUsers.clear();
 }
 
 void Server::c_quit(std::vector<std::string> param, Users *user) {
