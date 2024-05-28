@@ -24,7 +24,7 @@ class Users {
 		std::string					_buffer;
 		int 							_permissionLevel;
 		int							_socketDescriptor;
-		uint8_t						_status;
+		int						_status;
 		std::vector<Channel *>	_invite_lst;
 
 	public:
@@ -41,7 +41,7 @@ class Users {
 		std::string		getBuffer() const;
 		int				getPermissionLevel() const;
 		int				getSocketDescriptor() const;
-		uint8_t			getStatus() const;
+		int			getStatus() const;
 		std::string		getCmdBuffer() const;
 	
 		void				setHostName(std::string hostname);
@@ -53,8 +53,8 @@ class Users {
 		void				setCmdBuffer(std::string buf);
 		void				setPermissionLevel(int permissionLevel);
 		void				setSocketDescriptor(int sd);
-		void				setStatus(uint8_t stat);
-		void				unsetStatus(uint8_t stat);
+		void				setStatus(int stat);
+		void				unsetStatus(int stat);
 		void				clearBuff();
 		void				clearCmdBuff();
 	

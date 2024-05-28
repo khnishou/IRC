@@ -112,16 +112,16 @@ class Server {
 		void								c_quit(std::vector<std::string> param, Users *user);
 		void								c_bot(std::vector<std::string> param, Users *user);
 
-		int								mode_i(uint8_t setUnset, Channel *channel, Users *user);
-		int								mode_t(uint8_t setUnset, Channel *channel, Users *user);
-		int								mode_k(uint8_t setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
-		int								mode_l(uint8_t setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
-		int								mode_o(uint8_t setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user);
+		int								mode_i(int setUnset, Channel *channel, Users *user);
+		int								mode_t(int setUnset, Channel *channel, Users *user);
+		int								mode_k(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
+		int								mode_l(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user);
+		int								mode_o(int setUnset, int i, std::vector<std::string> param, Channel *channel, Users *user);
 
 		void								c_dcc(std::vector<std::string> param, Users *user);
 		// UTILS // for now
-		uint8_t 							initMode(std::vector<std::string> param, uint8_t mode, Channel *channel, Users *user);
-		uint8_t							checkMode(std::vector<std::string> param);
+		int 							initMode(std::vector<std::string> param, int mode, Channel *channel, Users *user);
+		int							checkMode(std::vector<std::string> param);
 };
 
 #endif

@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstdlib> 
+#include <cerrno> 
+#include <cstring>
 
 #define RED "\033[1;31m"
 #define GREEN "\033[0;32m"
@@ -50,7 +53,8 @@
 #define	RPL_INVITING(src, nick, targ, chan)								":" + src + " 341 " + nick + " " + targ + " " + chan + "\r\n"
 #define	RPL_NAMREPLY(src, nick, chan)									":" + src + " 353 " + nick + " = " + chan + " :"
 #define RPL_ENDOFNAMES(src, nick, chan)									":" + src + " 366 " + nick + " " + chan + " :END of NAMES list\r\n"
-#define	RPL_YOUREOPER(src)												":" + src + " 381 " + "PASS :You are now an IRC operator\r\n"
+#define	RPL_YOUREOPER(src, chan)										":" + src + "You are now an IRC operator in : " + chan + "\r\n"
+#define RPL_NOLONGEROP(src, chan)                                       ":" + src + "You are no longer an IRC operator in : " + chan + "\r\n"
 #define	RPL_QUOT(src, chan, quot)										":QUOTBOT!BOT@" + src + " NOTICE " + chan + " :" + quot + "\r\n"
 #define RPL_INPUTWARNING(src, nick)                                     ":" + src + " " + nick + " :Empty parameters will be ingored...\r\n"
 #define RPL_RECEIVEDTREQ(src, targ_nick, targ_host)                     ":" + src + " " + targ_nick + "@" + targ_host +":Received your file transfer request\r\n"
@@ -86,6 +90,7 @@
 #define FLAG_T		(1 << 1)
 #define FLAG_K		(1 << 2)
 #define FLAG_L		(1 << 3)
+#define ERR_SILENT	(1 << 5)
 #define ERR_PARAM	(1 << 6)
 #define ERR_SYNTAX	(1 << 7)
 
@@ -112,7 +117,7 @@ bool                        checkCSplit(const std::string& str, char del);
 std::vector<std::string>    cSplitStr(const std::string& str, char del);
 bool                        checkStrSplit(const std::string& str, std::string del);
 std::vector<std::string>    strSplitStr(const std::string& str, std::string del);
-uint8_t                     setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset);
+int                     setTheUnset(int mode, int flag, int setUnset);
 bool                        isNickname(const std::string& nickname);
 std::string                 fill_vec(std::vector<std::string> *param, std::vector<std::string>::iterator ite);
 Message                     parsing(std::string str);

@@ -33,7 +33,7 @@ Channel &Channel::operator=(const Channel &cp) {
 std::string				Channel::getName() const { return this->_name; }
 std::string				Channel::getTopic() const { return this->_topic; }
 std::string				Channel::getPassword() const { return this->_password; }
-uint8_t					Channel::getModes() const { return this->_modes; }
+int					Channel::getModes() const { return this->_modes; }
 int						Channel::getUserLimit() const { return this->_userLimit; }
 std::vector<Users *>	Channel::getUserList() const { return this->_userList; }
 std::vector<Users *>	Channel::getOperatorList() const { return this->_operatorList; }
@@ -41,7 +41,7 @@ std::vector<Users *>	Channel::getOperatorList() const { return this->_operatorLi
 void					Channel::setName(const std::string name) { this->_name = name; }
 void					Channel::setTopic(const std::string topic) { this->_topic = topic; }
 void					Channel::setPassword(const std::string pass) { this->_password = pass; }
-void					Channel::setMode(const uint8_t mode) { this->_modes = mode; }
+void					Channel::setMode(const int mode) { this->_modes = mode; }
 void					Channel::setUserLimit(const int userLimit) { this->_userLimit = userLimit; }
 
 //****************************************************************************//
@@ -139,7 +139,7 @@ bool	Channel::channelEmpty() {
 }
 
 std::string Channel::convertMode() {
-	uint8_t m = this->_modes;
+	int m = this->_modes;
 	std::string mode = "+";
 
 	if (m & FLAG_I)
