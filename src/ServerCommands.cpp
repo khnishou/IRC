@@ -15,7 +15,7 @@ void	Server::c_cap(std::vector<std::string> param, Users *user) {
 
 void	Server::c_part(std::vector<std::string> param, Users *user) {
 	if (param.size() < 1)
-		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART"))); // (461)
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "PART")));
 	if (!checkCSplit(param[0], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	std::vector<std::string> split = cSplitStr(param[0], ',');
@@ -32,7 +32,6 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 			channel->deleteUser(user, NULL, "");
 		else
 			channel->deleteOperator(user, NULL, "");
-		// after removing this guy, update channel
 		if (param.size() == 1)
 			channel->broadcastMsg(RPL_PART(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName(), "gonee... :'( "));
 		else
@@ -56,7 +55,7 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	if (!channel->isUser(user) && !channel->isOperator(user))
 		return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName())));
 	if (!channel->isOperator(user))
-		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName()))); // (482)
+		return (user->setBuffer(ERR_CHANOPRIVSNEEDED(getHost(), user->getNickName(), channel->getName())));
 	if (!checkCSplit(param[1], ','))
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	split = cSplitStr(param[1], ',');
@@ -98,7 +97,7 @@ void	Server::c_invite(std::vector<std::string> param, Users *user) {
 	channel->addUser(toAdd);
 	user->setBuffer(RPL_INVITING(getHost(), user->getNickName(), toAdd->getNickName(), channel->getName()));
 	toAdd->setBuffer(RPL_INVITE(user->getNickName(), user->getUserName(), user->getHostName(), toAdd->getNickName(), channel->getName()));
-	// prob broadcast on chan, also send him reply about chan topic
+	channel->broadcastMsg(RPL_JOIN(toAdd->getNickName(), toAdd->getUserName(), toAdd->getHostName(), channel->getName()));
 }
 
 void	Server::c_topic(std::vector<std::string> param, Users *user) {
@@ -307,34 +306,13 @@ void	Server::c_mode(std::vector<std::string> param, Users *user)
 	channel->broadcastMsg(RPL_CHANNELMODEIS(this->getHost(), user->getNickName(), channel->getName(), channel->convertMode()));
 }
 
-int Server::mode_i(int setUnset, Channel *channel, Users *user)
-{
-	if (setUnset & FLAG_SET)
-		user->setBuffer(user->getNickName() + " invite set" + "\n"); // check RPL invite flag set
-	else if (setUnset & FLAG_UNSET)
-		user->setBuffer(user->getNickName() + " invite unset" + "\n"); // check RPL invite flag unset
-	return (0);
-}
-
-int Server::mode_t(int setUnset, Channel *channel, Users *user)
-{
-	if (setUnset & FLAG_SET)
-		user->setBuffer(user->getNickName() + " topic set" + "\n"); // check RPL topic private
-	else if (setUnset & FLAG_UNSET)
-		user->setBuffer(user->getNickName() + " topic unset" + "\n"); // check RPL topic public
-	return (0);
-}
-
 int Server::mode_k(int setUnset, int i, int it, std::vector<std::string> param, Channel *channel, Users *user)
 {
 	if (setUnset & FLAG_SET)
 	{
 		it++;
-		channel->setPassword(param[i + it++]);
-		user->setBuffer(user->getNickName() + " password set to " + channel->getPassword() + "\n"); // check RPL password unset
+		channel->setPassword(param[i + it]);
 	}
-	else if (setUnset & FLAG_UNSET)
-		user->setBuffer(user->getNickName() + " password unset" + "\n"); // check RPL password unset
 	return (it);
 }
 
@@ -343,15 +321,10 @@ int Server::mode_l(int setUnset, int i, int it, std::vector<std::string> param, 
 	if (setUnset & FLAG_SET)
 	{
 		if (isUint(param[i + ++it]))
-		{
 			channel->setUserLimit(strtod(param[i + it].c_str(), NULL));
-			user->setBuffer(user->getNickName() + " user limit set to " + param[i + it] + "\n"); // check RPL users limit set to <std::stod(param[i + it])>
-		}
 		else
-			user->setBuffer("error: not an int"); // check
+			user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "MODE_L", "Invalid paramter"));
 	}
-	else if (setUnset & FLAG_UNSET)
-		user->setBuffer(user->getNickName() + " user limit unset" + "\n"); // check RPL users limit unset
 	return (it);
 }
 
@@ -435,29 +408,21 @@ int Server::initMode(std::vector<std::string> param, int mode, Channel *channel,
 				setUnset = FLAG_SET;
 			else if (!setUnset && param[i][j] == '-')
 				setUnset = FLAG_UNSET;
-			else if (setUnset && param[i][j] == 'i') // type D
-			{
-				mode_i(setUnset, channel, user);
+			else if (setUnset && param[i][j] == 'i')
 				mode = setTheUnset(mode, FLAG_I, setUnset);
-			}
-				
-			else if (setUnset && param[i][j] == 't') // type D
-			{
-				mode_t(setUnset, channel, user);
+			else if (setUnset && param[i][j] == 't')
 				mode = setTheUnset(mode, FLAG_T, setUnset);
-			}
-				
-			else if (setUnset && param[i][j] == 'k') // type C
+			else if (setUnset && param[i][j] == 'k')
 			{
 				it = mode_k(setUnset, i, it, param, channel, user);
 				mode = setTheUnset(mode, FLAG_K, setUnset);
 			}
-			else if (setUnset && param[i][j] == 'l') // type C
+			else if (setUnset && param[i][j] == 'l')
 			{
 				it = mode_l(setUnset, i, it, param, channel, user);
 				mode = setTheUnset(mode, FLAG_L, setUnset);
 			}
-			else if (setUnset && param[i][j] == 'o') // type B
+			else if (setUnset && param[i][j] == 'o')
 				mode_o(setUnset, i + ++it, param, channel, user);
 		}
 		i += it;

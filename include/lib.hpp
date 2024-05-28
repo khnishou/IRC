@@ -42,11 +42,11 @@
 #define ERR_CHANOPRIVSNEEDED(src, nick, chan)							":" + src +  " 482 " + nick + " " + chan + " :You're not channel operator\r\n"
 #define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
 #define ERR_USERSDONTMATCH(src, nick)									":" + src +  " 502 " + nick + " :Cant change mode for other users\r\n"
-
+#define ERR_INVALIDINPUT(src, nick, cmd, reason)                        ":" + src + " " + nick + " " + cmd + " :" + reason + "\r\n"
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "! " + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"
-#define RPL_CHANNELMODEIS(src, nick,chan, mode)							":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n" // check might create a function that return the right RPL
+#define RPL_CHANNELMODEIS(src, nick, chan, mode)						":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n" // check might create a function that return the right RPL
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
 #define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
