@@ -213,7 +213,7 @@ Message parsing(std::string str) {
 
 bool isUint(const std::string& str) // check the function again
 {
-	if (str.empty() || str[0] == '-' || str[0] == '+')
+	if (str.empty() || str[0] == '-' || str[0] == '+' || str.length() > 4)
 		return (false);
 	for (size_t i = 0; i < str.length(); i++)
 		if (!isdigit(str[i]))

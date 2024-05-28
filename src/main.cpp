@@ -9,9 +9,16 @@ int main(int argc, char **argv) {
 		exit(EXIT_SUCCESS);
 	}
 	std::string pswd = argv[2];
+	std::string p = argv[1];
+	if (!isUint(p)) {
+		std::cerr << "Error: Invalid port!" << std::endl;
+		exit(EXIT_SUCCESS);
+	}
 	int port = std::atoi(argv[1]);
-	// port check goes here
-
+	if (port < 6660 || (port > 6669 && port != 7000)) {
+		std::cerr << "Error: Invalid port!" << std::endl;
+		exit(EXIT_SUCCESS);
+	}
 	Server serv(port, pswd);
 
 	while (serv.getState() == START) {

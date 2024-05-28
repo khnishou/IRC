@@ -441,8 +441,10 @@ void Server::c_dcc(std::vector<std::string> param, Users *user) {
 		user->setBuffer(ERR_UNKNOWNCOMMAND(this->getHost(), user->getNickName(), "DCC: " + param[0]));
 	std::string fname = param[1];
 	std::string hostname = param[2];
+	if (!isUint(param[3]))
+		return user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
 	int	port = std::atoi(param[3].c_str());
-	if (hostname.empty() || fname.empty() || param[3].size() == 0 || port < 0 || port > 65535)
+	if (hostname.empty() || fname.empty() || param[3].size() == 0 || port < 6660 || (port > 6669 && port != 7000))
 		return user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
 	Users *receiver = getUserByNn(hostname);
 	if (!receiver)
