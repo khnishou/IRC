@@ -6,15 +6,15 @@
 //****************************************************************************//
 
 Users::Users(std::string hostname, int socketDescriptor) : 
-_hostName(hostname), _nickName("default"), _userName("default"), _real("default"),
-_modes("default"),  _cmdBuffer(""), _buffer(""), _permissionLevel(0), _socketDescriptor(socketDescriptor), _status(0) { }
+_hostName(hostname), _nickName("*"), _userName("*"), _real("*"), _modes("*"),  _cmdBuffer(""),
+_buffer(""), _permissionLevel(0), _socketDescriptor(socketDescriptor), _status(0) { }
 
 Users::Users(const Users &cp) : 
 _hostName(cp.getHostName()), _nickName(cp.getNickName()), _userName(cp.getUserName()), _real(cp.getReal()),
 _modes(cp.getModes()), _buffer(cp.getBuffer()), _permissionLevel(cp.getPermissionLevel()),
 _socketDescriptor(cp.getSocketDescriptor()), _status(cp.getStatus()) { }
 
-Users::~Users() { }
+Users::~Users() { close(_socketDescriptor); }
 
 Users &Users::operator=(const Users &cp) {
 	if (this != &cp) {

@@ -36,28 +36,28 @@ class Channel {
 		std::vector<Users *>	getUserList() const;
 		std::vector<Users *>	getOperatorList() const;
 		
-		void					setName(const std::string name);
-		void					setTopic(const std::string topic);
-		void					setPassword(const std::string pass);
-		void					setMode(const uint8_t mode);
-		void					setUserLimit(const int userlimit);
+		void						setName(const std::string name);
+		void						setTopic(const std::string topic);
+		void						setPassword(const std::string pass);
+		void						setMode(const uint8_t mode);
+		void						setUserLimit(const int userlimit);
 		
-		void					addUser(Users *user);
-		void					deleteUser(Users *removed, Users *remover, std::string host);
+		void						addUser(Users *user);
+		void						deleteUser(Users *removed, Users *remover, std::string host);
 
-		void					addOperator(Users *user);
-		void					deleteOperator(Users *removed, Users *remover, std::string host);
+		void						addOperator(Users *user);
+		void						deleteOperator(Users *removed, Users *remover, std::string host);
 
-		bool 					isUser(const Users *user);
-		bool 					isOperator(const Users *user);
+		bool 						isUser(const Users *user);
+		bool 						isOperator(const Users *user);
 
-		bool					haveMultOps();
-		bool					haveUsers();
-		bool					channelEmpty();
+		bool						haveMultOps();
+		bool						haveUsers();
+		bool						channelEmpty();
 		std::string				convertMode();
 		std::string				getNickNameList();
 
-		void					broadcastMsg(std::string msg);
+		void						broadcastMsg(std::string msg);
 };
 
 #endif

@@ -25,12 +25,10 @@ Server::~Server() {
 	close(_serverSocket);
 	for (std::vector<Users *>::iterator it = _allUsers.begin(); it != _allUsers.end(); ++it)
 		delete *it;
-	_allUsers.clear();
 	for (std::vector<Channel *>::iterator it = _allChannels.begin(); it != _allChannels.end(); ++it)
 		delete *it;
+	_allUsers.clear();
 	_allChannels.clear();
-	for (std::vector<struct pollfd>::iterator it = _fds.begin(); it != _fds.end(); ++it)
-		close((*it).fd);
 	_fds.clear();
 }
 
@@ -128,7 +126,6 @@ void Server::removeUserFromServer(Users *user) {
 		if ((*it).fd == this->_serverSocket)
 			continue ;
 		if ((*it).fd == user->getSocketDescriptor()) {
-			close(user->getSocketDescriptor());
 			this->_fds.erase(it);
 			break ;
 		}
