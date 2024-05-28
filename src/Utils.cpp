@@ -4,7 +4,7 @@
 
 bool checkCSplit(const std::string& str, char del)
 {
-  	if (str.empty() || str.front() == del || str.back() == del)
+  	if (str.empty() || str.c_str()[0] == del || str.c_str()[str.length() - 1] == del)
 		return (false);
 	for (size_t i = 0; i < str.size(); i++)
 	{
@@ -105,7 +105,7 @@ bool isNickname(const std::string& nickname)
 	return (true);
 }
 
-uint8_t setTheUnset(uint8_t mode, uint8_t flag, uint8_t setUnset)
+int setTheUnset(int mode, int flag, int setUnset)
 {
 	if ((setUnset & FLAG_SET) && !(setUnset & FLAG_UNSET))
 		return (mode | flag);
@@ -214,5 +214,5 @@ bool isUint(const std::string& str) // check the function again
 	for (size_t i = 0; i < str.length(); i++)
 		if (!isdigit(str[i]))
     		return (false);
-	return (std::stod(str) >= 0);
+	return (strtod(str.c_str(), NULL) >= 0);
 }

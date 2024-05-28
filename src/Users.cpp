@@ -42,7 +42,7 @@ std::string Users::getReal() const { return this->_real; }
 std::string	Users::getModes() const { return this->_modes; }
 std::string	Users::getBuffer() const { return this->_buffer; }
 std::string Users::getCmdBuffer() const { return this->_cmdBuffer; }
-uint8_t		Users::getStatus() const { return this->_status; }
+int		Users::getStatus() const { return this->_status; }
 int			Users::getPermissionLevel() const { return this->_permissionLevel; }
 int			Users::getSocketDescriptor() const { return this->_socketDescriptor; }
 
@@ -55,8 +55,8 @@ void		Users::setBuffer(std::string buf) { this->_buffer += buf; }
 void		Users::setCmdBuffer(std::string buf) { this->_cmdBuffer += buf; }
 void		Users::setPermissionLevel(int permissionLevel) { this->_permissionLevel = permissionLevel; }
 void		Users::setSocketDescriptor(int sd) { this->_socketDescriptor = sd; }
-void		Users::setStatus(uint8_t stat) { this->_status |= stat; }
-void		Users::unsetStatus(uint8_t stat) { this->_status &= ~stat; }
+void		Users::setStatus(int stat) { this->_status |= stat; }
+void		Users::unsetStatus(int stat) { this->_status &= ~stat; }
 void		Users::clearBuff() { this->_buffer.clear(); }
 void		Users::clearCmdBuff() { this->_cmdBuffer.clear(); }
 

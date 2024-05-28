@@ -4,27 +4,27 @@ void Server::init() {
 	char name[1024];
 
 	if (gethostname(name, sizeof(name)) == -1) {
-		std::cerr << "Error: gethostname: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: gethostname: " << strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	setHost(std::string(name));
 	
 	this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_serverSocket == -1) {
-		std::cerr << "Error: socket: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: socket: " << strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	int opt = 1;
 	if (setsockopt(this->_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))
 			== -1) {
-		std::cerr << "Error: setsockopt: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: setsockopt: " << strerror(errno) << std::endl;
 		close(this->_serverSocket);
 		exit(EXIT_FAILURE);
 	}
 
 	if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: fcntl: " << strerror(errno) << std::endl;
 		close(this->_serverSocket);
 		exit(EXIT_FAILURE);
 	}
@@ -36,13 +36,13 @@ void Server::init() {
 	serverAdr.sin_port = htons(getPort());
 	if (bind(this->_serverSocket, (struct sockaddr *)&serverAdr, sizeof(serverAdr))
 			== -1) {
-		std::cerr << "Error: bind: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: bind: " << strerror(errno) << std::endl;
 		close(this->_serverSocket);
 		exit(EXIT_FAILURE);			
 	}
 
 	if (listen(this->_serverSocket, 128) == -1) {
-		std::cerr << "Error: listen: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: listen: " << strerror(errno) << std::endl;
 		close(this->_serverSocket);
 		exit(EXIT_FAILURE);
 	}
@@ -62,7 +62,7 @@ void Server::start() {
 	while (getState() == ON) {
 		activity = poll(&(this->_fds[0]), this->_fds.size(), -1);	
 		if (activity < 0) {
-			std::cout << "Error: poll: " << std::strerror(errno) << std::endl;
+			std::cout << "Error: poll: " << strerror(errno) << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		for (size_t i = 0; i < this->_fds.size(); ++i) {
@@ -112,11 +112,11 @@ bool Server::allowed(Message msg, Users *user) {
 }
 
 void Server::executeCmd(Message msg, Users *user) {
-	if (allowed(msg, user) == false) {
-		user->setBuffer(ERR_NOTREGISTERED(getHost()));
-		// might need to add clear cmd buff here
-		return ;
-	}
+	// if (allowed(msg, user) == false) {
+	// 	user->setBuffer(ERR_NOTREGISTERED(getHost()));
+	// 	// might need to add clear cmd buff here
+	// 	return ;
+	// }
 	if (msg.command == "CAP")
 		c_cap(msg.parameters, user);
 	else if (msg.command == "PASS")
@@ -173,20 +173,20 @@ int Server::addNewClient() {
 	socklen_t clientAddrSize = sizeof(clientAdr);
 	int clientSocket = accept(this->_serverSocket, (struct sockaddr *)&clientAdr, &clientAddrSize);
 	if (clientSocket == -1) {
-		std::cerr << "Error: accept: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: accept: " << strerror(errno) << std::endl;
 		return -1;
 	}
 	else
 		std::cout << "NEW CONNECTION" << std::endl;
 
 	if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cerr << "Error: fcntl: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: fcntl: " << strerror(errno) << std::endl;
 		return -1;
 	}
 
 	char name[1000];
 	if (getnameinfo((struct sockaddr*)&clientAdr, clientAddrSize, name, sizeof(name), 0, 0, NI_NUMERICHOST) != 0) {
-		std::cerr << "Error: getnameinfo: " << std::strerror(errno) << std::endl;
+		std::cerr << "Error: getnameinfo: " << strerror(errno) << std::endl;
 		return -1;
 	}
 	
@@ -212,7 +212,7 @@ void Server::handleMsg(Users *user, size_t i) {
 		if (getBytesReceived() == 0)
 			std::cout << "Connection closed." << std::endl;
 		else
-			std::cerr << "Error: recv: " << std::strerror(errno) << std::endl;
+			std::cerr << "Error: recv: " << strerror(errno) << std::endl;
 		removeUserFromServer(user);
 	}
 	else {
@@ -228,6 +228,6 @@ void Server::handleMsg(Users *user, size_t i) {
 			std::cout << "Received: " << *it << std::endl;
 			std::cout << "Reply code: " << user->getBuffer() << std::endl;
 		}
-		user->clearCmdBuff(); // look into this
+		user->clearCmdBuff();
 	}
 }
