@@ -143,7 +143,7 @@ static int paramLen(std::string cmd)
 	else if (cmd == "QUIT")
 		return (0);
 	else if (cmd == "BOT")
-		return (0);
+		return (1);
 	else if (cmd == "DCC")
 		return (-1);
 	return (-1);

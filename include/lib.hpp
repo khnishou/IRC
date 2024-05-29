@@ -43,6 +43,7 @@
 #define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
 #define ERR_USERSDONTMATCH(src, nick)									":" + src +  " 502 " + nick + " :Cant change mode for other users\r\n"
 #define ERR_INVALIDINPUT(src, nick, cmd, reason)                        ":" + src + " " + nick + " " + cmd + " :" + reason + "\r\n"
+#define ERR_BOT(bot_name, bot_cmd, reason)                              ":" + bot_name + " " + bot_cmd + " " + reason + "\r\n"
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "! " + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"

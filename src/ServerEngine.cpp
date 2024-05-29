@@ -48,6 +48,7 @@ void Server::init() {
 	}
 	
 	struct pollfd sfd;
+	std::memset(&sfd, 0, sizeof(sfd));
 	sfd.fd = this->_serverSocket;
 	sfd.events = POLLIN;
 	addPfds(sfd);
@@ -60,11 +61,12 @@ void Server::start() {
 	std::cout << "-------------IRCSERVER ON-------------" << std::endl;
 	setState(ON);
 	while (getState() == ON) {
-		activity = poll(&(this->_fds[0]), this->_fds.size(), -1);	
+		activity = poll(&(this->_fds[0]), this->_fds.size(), -1);
 		if (activity < 0) {
 			std::cout << "Error: poll: " << strerror(errno) << std::endl;
 			exit(EXIT_FAILURE);
 		}
+
 		for (size_t i = 0; i < this->_fds.size(); ++i) {
 			if (this->_fds[i].revents & POLLIN) {
 				if (this->_fds[i].fd == this->_serverSocket) {
@@ -191,6 +193,7 @@ int Server::addNewClient() {
 	}
 	
 	pollfd new_client_fd;
+	std::memset(&new_client_fd, 0, sizeof(new_client_fd));
    new_client_fd.fd = clientSocket;
    new_client_fd.events = POLLIN | POLLOUT;
    addPfds(new_client_fd);
@@ -217,6 +220,7 @@ void Server::handleMsg(Users *user, size_t i) {
 	}
 	else {
 		std::string msg(_buffer, getBytesReceived());
+		std::memset(this->_buffer, '\0', sizeof(this->_buffer));
 		user->setCmdBuffer(msg);
 		if (!checkStrSplit(user->getCmdBuffer(), "\r\n"))
 			return ;
