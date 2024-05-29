@@ -226,6 +226,8 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 		if (!channel) {
 			if (getAllChannels().size() > CHANLIMIT) {
 				user->setBuffer(ERR_TOOMANYCHANNELS(this->getHost(), user->getNickName(), channels[i_chn]));
+				i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
+				i_chn++;
 				continue ;
 			}
 			else
@@ -241,7 +243,13 @@ void	Server::c_join(std::vector<std::string> param, Users *user)
 		else if (!(channel->getModes() & FLAG_K) ||
 			(!(keys.empty()) && !(keys[i_key].empty()) && keys[i_key] == channel->getPassword()))
 		{
-			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() < channel->getUserLimit())) {
+			if (!(channel->getModes() & FLAG_L) || (channel->getUserList().size() + channel->getOperatorList().size() < channel->getUserLimit())) {
+				if (channel->isUser(user) || channel->isOperator(user)) {
+					user->setBuffer(ERR_USERONCHANNEL(this->getHost(), user->getNickName(), channel->getName()));
+					i_key += ((channel->getModes() & FLAG_K) == FLAG_K);
+					i_chn++;
+					continue ;
+				}
 				channel->addUser(user);
 				channel->broadcastMsg(RPL_JOIN(user->getNickName(), user->getUserName(), user->getHostName(), channel->getName()));
 				if (!channel->getTopic().empty())
@@ -337,13 +345,18 @@ int Server::mode_o(int setUnset, int i, std::vector<std::string> param, Channel 
 			user->setBuffer(ERR_NOTONCHANNEL(this->getHost(), *it, channel->getName()));
 		else if ((setUnset & FLAG_SET) && channel->isUser(op))
 		{
-			channel->addOperator(op);
-			op->setBuffer(RPL_YOUREOPER(op->getNickName(), channel->getName()));
+			if (!channel->isOperator(op)) {
+				channel->addOperator(op);
+				channel->deleteUser(op, NULL, "");
+				op->setBuffer(RPL_YOUREOPER(op->getNickName(), channel->getName()));
+			}
 		}
 		else if (setUnset & FLAG_UNSET && channel->isOperator(op))
 		{
-			channel->deleteOperator(op, NULL, this->getHost());
-			op->setBuffer(RPL_NOLONGEROP(op->getNickName(), channel->getName()));
+			if (channel->isOperator(op)) {
+				channel->deleteOperator(op, NULL, this->getHost());
+				op->setBuffer(RPL_NOLONGEROP(op->getNickName(), channel->getName()));
+			}
 			if (!check_channel(channel))
 				;
 		}
@@ -455,7 +468,7 @@ void Server::c_dcc(std::vector<std::string> param, Users *user) {
 
 void Server::c_bot(std::vector<std::string> param, Users *user) {
 	if (param.size() != 2)
-		user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "BOT"));
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "BOT")));
 	Channel *chan = NULL;
 	Users *usr = NULL;
 

@@ -77,7 +77,7 @@ void Server::start() {
 						handleMsg(user, i);
 				}
 			}
-			if (i < this->_fds.size() && this->_fds[i].revents & POLLOUT)
+			if (i < this->_fds.size() && (this->_fds[i].revents & POLLOUT))
 				send_2usr(this->_fds[i].fd);
 		}
 	}

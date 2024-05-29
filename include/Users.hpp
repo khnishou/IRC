@@ -24,7 +24,7 @@ class Users {
 		std::string					_buffer;
 		int 							_permissionLevel;
 		int							_socketDescriptor;
-		int						_status;
+		int							_status;
 
 	public:
 		Users(std::string hostname, int socketDescriptor);
@@ -40,7 +40,7 @@ class Users {
 		std::string		getBuffer() const;
 		int				getPermissionLevel() const;
 		int				getSocketDescriptor() const;
-		int			getStatus() const;
+		int				getStatus() const;
 		std::string		getCmdBuffer() const;
 	
 		void				setHostName(std::string hostname);

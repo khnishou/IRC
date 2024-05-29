@@ -16,7 +16,7 @@ class Channel {
 		std::string 			_name;
 		std::string 			_topic;
 		std::string				_password;
-		int					_modes;
+		int						_modes;
 		int						_userLimit;
 		std::vector<Users *>	_userList;
 		std::vector<Users *>	_operatorList;
@@ -30,7 +30,7 @@ class Channel {
 		std::string 			getName() const;
 		std::string 			getTopic() const;
 		std::string				getPassword() const;
-		int					getModes() const;
+		int						getModes() const;
 		int						getUserLimit() const;
 		std::vector<Users *>	getUserList() const;
 		std::vector<Users *>	getOperatorList() const;
