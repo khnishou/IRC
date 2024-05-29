@@ -152,3 +152,11 @@ void Server::removeUserFromServer(Users *user) {
 	delete user;
 }
 
+bool	Server::usrInChan(Users *user) {
+	for (std::vector<Channel *>::iterator it = this->_allChannels.begin(); it != this->_allChannels.end(); ++it) {
+		if ((*it)->isUser(user) || (*it)->isOperator(user))
+			return true;
+	}
+	return false;
+}
+

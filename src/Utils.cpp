@@ -94,7 +94,7 @@ bool isNickname(const std::string& nickname)
 			 || nickname[0] == '@' || isdigit(nickname[0]) || std::isspace(nickname[0]))
 		return (false);
 	i = 0;
-	while (i < nickname.length() - 1)
+	while (i < nickname.length())
 	{
 		if (!isalnum(nickname[i]) && nickname[i] != '\\' && nickname[i] != '|'
 			&& nickname[i] != '[' && nickname[i] != ']' && nickname[i] != '{'
@@ -112,17 +112,6 @@ int setTheUnset(int mode, int flag, int setUnset)
 	else if (!(setUnset & FLAG_SET) && (setUnset & FLAG_UNSET))
 		return (mode & ~flag);
 	return (mode);
-}
-
-std::string fill_vec(std::vector<std::string> *param, std::vector<std::string>::iterator ite) {
-	std::string res;
-
-	for (std::vector<std::string>::iterator it = ite; it != param->end(); ++it) {
-		res += *it;
-		if (it != param->end() - 1)
-			res += " ";
-	}
-	return res;
 }
 
 static int paramLen(std::string cmd)

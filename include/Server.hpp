@@ -90,7 +90,7 @@ class Server {
 		// message forwarding i guess
 		void								send_2usr(int fd);
 		void								sendAllChan(std::vector<Channel *> lst, std::string msg);
-
+		bool								usrInChan(Users *user);
 		int								addNewClient();
 		void								removeUserFromServer(Users *user);
 		void								handleMsg(Users *user, size_t i);

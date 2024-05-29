@@ -39,8 +39,6 @@ void	Server::c_part(std::vector<std::string> param, Users *user) {
 			return (user->setBuffer(ERR_NOSUCHCHANNEL(getHost(), user->getNickName(), *it)));
 		if (!channel->isUser(user) && !channel->isOperator(user))
 			return (user->setBuffer(ERR_NOTONCHANNEL(getHost(), user->getNickName(), channel->getName())));
-		if (param.size() > 1)
-			std::string reason = fill_vec(&param, param.begin() + 1);
 		if (channel->isUser(user))
 			channel->deleteUser(user, NULL, "");
 		else
@@ -62,7 +60,6 @@ void	Server::c_ping(std::vector<std::string> param, Users *user) {
 
 void	Server::c_kick(std::vector<std::string> param, Users *user) {
 	std::vector<std::string> split;
-	// if (!(param.size() >= 3))
 	if (param.size() < 2)
 		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "KICK")));
 	Channel *channel = getChannel(param[0]);
@@ -76,10 +73,10 @@ void	Server::c_kick(std::vector<std::string> param, Users *user) {
 		user->setBuffer(RPL_INPUTWARNING(this->getHost(), user->getNickName())); 
 	split = cSplitStr(param[1], ',');
 	std::string reason;
-	if (param.size() < 4) 
+	if (param.size() < 3) 
 		reason = "Good boy points have dropped to 0!";
 	else
-		reason = fill_vec(&param, param.begin() + 2).substr();
+		reason = param[2];
 	for (size_t i = 0; i < split.size(); i++) {
 		Users *toKick = getUserByNn(split[i]);
 		if (!toKick)
@@ -134,9 +131,7 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 		else
 			return (user->setBuffer(RPL_TOPIC(getHost(), user->getNickName(), channel->getName(), channel->getTopic())));
 	}
-	std::string top;
-	top = fill_vec(&param, param.begin() + 1).substr(0, TOPICLEN);
-	channel->setTopic(top);
+	channel->setTopic(param[1].substr(0, TOPICLEN));
 	std::time_t currTime = std::time(NULL);
 	std::string time = std::ctime(&currTime);
 	channel->broadcastMsg(RPL_TOPIC(getHost(), user->getNickName(), channel->getName(), channel->getTopic()));
@@ -170,8 +165,12 @@ void	Server::c_nick(std::vector<std::string> param, Users *user)
 		else
 			user->setBuffer(RPL_NICK(user->getHostName(), param[0]));
 	}
-	else
-		sendAllChan(getChanList(user), RPL_NICKCHANGE(param[0], user->getUserName(), user->getHostName(), param[0]));
+	else {
+		if (usrInChan(user))
+			sendAllChan(getChanList(user), RPL_NICKCHANGE(param[0], user->getUserName(), user->getHostName(), param[0]));
+		else
+			user->setBuffer(RPL_NICK(user->getHostName(), param[0]));
+	}
 	user->setNickName(param[0]);
 }
 

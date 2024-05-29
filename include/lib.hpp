@@ -34,10 +34,10 @@
 #define ERR_NEEDMOREPARAMS(source, cmd)									":" + source + " 461 " + cmd + " :Not enough parameters\r\n"
 #define ERR_ALREADYREGISTRED(source)									":" + source + " 462 " ":You may not reregister\r\n"
 #define ERR_PASSWDMISMATCH(source)										":" + source + " 464 " + "PASS" + " :Password incorrect\r\n"
-#define ERR_CHANNELISFULL(src, nick, chan)                              ":" + src + " 471 " + nick + " " + chan + " :Cannot join channel (+l)"
+#define ERR_CHANNELISFULL(src, nick, chan)                              ":" + src + " 471 " + nick + " " + chan + " :Cannot join channel (+l)\r\n"
 #define	ERR_UMODEUNKNOWNFLAGCH(src, nick)								":" + src +  " 472 " + nick + " :Unknown mode char to me\r\n"
 #define ERR_INVITEONLYCHAN(src, nick, chan)								":" + src + " 473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n"
-#define ERR_BADCHANNELKEY(src, nick, chan)                              ":" + src + " 475 " + nick + " " + chan + " :Cannot join chanel (+k)"
+#define ERR_BADCHANNELKEY(src, nick, chan)                              ":" + src + " 475 " + nick + " " + chan + " :Cannot join chanel (+k)\r\n"
 #define	ERR_NOPRIVILEGES(src, cmd)										":" + src + " 481 " + cmd + " :Permission Denied- You're not an IRC operator\r\n"
 #define ERR_CHANOPRIVSNEEDED(src, nick, chan)							":" + src +  " 482 " + nick + " " + chan + " :You're not channel operator\r\n"
 #define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
@@ -46,7 +46,7 @@
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "! " + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"
-#define RPL_CHANNELMODEIS(src, nick, chan, mode)						":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n" // check might create a function that return the right RPL
+#define RPL_CHANNELMODEIS(src, nick, chan, mode)						":" + src + " 324 " + nick + " " + chan + " " + mode + "\r\n"
 #define RPL_NOTOPIC(src, nick, chan)									":" + src + " 331 " + nick + " " + chan + " :No topic is set\r\n"
 #define	RPL_TOPIC(src, nick, chan, topic)								":" + src + " 332 " + nick + " " + chan + " :" + topic + "\r\n"
 #define RPL_TOPICWHOTIME(src, chan, nick, time)                         ":" + src + " 333 " + chan + " " + nick + " " + time + "\r\n"
@@ -119,6 +119,5 @@ bool                        checkStrSplit(const std::string& str, std::string de
 std::vector<std::string>    strSplitStr(const std::string& str, std::string del);
 int                     setTheUnset(int mode, int flag, int setUnset);
 bool                        isNickname(const std::string& nickname);
-std::string                 fill_vec(std::vector<std::string> *param, std::vector<std::string>::iterator ite);
 Message                     parsing(std::string str);
 bool                        isUint(const std::string& str);
