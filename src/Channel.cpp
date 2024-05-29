@@ -144,16 +144,25 @@ bool	Channel::channelEmpty() {
 std::string Channel::convertMode() {
 	int m = this->_modes;
 	std::string mode = "+";
+	std::string no_mode = " -";
 
 	if (m & FLAG_I)
 		mode += "i";
+	else
+		no_mode += "i";
 	if (m & FLAG_T)
 		mode += "t";
+	else
+		no_mode += "t";
 	if (m & FLAG_K)
 		mode += "k";
+	else
+		no_mode += "k";
 	if (m & FLAG_L)
 		mode += "l";
-	return mode;
+	else
+		no_mode += "l";
+	return mode + no_mode;
 }
 
 std::string Channel::getNickNameList() {

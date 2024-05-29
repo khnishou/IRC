@@ -117,7 +117,7 @@ bool                        checkCSplit(const std::string& str, char del);
 std::vector<std::string>    cSplitStr(const std::string& str, char del);
 bool                        checkStrSplit(const std::string& str, std::string del);
 std::vector<std::string>    strSplitStr(const std::string& str, std::string del);
-int                     setTheUnset(int mode, int flag, int setUnset);
+int                         setTheUnset(int mode, int flag, int setUnset);
 bool                        isNickname(const std::string& nickname);
 Message                     parsing(std::string str);
 bool                        isUint(const std::string& str);
