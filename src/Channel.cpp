@@ -162,7 +162,7 @@ std::string Channel::convertMode() {
 		mode += "l";
 	else
 		no_mode += "l";
-	std::string tmp = mode + "\t" + no_mode;
+	std::string tmp = "["+ mode + "][" + no_mode + "]";
 	return tmp;
 }
 

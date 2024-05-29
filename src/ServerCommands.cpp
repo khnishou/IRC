@@ -133,9 +133,9 @@ void	Server::c_topic(std::vector<std::string> param, Users *user) {
 	}
 	channel->setTopic(param[1].substr(0, TOPICLEN));
 	std::time_t currTime = std::time(NULL);
-	std::string time = std::ctime(&currTime);
+	// std::string time = std::ctime(&currTime);
 	channel->broadcastMsg(RPL_TOPIC(getHost(), user->getNickName(), channel->getName(), channel->getTopic()));
-	channel->broadcastMsg(RPL_TOPICWHOTIME(getHost(), channel->getName(), user->getNickName(), time));
+	channel->broadcastMsg(RPL_TOPICWHOTIME(getHost(), channel->getName(), user->getNickName(), std::ctime(&currTime)));
 }
 
 void	Server::c_pass(std::vector<std::string> param, Users *user)
@@ -355,6 +355,7 @@ int Server::mode_o(int setUnset, int i, std::vector<std::string> param, Channel 
 		{
 			if (channel->isOperator(op)) {
 				channel->deleteOperator(op, NULL, this->getHost());
+				channel->addUser(op);
 				op->setBuffer(RPL_NOLONGEROP(op->getNickName(), channel->getName()));
 			}
 			if (!check_channel(channel))
@@ -449,19 +450,19 @@ int Server::initMode(std::vector<std::string> param, int mode, Channel *channel,
 
 void Server::c_dcc(std::vector<std::string> param, Users *user) {
 	if (param.size() != 4)
-		user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "DCC"));
+		return (user->setBuffer(ERR_NEEDMOREPARAMS(user->getNickName(), "DCC")));
 	if (param[0] != "SEND")
-		user->setBuffer(ERR_UNKNOWNCOMMAND(this->getHost(), user->getNickName(), "DCC: " + param[0]));
+		return (user->setBuffer(ERR_UNKNOWNCOMMAND(this->getHost(), user->getNickName(), "DCC: " + param[0])));
 	std::string fname = param[1];
-	std::string hostname = param[2];
+	std::string nname = param[2];
 	if (!isUint(param[3]))
 		return user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
 	int	port = std::atoi(param[3].c_str());
-	if (hostname.empty() || fname.empty() || param[3].size() == 0 || port < 6660 || (port > 6669 && port != 7000))
+	if (nname.empty() || fname.empty() || param[3].size() == 0)
 		return user->setBuffer(ERR_INVALIDINPUT(this->getHost(), user->getNickName(), "DCC", "one or multiple invalid parameters"));
-	Users *receiver = getUserByNn(hostname);
+	Users *receiver = getUserByNn(nname);
 	if (!receiver)
-		return user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), hostname));
+		return user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), nname));
 	user->setBuffer(RPL_RECEIVEDTREQ(this->getHost(), receiver->getNickName(), receiver->getHostName()));
 	receiver->setBuffer(RPL_TRANSFERREQ(this->getHost(), user->getNickName(), user->getHostName(), param[3], fname));
 }
@@ -477,6 +478,9 @@ void Server::c_bot(std::vector<std::string> param, Users *user) {
 	else if (param[0][0] == '@')
 		usr = getUserByNn(param[0].substr(1));
 
+	if (!chan && !usr)
+		return (user->setBuffer(ERR_NOSUCHNICK(this->getHost(), user->getNickName(), param[0])));
+
 	if (param[1] == "joke")
 		this->_bot.tellJoke(usr, chan, user->getNickName());
 	else if (param[1] == "d20")
@@ -485,5 +489,7 @@ void Server::c_bot(std::vector<std::string> param, Users *user) {
 		this->_bot.coinFlip(usr, chan, user->getNickName());
 	else if (param[1] == "eightball")
 		this->_bot.eightBall(usr, chan, user->getNickName());
+	else
+		return user->setBuffer(ERR_UNKNOWNCOMMAND(this->getHost(), user->getNickName(), "BOT " + param[1]));
 }
 
