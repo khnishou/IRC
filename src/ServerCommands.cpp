@@ -473,17 +473,17 @@ void Server::c_bot(std::vector<std::string> param, Users *user) {
 	Users *usr = NULL;
 
 	if (param[0][0] == '#')
-		chan = getChannel(param[0].substr(1));
+		chan = getChannel(param[0]);
 	else if (param[0][0] == '@')
 		usr = getUserByNn(param[0].substr(1));
 
 	if (param[1] == "joke")
-		this->_bot.tellJoke(usr, chan);
+		this->_bot.tellJoke(usr, chan, user->getNickName());
 	else if (param[1] == "d20")
-		this->_bot.d20(usr, chan);
+		this->_bot.d20(usr, chan, user->getNickName());
 	else if (param[1] == "coinflip")
-		this->_bot.coinFlip(usr, chan);
+		this->_bot.coinFlip(usr, chan, user->getNickName());
 	else if (param[1] == "eightball")
-		this->_bot.eightBall(usr, chan);
+		this->_bot.eightBall(usr, chan, user->getNickName());
 }
 

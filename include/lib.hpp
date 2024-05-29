@@ -43,7 +43,7 @@
 #define	ERR_UMODEUNKNOWNFLAG(src, nick)								    ":" + src +  " 501 " + nick + " :Unknown MODE flag\r\n"
 #define ERR_USERSDONTMATCH(src, nick)									":" + src +  " 502 " + nick + " :Cant change mode for other users\r\n"
 #define ERR_INVALIDINPUT(src, nick, cmd, reason)                        ":" + src + " " + nick + " " + cmd + " :" + reason + "\r\n"
-#define ERR_BOT(bot_name, bot_cmd, reason)                              ":" + bot_name + " " + bot_cmd + " " + reason + "\r\n"
+#define ERR_BOT(nick, bot_name, bot_cmd, reason)                        ":" + nick + "! " + bot_name + " " + bot_cmd + " " + reason + "\r\n"
 // NUMERIC REPLIES			
 #define RPL_WELCOME(src, nick, user, host)								":" + src + " 001 " + nick + " :Welcome to the IRC_SERV Network " + nick + "! " + user + "@" + host + "\r\n"
 #define RPL_MODEUSER(src, nick, mode)									":" + src + " 221 " + nick + " " + mode + "\r\n"
@@ -60,7 +60,7 @@
 #define RPL_INPUTWARNING(src, nick)                                     ":" + src + " " + nick + " :Empty parameters will be ingored...\r\n"
 #define RPL_RECEIVEDTREQ(src, targ_nick, targ_host)                     ":" + src + " " + targ_nick + "@" + targ_host +":Received your file transfer request\r\n"
 #define RPL_TRANSFERREQ(src, src_nick, src_host, src_port, fname)       ":" + src + " " + src_nick + "@" + src_host + " with port: " + src_port + " wants to send: " + fname + "\r\n"
-#define RPL_BOT(bot_name, bot_cmd, res)                                 ":" + bot_name + " " + bot_cmd + " :" + res + "\r\n"
+#define RPL_BOT(nick, bot_name, bot_cmd, res)                           ":" + nick + "! " + bot_name + " " + bot_cmd + " :" + res + "\r\n"
 #define RPL_PASS(host)                                                  ":" + host + " : Password is correct! Please proceed to choose a nickname and username!\r\n"
 #define RPL_NICK(host, new_nick)                                        ":" + host + " : Your nickname now is: " + new_nick + "\r\n"
 #define RPL_USER(host, new_user)                                        ":" + host + " : Your username now is: " + new_user + "\r\n"

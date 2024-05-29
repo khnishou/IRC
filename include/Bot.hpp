@@ -24,10 +24,10 @@ class Bot {
 		std::string getName() const;
 		void setName(const std::string name);
 
-		void tellJoke(Users *user, Channel *channel);
-		void d20(Users *user, Channel *channel);
-		void eightBall(Users *user, Channel *channel);
-		void coinFlip(Users *user, Channel *channel);
+		void tellJoke(Users *user, Channel *channel, std::string sender);
+		void d20(Users *user, Channel *channel, std::string sender);
+		void eightBall(Users *user, Channel *channel, std::string sender);
+		void coinFlip(Users *user, Channel *channel, std::string sender);
 };
 
 #endif
