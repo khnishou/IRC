@@ -355,8 +355,8 @@ int Server::mode_o(int setUnset, int i, std::vector<std::string> param, Channel 
 		{
 			if (channel->isOperator(op)) {
 				channel->addUser(op);
-				channel->deleteOperator(op, NULL, this->getHost());
 				op->setBuffer(RPL_NOLONGEROP(op->getNickName(), channel->getName()));
+				channel->deleteOperator(op, NULL, this->getHost());
 			}
 			if (!check_channel(channel))
 				;
