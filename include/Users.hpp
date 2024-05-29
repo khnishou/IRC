@@ -25,7 +25,6 @@ class Users {
 		int 							_permissionLevel;
 		int							_socketDescriptor;
 		int						_status;
-		std::vector<Channel *>	_invite_lst;
 
 	public:
 		Users(std::string hostname, int socketDescriptor);
@@ -57,10 +56,6 @@ class Users {
 		void				unsetStatus(int stat);
 		void				clearBuff();
 		void				clearCmdBuff();
-	
-		void				invite(Channel *channel);
-		bool				is_invited(std::string cname);
-		void				remove_invite(std::string cname);
 };
 
 #endif

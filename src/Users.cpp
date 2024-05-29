@@ -60,31 +60,3 @@ void		Users::unsetStatus(int stat) { this->_status &= ~stat; }
 void		Users::clearBuff() { this->_buffer.clear(); }
 void		Users::clearCmdBuff() { this->_cmdBuffer.clear(); }
 
-//****************************************************************************//
-//                               Other Function                               //
-//****************************************************************************//
-// these are useless, check again before deleting them
-void Users::invite(Channel *channel) {
-	if (this->is_invited(channel->getName()) == false)
-		this->_invite_lst.push_back(channel);
-}
-
-bool Users::is_invited(std::string cname) {
-	for (std::vector<Channel *>::iterator it = this->_invite_lst.begin(); it != this->_invite_lst.end(); ++it) {
-		if ((*it)->getName() == cname)
-			return true;
-	}
-	return false;
-}
-
-void Users::remove_invite(std::string cname) {
-	if (this->is_invited(cname) == true) {
-		for (std::vector<Channel *>::iterator it = this->_invite_lst.begin();
-				it != this->_invite_lst.end(); ++it) {
-			if ((*it)->getName() == cname) {
-				this->_invite_lst.erase(it);
-				return ;
-			}
-		}
-	}
-}
