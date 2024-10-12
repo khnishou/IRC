@@ -1,4 +1,4 @@
-# IRC 42 Project
+# IRC Project
 
 ## Overview
 
@@ -44,7 +44,7 @@ Use WeeChat to connect to your IRC servers and channels. The IRC program will en
 
 ## Contributing
 
-We welcome contributions to the IRC 42 project! To contribute, please follow these guidelines:
+We welcome contributions to the IRC project! To contribute, please follow these guidelines:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bug fix.
